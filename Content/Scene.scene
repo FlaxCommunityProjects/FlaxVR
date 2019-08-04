@@ -1,0 +1,1472 @@
+{
+	"ID": "74a68a984824b4510d12589f199ad68f",
+	"TypeName": "FlaxEngine.SceneAsset",
+	"EngineBuild": 6181,
+	"Data": [
+		{
+			"TypeID": 9,
+			"ID": "74a68a984824b4510d12589f199ad68f",
+			"ParentID": "00000000000000000000000000000000",
+			"Name": "Scene",
+			"Lightmaps": [
+				{
+					"Lightmap0": "520522344858c273e9e7d9a9131555df",
+					"Lightmap1": "bf2bef904ca9b75147d352a1b5089ace",
+					"Lightmap2": "69b94adb41aca213ce537d91d53dc89d"
+				}
+			],
+			"LightmapSettings": {},
+			"CSG": {
+				"Model": "c91570f843acc5d741133b803211d574",
+				"Data": "0e5f7de9441f282e370327b31385c016",
+				"CollisionData": "104e0dc7466c412f593951a357343ccf"
+			}
+		},
+		{
+			"TypeID": 3,
+			"ID": "28553d634087c67c711ebd96080482aa",
+			"ParentID": "74a68a984824b4510d12589f199ad68f",
+			"Name": "Visuals"
+		},
+		{
+			"TypeID": 10,
+			"ID": "bc81376747666609b0974580a21519a1",
+			"ParentID": "28553d634087c67c711ebd96080482aa",
+			"Name": "Sky",
+			"Transform": {
+				"Translation": {
+					"X": -69.65292358398438,
+					"Y": 75.30659484863281,
+					"Z": -14.423166275024414
+				}
+			},
+			"StaticFlags": 3,
+			"Sun": "deecf0894777293a4f478dadacf2a6f8",
+			"SunDiscScale": 2.0,
+			"FogSunPower": 9.0
+		},
+		{
+			"TypeID": 7,
+			"ID": "da5e1c454a56377517d41686ebb0348f",
+			"ParentID": "28553d634087c67c711ebd96080482aa",
+			"Name": "Environment Probe",
+			"Transform": {
+				"Translation": {
+					"X": 0.0,
+					"Y": 72.001953125,
+					"Z": 0.0
+				}
+			},
+			"Radius": 500.0,
+			"ProbeID": "1e1fb3a7447c1265b15967b480549d98"
+		},
+		{
+			"TypeID": 4,
+			"ID": "deecf0894777293a4f478dadacf2a6f8",
+			"ParentID": "28553d634087c67c711ebd96080482aa",
+			"Name": "Directional Light",
+			"Transform": {
+				"Translation": {
+					"X": -1.6893305778503419,
+					"Y": 99.54244995117188,
+					"Z": 0.0
+				},
+				"Orientation": {
+					"X": 0.5176515579223633,
+					"Y": 0.0833025798201561,
+					"Z": 0.06534233689308167,
+					"W": 0.8490158915519714
+				}
+			},
+			"Color": {
+				"R": 1.0,
+				"G": 0.9606999754905701,
+				"B": 0.8050000071525574,
+				"A": 1.0
+			},
+			"MinRoughness": 0.0,
+			"ShadowsDistance": 2000.0,
+			"ShadowsFadeDistance": 50.0
+		},
+		{
+			"TypeID": 25,
+			"ID": "eb18e84d41670d6314174b89a1d5ffea",
+			"ParentID": "28553d634087c67c711ebd96080482aa",
+			"Name": "SkyLight",
+			"Transform": {
+				"Translation": {
+					"X": 0.0,
+					"Y": 150.0,
+					"Z": 0.0
+				}
+			},
+			"Brightness": 1.7999999523162842,
+			"CustomTexture": "1e1fb3a7447c1265b15967b480549d98"
+		},
+		{
+			"TypeID": 3,
+			"ID": "71485f22423f938f9572b7b9779a44d5",
+			"ParentID": "74a68a984824b4510d12589f199ad68f",
+			"Name": "Brushes"
+		},
+		{
+			"TypeID": 8,
+			"ID": "b0af681c49f525c9996e3c8feb3c4a03",
+			"ParentID": "71485f22423f938f9572b7b9779a44d5",
+			"Name": "Box Brush",
+			"Size": {
+				"X": 300.0,
+				"Y": 10.0,
+				"Z": 300.0
+			},
+			"Surfaces": [
+				{
+					"Material": "7d946f724cffb015b4268091089793d8"
+				},
+				{
+					"Material": "7d946f724cffb015b4268091089793d8"
+				},
+				{
+					"Material": "7d946f724cffb015b4268091089793d8"
+				},
+				{
+					"Material": "7d946f724cffb015b4268091089793d8",
+					"ScaleInLightmap": 0.0
+				},
+				{
+					"Material": "7d946f724cffb015b4268091089793d8"
+				},
+				{
+					"Material": "7d946f724cffb015b4268091089793d8"
+				}
+			]
+		},
+		{
+			"TypeID": 8,
+			"ID": "56e934c543c02d12fecc6e8a563ee2af",
+			"ParentID": "71485f22423f938f9572b7b9779a44d5",
+			"Name": "Box Brush",
+			"Transform": {
+				"Translation": {
+					"X": 24.59819793701172,
+					"Y": 28.155338287353517,
+					"Z": -60.500328063964847
+				}
+			},
+			"Size": {
+				"X": 60.0,
+				"Y": 50.0,
+				"Z": 60.0
+			},
+			"Surfaces": [
+				{
+					"Material": "6e30906747fab8d036e77ea7f05cc030"
+				},
+				{
+					"Material": "6e30906747fab8d036e77ea7f05cc030"
+				},
+				{
+					"Material": "6e30906747fab8d036e77ea7f05cc030"
+				},
+				{
+					"Material": "6e30906747fab8d036e77ea7f05cc030",
+					"ScaleInLightmap": 0.0
+				},
+				{
+					"Material": "6e30906747fab8d036e77ea7f05cc030"
+				},
+				{
+					"Material": "6e30906747fab8d036e77ea7f05cc030"
+				}
+			]
+		},
+		{
+			"TypeID": 2,
+			"ID": "b0d72c3746caebca055e1f921ca21c7c",
+			"ParentID": "74a68a984824b4510d12589f199ad68f",
+			"Name": "Camera",
+			"Transform": {
+				"Translation": {
+					"X": -164.33248901367188,
+					"Y": 68.88692474365235,
+					"Z": 80.31642150878906
+				},
+				"Orientation": {
+					"X": 0.022202536463737489,
+					"Y": 0.9633283615112305,
+					"Z": -0.08428028970956803,
+					"W": 0.2537761330604553
+				}
+			},
+			"StaticFlags": 0,
+			"Near": 0.10000000149011612
+		},
+		{
+			"TypeID": 24,
+			"ID": "a9ae06ec42882434ee61aab42a1c82c5",
+			"ParentID": "74a68a984824b4510d12589f199ad68f",
+			"Name": "CSG.Collider",
+			"HideFlags": 4,
+			"CollisionData": "104e0dc7466c412f593951a357343ccf"
+		},
+		{
+			"TypeID": 1,
+			"ID": "7eff8e8543a2b10f19dc35b92fc11b99",
+			"ParentID": "74a68a984824b4510d12589f199ad68f",
+			"Name": "CSG.Model",
+			"HideFlags": 4,
+			"Model": "c91570f843acc5d741133b803211d574",
+			"Buffer": {
+				"Entries": [
+					{},
+					{}
+				]
+			}
+		},
+		{
+			"TypeID": 35,
+			"ID": "9fc751234919cb4c68210ea592c8c8b2",
+			"ParentID": "74a68a984824b4510d12589f199ad68f",
+			"Name": "Terrain",
+			"Transform": {
+				"Translation": {
+					"X": -10000.0,
+					"Y": 0.0,
+					"Z": -10000.0
+				}
+			},
+			"LODCount": 6,
+			"ChunkSize": 127,
+			"Patches": [
+				{
+					"X": 0,
+					"Z": 0,
+					"Offset": -0.000015259021893143655,
+					"Height": 1.0,
+					"Heightmap": "fddc7fc048be3aa3c03819856232036e",
+					"Splatmap0": "00000000000000000000000000000000",
+					"Splatmap1": "00000000000000000000000000000000",
+					"Heightfield": "398d8a774ec64b9ad9b837bf71f8b05c",
+					"Chunks": [
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						}
+					]
+				},
+				{
+					"X": 1,
+					"Z": 0,
+					"Offset": -0.000015259021893143655,
+					"Height": 1.0,
+					"Heightmap": "641f3dba4eefaf2c1f99589a209c0fae",
+					"Splatmap0": "00000000000000000000000000000000",
+					"Splatmap1": "00000000000000000000000000000000",
+					"Heightfield": "a2ba32ee4a3fe7506101028cd7606745",
+					"Chunks": [
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						}
+					]
+				},
+				{
+					"X": 2,
+					"Z": 0,
+					"Offset": -0.000015259021893143655,
+					"Height": 1.0,
+					"Heightmap": "fdb7a2af4d3eb1ffa0a77a994fed13ae",
+					"Splatmap0": "00000000000000000000000000000000",
+					"Splatmap1": "00000000000000000000000000000000",
+					"Heightfield": "faa182d54f1e075203d43c8fc1ea4f6f",
+					"Chunks": [
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						}
+					]
+				},
+				{
+					"X": 3,
+					"Z": 0,
+					"Offset": -0.000015259021893143655,
+					"Height": 1.0,
+					"Heightmap": "504068304865791854392288dd87384d",
+					"Splatmap0": "00000000000000000000000000000000",
+					"Splatmap1": "00000000000000000000000000000000",
+					"Heightfield": "a9a7025947997e47f00762a7e42d74c2",
+					"Chunks": [
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						}
+					]
+				},
+				{
+					"X": 0,
+					"Z": 1,
+					"Offset": -0.000015259021893143655,
+					"Height": 1.0,
+					"Heightmap": "c0b82f6444866e052413db8d6e0233fe",
+					"Splatmap0": "00000000000000000000000000000000",
+					"Splatmap1": "00000000000000000000000000000000",
+					"Heightfield": "1946710c4ad7cf3c74220c8500a147d6",
+					"Chunks": [
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						}
+					]
+				},
+				{
+					"X": 1,
+					"Z": 1,
+					"Offset": -0.000015259021893143655,
+					"Height": 1.0,
+					"Heightmap": "7e266e7e47b328efeadca1a80a726b25",
+					"Splatmap0": "00000000000000000000000000000000",
+					"Splatmap1": "00000000000000000000000000000000",
+					"Heightfield": "e4ddad36406fae17707e30b994597a76",
+					"Chunks": [
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						}
+					]
+				},
+				{
+					"X": 2,
+					"Z": 1,
+					"Offset": -0.000015259021893143655,
+					"Height": 1.0,
+					"Heightmap": "f200e05a43f7ed76c5db1a91be507418",
+					"Splatmap0": "00000000000000000000000000000000",
+					"Splatmap1": "00000000000000000000000000000000",
+					"Heightfield": "d5b88a8b4c49fc8276dab0b6b958897b",
+					"Chunks": [
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						}
+					]
+				},
+				{
+					"X": 3,
+					"Z": 1,
+					"Offset": -0.000015259021893143655,
+					"Height": 1.0,
+					"Heightmap": "cd90b1b84709875c4ad78691f7aee036",
+					"Splatmap0": "00000000000000000000000000000000",
+					"Splatmap1": "00000000000000000000000000000000",
+					"Heightfield": "27512675489bd841c9d500ac0037f88e",
+					"Chunks": [
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						}
+					]
+				},
+				{
+					"X": 0,
+					"Z": 2,
+					"Offset": -0.000015259021893143655,
+					"Height": 1.0,
+					"Heightmap": "dc051d8543f8adfbea8766a285440a61",
+					"Splatmap0": "00000000000000000000000000000000",
+					"Splatmap1": "00000000000000000000000000000000",
+					"Heightfield": "dc0ad66848d68b6fd521918422134631",
+					"Chunks": [
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						}
+					]
+				},
+				{
+					"X": 1,
+					"Z": 2,
+					"Offset": -0.000015259021893143655,
+					"Height": 1.0,
+					"Heightmap": "4326358a4c1b17a53d0d9a95a787187b",
+					"Splatmap0": "00000000000000000000000000000000",
+					"Splatmap1": "00000000000000000000000000000000",
+					"Heightfield": "ed5ee43646a10a09db435282983e036f",
+					"Chunks": [
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						}
+					]
+				},
+				{
+					"X": 2,
+					"Z": 2,
+					"Offset": -0.000015259021893143655,
+					"Height": 1.0,
+					"Heightmap": "976af2434cb160ac8fd9518641f3d2d6",
+					"Splatmap0": "00000000000000000000000000000000",
+					"Splatmap1": "00000000000000000000000000000000",
+					"Heightfield": "51e4cad3412556dcb593efa73724254b",
+					"Chunks": [
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						}
+					]
+				},
+				{
+					"X": 3,
+					"Z": 2,
+					"Offset": -0.000015259021893143655,
+					"Height": 1.0,
+					"Heightmap": "677b3cbd4482b4441c8f51ab971ba6de",
+					"Splatmap0": "00000000000000000000000000000000",
+					"Splatmap1": "00000000000000000000000000000000",
+					"Heightfield": "5ca70a314012f83b79fd7ebd23ac5f86",
+					"Chunks": [
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						}
+					]
+				},
+				{
+					"X": 0,
+					"Z": 3,
+					"Offset": -0.000015259021893143655,
+					"Height": 1.0,
+					"Heightmap": "14cf1aa84356cff0d0595f9f6d2cebad",
+					"Splatmap0": "00000000000000000000000000000000",
+					"Splatmap1": "00000000000000000000000000000000",
+					"Heightfield": "09c252b1486a0d83a572448d79b24c08",
+					"Chunks": [
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						}
+					]
+				},
+				{
+					"X": 1,
+					"Z": 3,
+					"Offset": -0.000015259021893143655,
+					"Height": 1.0,
+					"Heightmap": "0337ee0f458b7d1a02f3d19af69ce680",
+					"Splatmap0": "00000000000000000000000000000000",
+					"Splatmap1": "00000000000000000000000000000000",
+					"Heightfield": "84a4047e47be587c82a8ea867a7ece32",
+					"Chunks": [
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						}
+					]
+				},
+				{
+					"X": 2,
+					"Z": 3,
+					"Offset": -0.000015259021893143655,
+					"Height": 1.0,
+					"Heightmap": "5d5a17f64fbc5fcfefc17ab1a831b3ff",
+					"Splatmap0": "00000000000000000000000000000000",
+					"Splatmap1": "00000000000000000000000000000000",
+					"Heightfield": "db4b1c3340fe34e1204cc5aa4e671d03",
+					"Chunks": [
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						}
+					]
+				},
+				{
+					"X": 3,
+					"Z": 3,
+					"Offset": -0.000015259021893143655,
+					"Height": 1.0,
+					"Heightmap": "1a308d6d44a281ba3a26b0a968d551f5",
+					"Splatmap0": "00000000000000000000000000000000",
+					"Splatmap1": "00000000000000000000000000000000",
+					"Heightfield": "d3197b4d4f127d2c90cf769927a25dcc",
+					"Chunks": [
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						},
+						{
+							"Offset": 0.0,
+							"Height": 1.0
+						}
+					]
+				}
+			]
+		},
+		{
+			"TypeID": 3,
+			"ID": "93c00ddd4f8b582e9ec1b8804f93adc4",
+			"ParentID": "74a68a984824b4510d12589f199ad68f",
+			"Name": "VRCam"
+		},
+		{
+			"TypeID": "FlaxVR.Source.VRSpawner",
+			"ID": "274b33d7494426d5cf806da2a427828b",
+			"ParentID": "93c00ddd4f8b582e9ec1b8804f93adc4",
+			"V": {}
+		}
+	]
+}

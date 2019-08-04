@@ -1,0 +1,46 @@
+{
+	"ID": "c310034d4b660789cb61369688ed476f",
+	"TypeName": "FlaxEditor.Content.Settings.BuildSettings",
+	"EngineBuild": 6166,
+	"Data": {
+	"MaxAssetsPerPackage": 256,
+	"MaxPackageSizeMB": 256,
+	"ContentKey": 0,
+	"Presets": [
+		{
+			"Name": "Development",
+			"Targets": [
+				{
+					"Name": "Windows 64bit",
+					"Output": "Output\\Win64",
+					"Platform": 2,
+					"Mode": 1
+				},
+				{
+					"Name": "Windows 32bit",
+					"Output": "Output\\Win32",
+					"Platform": 1,
+					"Mode": 1
+				}
+			]
+		},
+		{
+			"Name": "Release",
+			"Targets": [
+				{
+					"Name": "Windows 64bit",
+					"Output": "Output\\Win64",
+					"Platform": 2,
+					"Mode": 0
+				},
+				{
+					"Name": "Windows 32bit",
+					"Output": "Output\\Win32",
+					"Platform": 1,
+					"Mode": 0
+				}
+			]
+		}
+	]
+}
+}

@@ -1,0 +1,15 @@
+{
+	"ID": "d98d01d34584e13c0a952aa91bea43ac",
+	"TypeName": "FlaxEditor.Content.Settings.GraphicsSettings",
+	"EngineBuild": 6166,
+	"Data": {
+	"UseVSync": false,
+	"AAQuality": 1,
+	"SSRQuality": 1,
+	"SSAOQuality": 1,
+	"VolumetricFogQuality": 2,
+	"ShadowsQuality": 1,
+	"ShadowMapsQuality": 1,
+	"AllowCSMBlending": false
+}
+}

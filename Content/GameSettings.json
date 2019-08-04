@@ -1,0 +1,20 @@
+{
+	"ID": "5807b0bd4b5b2ae80bcfae876cb66d92",
+	"TypeName": "FlaxEditor.Content.Settings.GameSettings",
+	"EngineBuild": 6166,
+	"Data": {
+	"ProductName": "Basic Scene",
+	"CompanyName": "My Company",
+	"Version": "1.0",
+	"FirstScene": "74a68a984824b4510d12589f199ad68f",
+	"Time": "5ba5e0ad4abea5addf8a94bc9c37dd77",
+	"Audio": "87d80be44c5a57039e6433931e2119b5",
+	"LayersAndTags": "22afb41f4cb39c257ee3628e7ef95ba6",
+	"Physics": "07a6aae34c009c3048eb93b458bd85df",
+	"Input": "498d08594d3853ccb930d08b7ecdae78",
+	"Graphics": "d98d01d34584e13c0a952aa91bea43ac",
+	"GameCooking": "c310034d4b660789cb61369688ed476f",
+	"WindowsPlatform": "556b9cdd4618934b54e881ac9fb26b0f",
+	"UWPPlatform": "629f44e343f65f54c7dbc4b4e25614b2"
+}
+}
