@@ -4,7 +4,8 @@ namespace FlaxVR.Source
 {
 	public class VRSpawner : Script
 	{
-		private void Update()
+        
+		public override void OnUpdate()
 		{
             // For testing only... could probably be in scene directly
             if (Input.GetKeyUp(Keys.W))
@@ -13,5 +14,6 @@ namespace FlaxVR.Source
             if (Input.GetKeyUp(Keys.S))
                 Actor.RemoveScript(Actor.GetScript<VRCamera>());
 		}
-	}
+		
+    }
 }
