@@ -22,7 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>DEBUG;FLAX_ASSERTIONS;TRACE;FLAX_0;FLAX_0_4;FLAX_0_4_6181;FLAX_EDITOR;FLAX_WINDOWS;FLAX_EDITOR_WIN</DefineConstants>
+    <DefineConstants>DEBUG;FLAX_ASSERTIONS;TRACE;FLAX_0;FLAX_0_5;FLAX_0_5_6187;FLAX_EDITOR;FLAX_WINDOWS;FLAX_EDITOR_WIN</DefineConstants>
 	<UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -33,7 +33,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>TRACE;FLAX_0;FLAX_0_4;FLAX_0_4_6181;FLAX_EDITOR;FLAX_WINDOWS;FLAX_EDITOR_WIN</DefineConstants>
+    <DefineConstants>TRACE;FLAX_0;FLAX_0_5;FLAX_0_5_6187;FLAX_EDITOR;FLAX_WINDOWS;FLAX_EDITOR_WIN</DefineConstants>
 	<UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
@@ -42,25 +42,31 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
 	<Reference Include="FlaxEngine">
-		<HintPath>Cache\Assemblies\Release\FlaxEngine.dll</HintPath>
+		<HintPath>Cache\Assemblies\FlaxEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="Newtonsoft.Json">
-		<HintPath>Cache\Assemblies\Release\Newtonsoft.Json.dll</HintPath>
+		<HintPath>Cache\Assemblies\Newtonsoft.Json.dll</HintPath>
 	</Reference>
 	<Reference Include="FlaxEditor">
-		<HintPath>Cache\Assemblies\Release\FlaxEditor.dll</HintPath>
+		<HintPath>Cache\Assemblies\FlaxEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\HmdPoseState.cs" />
     <Compile Include="Source\MirrorTextureEyeSource.cs" />
+    <Compile Include="Source\VRButtons.cs" />
+    <Compile Include="Source\VRButtonState.cs" />
     <Compile Include="Source\VRCamera.cs" />
     <Compile Include="Source\VRContext.cs" />
     <Compile Include="Source\VRContextOptions.cs" />
+    <Compile Include="Source\VRController.cs" />
+    <Compile Include="Source\VRControllerRole.cs" />
+    <Compile Include="Source\VRControllerState.cs" />
     <Compile Include="Source\VREye.cs" />
+    <Compile Include="Source\VRGamepadDPad.cs" />
     <Compile Include="Source\VRMirrorBlitter.cs" />
-    <Compile Include="Source\VRSpawner.cs" />
     <Compile Include="Source\OpenVR\OpenVRContext.cs" />
+    <Compile Include="Source\OpenVR\OpenVRExtensions.cs" />
     <Compile Include="Source\OpenVR\openvr_api.cs" />
     <Compile Include="Cache\AssemblyInfo.cs" />
   </ItemGroup>

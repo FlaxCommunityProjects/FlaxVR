@@ -32,7 +32,7 @@ namespace FlaxVR.OpenVR
 
             EVRInitError initError = EVRInitError.None;
             _vrSystem = OVR.Init(ref initError, EVRApplicationType.VRApplication_Scene);
-            if(initError != EVRInitError.None)
+            if (initError != EVRInitError.None)
                 throw new Exception($"Failed to initialize OpenVR: {OVR.GetStringForHmdError(initError)}");
 
             _compositor = OVR.Compositor;
@@ -185,6 +185,7 @@ namespace FlaxVR.OpenVR
 
             TrackedDevicePose_t hmdPose = _devicePoses[OVR.k_unTrackedDeviceIndex_Hmd];
             Matrix deviceToAbsolute = ToSysMatrix(hmdPose.mDeviceToAbsoluteTracking);
+            deviceToAbsolute.Decompose(out _, out Quaternion deviceRotation, out Vector3 devicePosition);
             Matrix.Invert(ref deviceToAbsolute, out Matrix absoluteToDevice);
 
             Matrix viewLeft = absoluteToDevice * _headToEyeLeft;
@@ -202,6 +203,7 @@ namespace FlaxVR.OpenVR
 
             // TODO: Expose mDeviceToAbsoluteTracking as "Head position/rotation" so we can move master actor properly
             return new HmdPoseState(
+                devicePosition, deviceRotation,
                 _projLeft, _projRight,
                 leftPosition, rightPosition,
                 leftRotation, rightRotation);
@@ -211,18 +213,18 @@ namespace FlaxVR.OpenVR
         {
             // Includes RH to LH conversion
             return new Matrix(
-                 hmdMat.m0,  hmdMat.m4, -hmdMat.m8,  0f,
-                 hmdMat.m1,  hmdMat.m5, -hmdMat.m9,  0f,
-                -hmdMat.m2, -hmdMat.m6,  hmdMat.m10, 0f,
-                 hmdMat.m3,  hmdMat.m7, -hmdMat.m11, 1f);
+                 hmdMat.m0, hmdMat.m4, -hmdMat.m8, 0f,
+                 hmdMat.m1, hmdMat.m5, -hmdMat.m9, 0f,
+                -hmdMat.m2, -hmdMat.m6, hmdMat.m10, 0f,
+                 hmdMat.m3, hmdMat.m7, -hmdMat.m11, 1f);
         }
 
         private static Matrix ToSysMatrix(HmdMatrix44_t hmdMat)
         {
             // DOESN'T include RH to LH conversion (since projection matrices are now built from raw data instead)
             return new Matrix(
-                hmdMat.m0, hmdMat.m4, hmdMat.m8,  hmdMat.m12,
-                hmdMat.m1, hmdMat.m5, hmdMat.m9,  hmdMat.m13,
+                hmdMat.m0, hmdMat.m4, hmdMat.m8, hmdMat.m12,
+                hmdMat.m1, hmdMat.m5, hmdMat.m9, hmdMat.m13,
                 hmdMat.m2, hmdMat.m6, hmdMat.m10, hmdMat.m14,
                 hmdMat.m3, hmdMat.m7, hmdMat.m11, hmdMat.m15);
         }

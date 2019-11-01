@@ -1,7 +1,6 @@
 ﻿using FlaxEngine;
-using FlaxEngine.VR;
 
-namespace UI
+namespace FlaxVR
 {
     public class VRController : Script
     {
@@ -22,8 +21,8 @@ namespace UI
             {
                 var transform = LocalTransform;
 
-                transform.Translation = State.Pose.Position;
-                transform.Orientation = State.Pose.Orientation;
+                transform.Translation = State.Pose.DevicePosition;
+                transform.Orientation = State.Pose.DeviceRotation;
 
                 LocalTransform = transform;
             }

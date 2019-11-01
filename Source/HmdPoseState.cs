@@ -5,6 +5,8 @@ namespace FlaxVR
 {
     public struct HmdPoseState // TODO: Add readonly when switch to C# 7.2
     {
+        public readonly Quaternion DeviceRotation;
+        public readonly Vector3 DevicePosition;
         public readonly Matrix LeftEyeProjection;
         public readonly Matrix RightEyeProjection;
         public readonly Vector3 LeftEyePosition;
@@ -12,6 +14,8 @@ namespace FlaxVR
         public readonly Quaternion LeftEyeRotation;
         public readonly Quaternion RightEyeRotation;
         public HmdPoseState(
+            Vector3 devicePosition,
+            Quaternion deviceRotation,
             Matrix leftEyeProjection,
             Matrix rightEyeProjection,
             Vector3 leftEyePosition,
@@ -19,6 +23,8 @@ namespace FlaxVR
             Quaternion leftEyeRotation,
             Quaternion rightEyeRotation)
         {
+            DeviceRotation = deviceRotation;
+            DevicePosition = devicePosition;
             LeftEyeProjection = leftEyeProjection;
             RightEyeProjection = rightEyeProjection;
             LeftEyePosition = leftEyePosition;
@@ -31,9 +37,9 @@ namespace FlaxVR
         {
             switch (eye)
             {
-                case VREye.Left: return LeftEyePosition;
-                case VREye.Right: return RightEyePosition;
-                default: throw new Exception($"Invalid {nameof(VREye)}: {eye}.");
+            case VREye.Left: return LeftEyePosition;
+            case VREye.Right: return RightEyePosition;
+            default: throw new Exception($"Invalid {nameof(VREye)}: {eye}.");
             }
         }
 
@@ -41,9 +47,9 @@ namespace FlaxVR
         {
             switch (eye)
             {
-                case VREye.Left: return LeftEyeRotation;
-                case VREye.Right: return RightEyeRotation;
-                default: throw new Exception($"Invalid {nameof(VREye)}: {eye}.");
+            case VREye.Left: return LeftEyeRotation;
+            case VREye.Right: return RightEyeRotation;
+            default: throw new Exception($"Invalid {nameof(VREye)}: {eye}.");
             }
         }
 

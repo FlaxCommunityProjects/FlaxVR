@@ -1,10 +1,10 @@
 {
 	"ID": "74a68a984824b4510d12589f199ad68f",
 	"TypeName": "FlaxEngine.SceneAsset",
-	"EngineBuild": 6181,
+	"EngineBuild": 6187,
 	"Data": [
 		{
-			"TypeID": 9,
+			"TypeName": "FlaxEngine.Scene",
 			"ID": "74a68a984824b4510d12589f199ad68f",
 			"ParentID": "00000000000000000000000000000000",
 			"Name": "Scene",
@@ -23,13 +23,13 @@
 			}
 		},
 		{
-			"TypeID": 3,
+			"TypeName": "FlaxEngine.EmptyActor",
 			"ID": "28553d634087c67c711ebd96080482aa",
 			"ParentID": "74a68a984824b4510d12589f199ad68f",
 			"Name": "Visuals"
 		},
 		{
-			"TypeID": 10,
+			"TypeName": "FlaxEngine.Sky",
 			"ID": "bc81376747666609b0974580a21519a1",
 			"ParentID": "28553d634087c67c711ebd96080482aa",
 			"Name": "Sky",
@@ -46,7 +46,7 @@
 			"FogSunPower": 9.0
 		},
 		{
-			"TypeID": 7,
+			"TypeName": "FlaxEngine.EnvironmentProbe",
 			"ID": "da5e1c454a56377517d41686ebb0348f",
 			"ParentID": "28553d634087c67c711ebd96080482aa",
 			"Name": "Environment Probe",
@@ -61,7 +61,7 @@
 			"ProbeID": "1e1fb3a7447c1265b15967b480549d98"
 		},
 		{
-			"TypeID": 4,
+			"TypeName": "FlaxEngine.DirectionalLight",
 			"ID": "deecf0894777293a4f478dadacf2a6f8",
 			"ParentID": "28553d634087c67c711ebd96080482aa",
 			"Name": "Directional Light",
@@ -89,7 +89,7 @@
 			"ShadowsFadeDistance": 50.0
 		},
 		{
-			"TypeID": 25,
+			"TypeName": "FlaxEngine.SkyLight",
 			"ID": "eb18e84d41670d6314174b89a1d5ffea",
 			"ParentID": "28553d634087c67c711ebd96080482aa",
 			"Name": "SkyLight",
@@ -104,13 +104,13 @@
 			"CustomTexture": "1e1fb3a7447c1265b15967b480549d98"
 		},
 		{
-			"TypeID": 3,
+			"TypeName": "FlaxEngine.EmptyActor",
 			"ID": "71485f22423f938f9572b7b9779a44d5",
 			"ParentID": "74a68a984824b4510d12589f199ad68f",
 			"Name": "Brushes"
 		},
 		{
-			"TypeID": 8,
+			"TypeName": "FlaxEngine.BoxBrush",
 			"ID": "b0af681c49f525c9996e3c8feb3c4a03",
 			"ParentID": "71485f22423f938f9572b7b9779a44d5",
 			"Name": "Box Brush",
@@ -142,7 +142,7 @@
 			]
 		},
 		{
-			"TypeID": 8,
+			"TypeName": "FlaxEngine.BoxBrush",
 			"ID": "56e934c543c02d12fecc6e8a563ee2af",
 			"ParentID": "71485f22423f938f9572b7b9779a44d5",
 			"Name": "Box Brush",
@@ -181,7 +181,7 @@
 			]
 		},
 		{
-			"TypeID": 2,
+			"TypeName": "FlaxEngine.Camera",
 			"ID": "b0d72c3746caebca055e1f921ca21c7c",
 			"ParentID": "74a68a984824b4510d12589f199ad68f",
 			"Name": "Camera",
@@ -202,7 +202,7 @@
 			"Near": 0.10000000149011612
 		},
 		{
-			"TypeID": 24,
+			"TypeName": "FlaxEngine.MeshCollider",
 			"ID": "a9ae06ec42882434ee61aab42a1c82c5",
 			"ParentID": "74a68a984824b4510d12589f199ad68f",
 			"Name": "CSG.Collider",
@@ -210,7 +210,7 @@
 			"CollisionData": "104e0dc7466c412f593951a357343ccf"
 		},
 		{
-			"TypeID": 1,
+			"TypeName": "FlaxEngine.StaticModel",
 			"ID": "7eff8e8543a2b10f19dc35b92fc11b99",
 			"ParentID": "74a68a984824b4510d12589f199ad68f",
 			"Name": "CSG.Model",
@@ -224,7 +224,7 @@
 			}
 		},
 		{
-			"TypeID": 35,
+			"TypeName": "FlaxEngine.Terrain",
 			"ID": "9fc751234919cb4c68210ea592c8c8b2",
 			"ParentID": "74a68a984824b4510d12589f199ad68f",
 			"Name": "Terrain",
@@ -1457,16 +1457,23 @@
 			]
 		},
 		{
-			"TypeID": 3,
+			"TypeName": "FlaxEngine.EmptyActor",
 			"ID": "93c00ddd4f8b582e9ec1b8804f93adc4",
 			"ParentID": "74a68a984824b4510d12589f199ad68f",
 			"Name": "VRCam"
 		},
 		{
-			"TypeID": "FlaxVR.Source.VRSpawner",
-			"ID": "274b33d7494426d5cf806da2a427828b",
+			"TypeName": "FlaxVR.VRCamera",
+			"ID": "0bd7e22743838f13e0a55686d982a7be",
 			"ParentID": "93c00ddd4f8b582e9ec1b8804f93adc4",
-			"V": {}
+			"V": {
+	"_zNear": 0.0,
+	"_zFar": 0.0,
+	"MirrorEnabled": true,
+	"MirrorSource": 0,
+	"ZNear": 0.0,
+	"ZFar": 0.0
+}
 		}
 	]
 }

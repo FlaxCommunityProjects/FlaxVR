@@ -1,4 +1,6 @@
-﻿using Valve.VR;
+﻿using FlaxEngine;
+using FlaxVR.OpenVR;
+using Valve.VR;
 
 namespace FlaxVR
 {
@@ -13,7 +15,7 @@ namespace FlaxVR
         /// <value>
         /// The pose.
         /// </value>
-        public VRPose Pose { get; set; }
+        public HmdPoseState Pose { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is connected.
@@ -79,7 +81,7 @@ namespace FlaxVR
         /// <param name="role">The role.</param>
         /// <param name="state">The state.</param>
         /// <param name="pose">The pose.</param>
-        internal void Update(VRControllerRole role, ref VRControllerState_t state, ref VRPose pose)
+        internal void Update(VRControllerRole role, ref VRControllerState_t state, ref HmdPoseState pose)
         {
             IsConnected = true;
             Pose = pose;
