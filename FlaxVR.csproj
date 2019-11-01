@@ -65,6 +65,7 @@
     <Compile Include="Source\VREye.cs" />
     <Compile Include="Source\VRGamepadDPad.cs" />
     <Compile Include="Source\VRMirrorBlitter.cs" />
+    <Compile Include="Source\VRTrackingReference.cs" />
     <Compile Include="Source\OpenVR\OpenVRContext.cs" />
     <Compile Include="Source\OpenVR\OpenVRExtensions.cs" />
     <Compile Include="Source\OpenVR\openvr_api.cs" />

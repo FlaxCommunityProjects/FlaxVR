@@ -6,8 +6,8 @@ using FlaxEngine.Rendering;
 namespace FlaxVR
 {
     [ExecuteInEditMode]
-	public class VRCamera : Script
-	{
+    public class VRCamera : Script
+    {
         VRContext _context;
 
         CustomRenderTask renderTask;
@@ -59,9 +59,9 @@ namespace FlaxVR
             }
         }
 
-		public override void OnUpdate()
-		{
-            if(_context != null)
+        public override void OnUpdate()
+        {
+            if (_context != null)
             {
                 // Clone settings from MainRenderTask (LOD, Quality etc..)
                 var mrtView = MainRenderTask.Instance.View;
@@ -117,7 +117,8 @@ namespace FlaxVR
             MainRenderTask.Instance.Enabled = false;
 
             renderTask = RenderTask.Create<CustomRenderTask>();
-            renderTask.Render += (ctx) => {
+            renderTask.Render += (ctx) =>
+            {
 
                 // Only draw after WaitForPoses otherwise we get "frame already submited" exceptions 
                 // TODO: Run pose update seaparate from standard update loop (probably in render task or sth)
@@ -126,7 +127,7 @@ namespace FlaxVR
                     return;
 
                 _hasNewPoses = false;
-                    
+
 
                 if (lRenderBuffers == null)
                     lRenderBuffers = RenderBuffers.New();
@@ -169,7 +170,7 @@ namespace FlaxVR
 
         public override void OnDestroy()
         {
-            if(_context != null)
+            if (_context != null)
             {
                 _context.Dispose();
                 _context = null;
@@ -198,12 +199,12 @@ namespace FlaxVR
                 rRenderBuffers = null;
             }
 
-            if(blitter != null)
+            if (blitter != null)
             {
                 blitter = null;
             }
 
-            if(canvas != null)
+            if (canvas != null)
             {
                 Destroy(canvas);
                 canvas = null;

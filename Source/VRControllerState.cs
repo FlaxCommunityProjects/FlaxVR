@@ -7,7 +7,7 @@ namespace FlaxVR
     /// <summary>
     /// State of OpenVR Controller
     /// </summary>
-    public class VRControllerState
+    public class VRControllerState : VRTrackingReference
     {
         /// <summary>
         /// Gets or sets the pose.
