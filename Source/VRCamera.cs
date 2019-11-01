@@ -59,7 +59,7 @@ namespace FlaxVR
             }
         }
 
-		private void Update()
+		public override void OnUpdate()
 		{
             if(_context != null)
             {
@@ -99,7 +99,7 @@ namespace FlaxVR
             DebugDraw.DrawWireFrustum(rBoundingFrustum, Color.Blue);
         }*/
 
-        private void Start()
+        public override void OnStart()
         {
             if (VRContext.IsOpenVRSupported())
             {
@@ -117,7 +117,7 @@ namespace FlaxVR
             MainRenderTask.Instance.Enabled = false;
 
             renderTask = RenderTask.Create<CustomRenderTask>();
-            renderTask.OnRender += (ctx) => {
+            renderTask.Render += (ctx) => {
 
                 // Only draw after WaitForPoses otherwise we get "frame already submited" exceptions 
                 // TODO: Run pose update seaparate from standard update loop (probably in render task or sth)
@@ -140,8 +140,10 @@ namespace FlaxVR
                 lRenderBuffers.Size = _context.LeftEyeRenderTarget.Size;
                 rRenderBuffers.Size = _context.LeftEyeRenderTarget.Size;
 
-                ctx.DrawScene(renderTask, _context.LeftEyeRenderTarget, lRenderBuffers, ref lRenderView, ViewFlags.DefaultGame &~ViewFlags.MotionBlur, ViewMode.Default, new List<Actor>(), ActorsSources.Scenes, null);
-                ctx.DrawScene(renderTask, _context.RightEyeRenderTarget, rRenderBuffers, ref rRenderView, ViewFlags.DefaultGame & ~ViewFlags.MotionBlur, ViewMode.Default, new List<Actor>(), ActorsSources.Scenes, null);
+                lRenderView.Flags = lRenderView.Flags & ~ViewFlags.MotionBlur;
+                rRenderView.Flags = lRenderView.Flags & ~ViewFlags.MotionBlur;
+                ctx.DrawScene(renderTask, _context.LeftEyeRenderTarget, lRenderBuffers, ref lRenderView, new List<Actor>(), ActorsSources.Scenes, null);
+                ctx.DrawScene(renderTask, _context.RightEyeRenderTarget, rRenderBuffers, ref rRenderView, new List<Actor>(), ActorsSources.Scenes, null);
 
                 _context?.SubmitFrame();
             };
@@ -165,7 +167,7 @@ namespace FlaxVR
                 task.CustomActors.Clear();
         }
 
-        private void OnDestroy()
+        public override void OnDestroy()
         {
             if(_context != null)
             {
