@@ -7,21 +7,23 @@ namespace FlaxVR
     /// <summary>
     /// State of OpenVR Controller
     /// </summary>
-    public class VRControllerState : VRTrackingReference
+    public class VRControllerState
     {
         /// <summary>
-        /// Gets or sets the pose.
+        /// The position of the pose
         /// </summary>
-        /// <value>
-        /// The pose.
-        /// </value>
-        public HmdPoseState Pose { get; set; }
+        public Vector3 Position { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this instance is connected.
+        /// The orientation of the pose
+        /// </summary>
+        public Quaternion Orientation { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this pose is valid.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if this instance is connected; otherwise, <c>false</c>.
+        ///   <c>true</c> if this pose is valid; otherwise, <c>false</c>.
         /// </value>
         public bool IsConnected { get; set; }
 
@@ -81,10 +83,10 @@ namespace FlaxVR
         /// <param name="role">The role.</param>
         /// <param name="state">The state.</param>
         /// <param name="pose">The pose.</param>
-        internal void Update(VRControllerRole role, ref VRControllerState_t state, ref HmdPoseState pose)
+        internal void Update(VRControllerRole role, ref VRControllerState_t state, Vector3 position, Quaternion orientation)
         {
-            IsConnected = true;
-            Pose = pose;
+            Position = position;
+            Orientation = orientation;
             Role = role;
 
             // Trackpad

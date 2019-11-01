@@ -4,6 +4,7 @@ using System.Text;
 using Valve.VR;
 using OVR = Valve.VR.OpenVR;
 using FlaxEngine.Rendering;
+using System.Collections.Generic;
 
 namespace FlaxVR.OpenVR
 {
@@ -19,12 +20,64 @@ namespace FlaxVR.OpenVR
         private Matrix _projRight;
         private Matrix _headToEyeLeft;
         private Matrix _headToEyeRight;
-        private TrackedDevicePose_t[] _devicePoses = new TrackedDevicePose_t[1];
+        private TrackedDevicePose_t[] _devicePoses = new TrackedDevicePose_t[OVR.k_unMaxTrackedDeviceCount];
+        private readonly List<VRTrackingReference> _trackingReferences = new List<VRTrackingReference>();
+        private readonly List<VRControllerState> _controllers = new List<VRControllerState>();
 
         public override RenderTarget LeftEyeRenderTarget => _leftEyeRT;
         public override RenderTarget RightEyeRenderTarget => _rightEyeRT;
 
         public override string DeviceName => _deviceName;
+
+        /// <summary>
+        /// Gets the index of the left controller.
+        /// </summary>
+        /// <value>
+        /// The index of the left controller.
+        /// </value>
+        public int LeftControllerIndex { get; private set; }
+
+        /// <summary>
+        /// Gets the index of the right controller.
+        /// </summary>
+        /// <value>
+        /// The index of the right controller.
+        /// </value>
+        public int RightControllerIndex { get; private set; }
+
+        /// <summary>
+        /// Gets the left controller.
+        /// </summary>
+        /// <value>
+        /// The left controller.
+        /// </value>
+        public VRControllerState LeftController
+        {
+            get
+            {
+                if (LeftControllerIndex >= 0 && LeftControllerIndex < _controllers.Count)
+                    return _controllers[LeftControllerIndex];
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets the right controller.
+        /// </summary>
+        /// <value>
+        /// The right controller.
+        /// </value>
+        public VRControllerState RightController
+        {
+            get
+            {
+                if (RightControllerIndex >= 0 && RightControllerIndex < _controllers.Count)
+                {
+                    return _controllers[RightControllerIndex];
+                }
+                return null;
+            }
+        }
 
         public OpenVRContext(VRContextOptions options)
         {
@@ -51,6 +104,70 @@ namespace FlaxVR.OpenVR
                 return false;
             }
         }
+
+        /// <summary>
+        /// Updates the devices.
+        /// </summary>
+        private void UpdateDevices()
+        {
+            // Get indexes of left and right controllers
+            LeftControllerIndex = -1;
+            RightControllerIndex = -1;
+            int lhIndex = (int)_vrSystem.GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole.LeftHand);
+            int rhIndex = (int)_vrSystem.GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole.RightHand);
+
+            _controllers.Clear();
+            _trackingReferences.Clear();
+
+            // Update all tracked devices
+            for (uint i = 0; i < OVR.k_unMaxTrackedDeviceCount; i++)
+            {
+                TrackedDevicePose_t pose = _devicePoses[i];
+
+                // We are interested in valid and connected devices only
+                if (pose.bDeviceIsConnected && pose.bPoseIsValid)
+                {
+                    ToVRPose(pose, out Vector3 posePosition, out Quaternion poseOrientation);
+                    ETrackedDeviceClass c = _vrSystem.GetTrackedDeviceClass(i);
+
+                    // Update controller
+                    if (c == ETrackedDeviceClass.Controller)
+                    {
+                        VRControllerState_t state_t = default(VRControllerState_t);
+                        if (_vrSystem.GetControllerState(i, ref state_t, (uint)System.Runtime.InteropServices.Marshal.SizeOf(state_t)))
+                        {
+                            VRControllerRole role;
+                            if (i == lhIndex)
+                            {
+                                role = VRControllerRole.LeftHand;
+                                LeftControllerIndex = _controllers.Count;
+                            }
+                            else if (i == rhIndex)
+                            {
+                                role = VRControllerRole.RightHand;
+                                RightControllerIndex = _controllers.Count;
+                            }
+                            else
+                            {
+                                role = VRControllerRole.Undefined;
+                            }
+
+                            VRControllerState state = new VRControllerState();
+                            state.Update(role, ref state_t, posePosition, poseOrientation);
+                            _controllers.Add(state);
+                        }
+                    }
+                    // Update generic reference (base station etc...)
+                    else if (c == ETrackedDeviceClass.TrackingReference)
+                    {
+                        VRTrackingReference reference = new VRTrackingReference();
+                        reference.Update(posePosition, poseOrientation);
+                        _trackingReferences.Add(reference);
+                    }
+                }
+            }
+        }
+
 
         public override void Dispose()
         {
@@ -227,6 +344,13 @@ namespace FlaxVR.OpenVR
                 hmdMat.m1, hmdMat.m5, hmdMat.m9, hmdMat.m13,
                 hmdMat.m2, hmdMat.m6, hmdMat.m10, hmdMat.m14,
                 hmdMat.m3, hmdMat.m7, hmdMat.m11, hmdMat.m15);
+        }
+
+        public static void ToVRPose(TrackedDevicePose_t trackedPose, out Vector3 position, out Quaternion orientation)
+        {
+            Matrix matrix = ToSysMatrix(trackedPose.mDeviceToAbsoluteTracking);
+            position = matrix.TranslationVector * 100; //m -> cm
+            orientation = Quaternion.RotationMatrix(matrix);
         }
     }
 }

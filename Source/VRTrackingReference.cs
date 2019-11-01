@@ -15,7 +15,7 @@ namespace FlaxVR
         /// <summary>
         /// The position of the pose
         /// </summary>
-        public Vector3 Postion { get; set; }
+        public Vector3 Position { get; set; }
 
         /// <summary>
         /// The orientation of the pose
@@ -36,7 +36,7 @@ namespace FlaxVR
         internal void Update(Vector3 position, Quaternion orientation)
         {
             IsConnected = true;
-            Postion = position;
+            Position = position;
             Orientation = orientation;
         }
     }
