@@ -85,6 +85,7 @@ namespace FlaxVR
         /// <param name="pose">The pose.</param>
         internal void Update(VRControllerRole role, ref VRControllerState_t state, Vector3 position, Quaternion orientation)
         {
+            IsConnected = true;
             Position = position;
             Orientation = orientation;
             Role = role;

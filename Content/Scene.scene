@@ -245,6 +245,8 @@
 	"_zFar": 0.0,
 	"MirrorEnabled": true,
 	"MirrorSource": 0,
+	"LeftController": "923a4ab347fdcd6c9b8b43bd71268f7b",
+	"RightController": "54e63c5e4ccd25a5f9c485955f58e408",
 	"ZNear": 0.0,
 	"ZFar": 0.0
 }

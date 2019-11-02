@@ -23,6 +23,8 @@ namespace FlaxVR
         public abstract int RightControllerIndex { get; }
 
         public abstract void UpdateProjectionMatrices(float zNear, float zFar);
+        public abstract void UpdateDevices();
+
         public abstract HmdPoseState WaitForPoses();
         public abstract void SubmitFrame();
         public abstract void Dispose();

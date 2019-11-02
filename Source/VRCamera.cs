@@ -119,13 +119,11 @@ namespace FlaxVR
                     blitter.MirrorMode = MirrorSource;
 
                 _hasNewPoses = true;
+
+                _context.UpdateDevices();
             }
         }
 
-        public override void OnAwake()
-        {
-            SetupHierarchy();
-        }
 
         private EmptyActor ConfigureRootAnchor(string name)
         {
@@ -302,6 +300,8 @@ namespace FlaxVR
             blitter = canvas.GUI.GetChild<VRMirrorBlitter>() ?? canvas.GUI.AddChild(new VRMirrorBlitter(_context));
 
             MainRenderTask.Instance.Begin += UpdateMRT;
+
+            SetupHierarchy();
         }
 
         private void UpdateMRT(SceneRenderTask task, GPUContext context)

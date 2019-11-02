@@ -128,7 +128,7 @@ namespace FlaxVR.OpenVR
         /// <summary>
         /// Updates the devices.
         /// </summary>
-        private void UpdateDevices()
+        public override void UpdateDevices()
         {
             // Get indexes of left and right controllers
             _leftControllerIndex = -1;
