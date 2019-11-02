@@ -41,9 +41,7 @@
 				}
 			},
 			"StaticFlags": 3,
-			"Sun": "deecf0894777293a4f478dadacf2a6f8",
-			"SunDiscScale": 2.0,
-			"FogSunPower": 9.0
+			"Sun": "deecf0894777293a4f478dadacf2a6f8"
 		},
 		{
 			"TypeName": "FlaxEngine.EnvironmentProbe",
@@ -241,26 +239,37 @@
 			"ID": "0bd7e22743838f13e0a55686d982a7be",
 			"ParentID": "93c00ddd4f8b582e9ec1b8804f93adc4",
 			"V": {
-	"_zNear": 0.0,
-	"_zFar": 0.0,
+	"_zNear": 20000.0,
+	"_zFar": 0.1,
 	"MirrorEnabled": true,
 	"MirrorSource": 0,
-	"LeftController": "923a4ab347fdcd6c9b8b43bd71268f7b",
-	"RightController": "54e63c5e4ccd25a5f9c485955f58e408",
-	"ZNear": 0.0,
-	"ZFar": 0.0
+	"LeftController": "27807cd54b025901bfcc3780859d4190",
+	"RightController": "bac6caac4ff64f6f9d8d7998396c9418",
+	"ZNear": 20000.0,
+	"ZFar": 0.1
 }
 		},
 		{
 			"TypeName": "FlaxEngine.StaticModel",
 			"ID": "02b8cde4417e3d9d9938dda8930dc581",
 			"ParentID": "93c00ddd4f8b582e9ec1b8804f93adc4",
-			"Name": "Cube 0",
+			"Name": "Left Hand",
 			"Transform": {
 				"Translation": {
-					"X": -146.74603271484376,
-					"Y": 0.0,
-					"Z": -143.10154724121095
+					"X": -10.901932716369629,
+					"Y": 144.37718200683595,
+					"Z": -11.31468677520752
+				},
+				"Orientation": {
+					"X": 0.09594113379716873,
+					"Y": -0.28956857323646548,
+					"Z": -0.01430458016693592,
+					"W": 0.9522293210029602
+				},
+				"Scale": {
+					"X": 0.10000000149011612,
+					"Y": 0.10000000149011612,
+					"Z": 0.10000000149011612
 				}
 			},
 			"Model": "b43f0f8f4aaba3f3156896a5a22ba493",
@@ -283,12 +292,23 @@
 			"TypeName": "FlaxEngine.StaticModel",
 			"ID": "cac95da54cac22ad54239daff02682fb",
 			"ParentID": "93c00ddd4f8b582e9ec1b8804f93adc4",
-			"Name": "Cube",
+			"Name": "Right Hand",
 			"Transform": {
 				"Translation": {
-					"X": 0.0,
-					"Y": 0.0,
-					"Z": -143.10154724121095
+					"X": -52.98728942871094,
+					"Y": 144.44960021972657,
+					"Z": -39.54011917114258
+				},
+				"Orientation": {
+					"X": 0.08223535865545273,
+					"Y": -0.26472538709640505,
+					"Z": 0.03462999314069748,
+					"W": 0.9601867198944092
+				},
+				"Scale": {
+					"X": 0.10000000149011612,
+					"Y": 0.10000000149011612,
+					"Z": 0.10000000149011612
 				}
 			},
 			"Model": "b43f0f8f4aaba3f3156896a5a22ba493",
@@ -304,6 +324,143 @@
 			"ParentID": "cac95da54cac22ad54239daff02682fb",
 			"V": {
 	"Role": 1,
+	"ControllerIndex": 0
+}
+		},
+		{
+			"TypeName": "FlaxEngine.EmptyActor",
+			"ID": "7aea37f244b56fc415301d85a939fd71",
+			"ParentID": "93c00ddd4f8b582e9ec1b8804f93adc4",
+			"Name": "TrackingSpace",
+			"Transform": {
+				"Translation": {
+					"X": 0.0,
+					"Y": -57.598472595214847,
+					"Z": 0.0
+				}
+			}
+		},
+		{
+			"TypeName": "FlaxEngine.EmptyActor",
+			"ID": "b08984c54ecf8cd90dddeca38bbc5760",
+			"ParentID": "7aea37f244b56fc415301d85a939fd71",
+			"Name": "TrackerAnchor"
+		},
+		{
+			"TypeName": "FlaxEngine.EmptyActor",
+			"ID": "2258438e4a3897b4806ff28dfc490053",
+			"ParentID": "7aea37f244b56fc415301d85a939fd71",
+			"Name": "LeftControllerAnchor",
+			"Transform": {
+				"Translation": {
+					"X": -52.98728942871094,
+					"Y": 144.44960021972657,
+					"Z": -39.54011917114258
+				},
+				"Orientation": {
+					"X": 0.08223535865545273,
+					"Y": -0.26472538709640505,
+					"Z": 0.03462999314069748,
+					"W": 0.9601867198944092
+				}
+			}
+		},
+		{
+			"TypeName": "FlaxVR.VRController",
+			"ID": "9c235f564f1e5035bd9a75b89440c266",
+			"ParentID": "2258438e4a3897b4806ff28dfc490053",
+			"V": {
+	"Role": 1,
+	"ControllerIndex": 0
+}
+		},
+		{
+			"TypeName": "FlaxEngine.EmptyActor",
+			"ID": "b257ca8c4c11f51d77cce7b80db391ed",
+			"ParentID": "7aea37f244b56fc415301d85a939fd71",
+			"Name": "RightControllerAnchor",
+			"Transform": {
+				"Translation": {
+					"X": -10.901932716369629,
+					"Y": 144.37718200683595,
+					"Z": -11.31468677520752
+				},
+				"Orientation": {
+					"X": 0.09594113379716873,
+					"Y": -0.28956857323646548,
+					"Z": -0.01430458016693592,
+					"W": 0.9522293210029602
+				}
+			}
+		},
+		{
+			"TypeName": "FlaxVR.VRController",
+			"ID": "37a4c79e4f33d3751d722ca302f5e056",
+			"ParentID": "b257ca8c4c11f51d77cce7b80db391ed",
+			"V": {
+	"Role": 2,
+	"ControllerIndex": 0
+}
+		},
+		{
+			"TypeName": "FlaxEngine.EmptyActor",
+			"ID": "dee0b1344f29e80da0f35f99b8d0ba0f",
+			"ParentID": "7aea37f244b56fc415301d85a939fd71",
+			"Name": "TrackerAnchor"
+		},
+		{
+			"TypeName": "FlaxEngine.EmptyActor",
+			"ID": "b134800043986d1e59e1e6bdd2d1eaa0",
+			"ParentID": "7aea37f244b56fc415301d85a939fd71",
+			"Name": "LeftControllerAnchor",
+			"Transform": {
+				"Translation": {
+					"X": -52.98728942871094,
+					"Y": 144.44960021972657,
+					"Z": -39.54011917114258
+				},
+				"Orientation": {
+					"X": 0.08223535865545273,
+					"Y": -0.26472538709640505,
+					"Z": 0.03462999314069748,
+					"W": 0.9601867198944092
+				}
+			}
+		},
+		{
+			"TypeName": "FlaxVR.VRController",
+			"ID": "27807cd54b025901bfcc3780859d4190",
+			"ParentID": "b134800043986d1e59e1e6bdd2d1eaa0",
+			"V": {
+	"Role": 1,
+	"ControllerIndex": 0
+}
+		},
+		{
+			"TypeName": "FlaxEngine.EmptyActor",
+			"ID": "30be237f40e3da31685fd6bcf24593b5",
+			"ParentID": "7aea37f244b56fc415301d85a939fd71",
+			"Name": "RightControllerAnchor",
+			"Transform": {
+				"Translation": {
+					"X": -10.901932716369629,
+					"Y": 144.37718200683595,
+					"Z": -11.31468677520752
+				},
+				"Orientation": {
+					"X": 0.09594113379716873,
+					"Y": -0.28956857323646548,
+					"Z": -0.01430458016693592,
+					"W": 0.9522293210029602
+				}
+			}
+		},
+		{
+			"TypeName": "FlaxVR.VRController",
+			"ID": "bac6caac4ff64f6f9d8d7998396c9418",
+			"ParentID": "30be237f40e3da31685fd6bcf24593b5",
+			"V": {
+	"Role": 2,
 	"ControllerIndex": 0
 }
 		}

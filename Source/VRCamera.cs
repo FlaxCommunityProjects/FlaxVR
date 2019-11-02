@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using FlaxEngine;
 using FlaxEngine.Rendering;
 using FlaxVR.OpenVR;
@@ -7,7 +8,6 @@ using UI;
 
 namespace FlaxVR
 {
-    [ExecuteInEditMode]
     public class VRCamera : Script
     {
 
@@ -28,8 +28,10 @@ namespace FlaxVR
         /*BoundingFrustum lBoundingFrustum;
         BoundingFrustum rBoundingFrustum;*/
 
-        [Serialize] private float _zNear;
-        [Serialize] private float _zFar;
+        [Serialize]
+        private float _zNear = 8f;
+        [Serialize]
+        private float _zFar = 20000f;
 
         public bool MirrorEnabled = true;
         [VisibleIf("MirrorEnabled")]
@@ -60,7 +62,8 @@ namespace FlaxVR
         [HideInEditor]
         public EmptyActor RightControllerAnchor { get; private set; }
 
-        [Range(0.1f, 30000f)]
+        [Range(8f, 30000f)]
+        [DefaultValue(20000f)]
         public float ZNear
         {
             get => _zNear;
@@ -75,6 +78,7 @@ namespace FlaxVR
         }
 
         [Range(0.1f, 30000f)]
+        [DefaultValue(0.1f)]
         public float ZFar
         {
             get => _zFar;
@@ -283,12 +287,14 @@ namespace FlaxVR
                     return;
 
                 lRenderBuffers.Size = _context.LeftEyeRenderTarget.Size;
-                rRenderBuffers.Size = _context.LeftEyeRenderTarget.Size;
+                rRenderBuffers.Size = _context.RightEyeRenderTarget.Size;
 
                 lRenderView.Flags = lRenderView.Flags & ~ViewFlags.MotionBlur;
-                rRenderView.Flags = lRenderView.Flags & ~ViewFlags.MotionBlur;
-                ctx.DrawScene(renderTask, _context.LeftEyeRenderTarget, lRenderBuffers, ref lRenderView, new List<Actor>(), ActorsSources.Scenes, null);
-                ctx.DrawScene(renderTask, _context.RightEyeRenderTarget, rRenderBuffers, ref rRenderView, new List<Actor>(), ActorsSources.Scenes, null);
+                lRenderView.Near = ZNear;
+                lRenderView.Far = ZFar;
+                rRenderView.Flags = rRenderView.Flags & ~ViewFlags.MotionBlur;
+                ctx.DrawScene(renderTask, _context.LeftEyeRenderTarget, lRenderBuffers, ref lRenderView, Utils.GetEmptyArray<Actor>(), ActorsSources.Scenes, null);
+                ctx.DrawScene(renderTask, _context.RightEyeRenderTarget, rRenderBuffers, ref rRenderView, Utils.GetEmptyArray<Actor>(), ActorsSources.Scenes, null);
 
                 _context?.SubmitFrame();
             };
