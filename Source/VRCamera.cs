@@ -2,12 +2,19 @@
 using System.Collections.Generic;
 using FlaxEngine;
 using FlaxEngine.Rendering;
+using UI;
 
 namespace FlaxVR
 {
     [ExecuteInEditMode]
     public class VRCamera : Script
     {
+
+        private static readonly string trackingSpaceName = "TrackingSpace";
+        private static readonly string trackerAnchorName = "TrackerAnchor";
+        private static readonly string leftControllerAnchorName = "LeftControllerAnchor";
+        private static readonly string rightControllerAnchorName = "RightControllerAnchor";
+
         VRContext _context;
 
         CustomRenderTask renderTask;
@@ -30,6 +37,27 @@ namespace FlaxVR
         private UICanvas canvas;
         private VRMirrorBlitter blitter;
         private bool _hasNewPoses = false;
+
+        private List<VRController> vrControllers = new List<VRController>();
+
+        [HideInEditor]
+        public VRController LeftController;
+
+        [HideInEditor]
+        public VRController RightController;
+
+        // Anchors
+        [HideInEditor]
+        public EmptyActor TrackingSpace { get; private set; }
+
+        [HideInEditor]
+        public EmptyActor TrackerAnchor { get; private set; }
+
+        [HideInEditor]
+        public EmptyActor LeftControllerAnchor { get; private set; }
+
+        [HideInEditor]
+        public EmptyActor RightControllerAnchor { get; private set; }
 
         [Range(0.1f, 30000f)]
         public float ZNear
@@ -91,6 +119,125 @@ namespace FlaxVR
 
                 _hasNewPoses = true;
             }
+        }
+
+        public override void OnAwake()
+        {
+            SetupHierarchy();
+        }
+
+        private EmptyActor ConfigureRootAnchor(string name)
+        {
+            EmptyActor anchor = Actor.GetChild(name) as EmptyActor;
+            if (anchor == null)
+            {
+                anchor = EmptyActor.New();
+                Actor.AddChild(anchor);
+                anchor.Name = name;
+            }
+            return anchor;
+        }
+
+        private EmptyActor ConfigureTrackerAnchor(EmptyActor root)
+        {
+            EmptyActor anchor = Actor.GetChild(trackerAnchorName) as EmptyActor;
+            if (anchor == null)
+            {
+                anchor = EmptyActor.New();
+                root.AddChild(anchor);
+                anchor.Name = trackerAnchorName;
+            }
+            return anchor;
+        }
+
+        private EmptyActor ConfigureControllerAnchor(EmptyActor root, VRControllerRole role)
+        {
+            string name = role == VRControllerRole.LeftHand ? leftControllerAnchorName : role == VRControllerRole.RightHand ? rightControllerAnchorName : string.Empty;
+
+            EmptyActor anchor = Actor.GetChild(name) as EmptyActor;
+
+            if (anchor == null)
+            {
+                anchor = EmptyActor.New();
+                var script = New<VRController>();
+                script.Role = role;
+                anchor.AddScript(script);
+                root.AddChild(anchor);
+                anchor.Name = name;
+            }
+            return anchor;
+        }
+
+        private void SetupHierarchy()
+        {
+            if (TrackingSpace == null)
+            {
+                TrackingSpace = ConfigureRootAnchor(trackingSpaceName);
+            }
+
+            if (TrackerAnchor == null)
+            {
+                TrackerAnchor = ConfigureTrackerAnchor(TrackingSpace);
+            }
+
+            if (LeftControllerAnchor == null)
+            {
+                LeftControllerAnchor = ConfigureControllerAnchor(TrackingSpace, VRControllerRole.LeftHand);
+                LeftController = LeftControllerAnchor.GetScript<VRController>();
+            }
+
+            if (RightControllerAnchor == null)
+            {
+                RightControllerAnchor = ConfigureControllerAnchor(TrackingSpace, VRControllerRole.RightHand);
+                RightController = RightControllerAnchor.GetScript<VRController>();
+            }
+
+
+            vrControllers = Actor.GetScriptsRecursive<VRController>();
+
+        }
+
+
+        public override void OnLateUpdate()
+        {
+
+            foreach (VRController controller in vrControllers)
+            {
+                VRControllerRole role = controller.Role;
+                int cIndex;
+                if (role == VRControllerRole.LeftHand)
+                {
+                    cIndex = VRSystem.Instance.LeftControllerIndex;
+                }
+                else if (role == VRControllerRole.RightHand)
+                {
+                    cIndex = VRSystem.Instance.RightControllerIndex;
+                }
+                else
+                {
+                    cIndex = controller.ControllerIndex;
+                }
+
+                VRControllerState[] states = VRSystem.Instance.Controllers;
+                VRControllerState newState;
+
+                if (cIndex >= 0 && states != null && cIndex < states.Length)
+                {
+                    newState = states[cIndex];
+                }
+                else
+                {
+                    newState = new VRControllerState();
+                }
+
+                controller.UpdateState(newState);
+            }
+            VRPose centerPose = eyes[2].Pose;
+            transform = CenterEyeAnchor.LocalTransform;
+            transform.Translation = centerPose.Position;
+            transform.Orientation = centerPose.Orientation;
+
+            CenterEyeAnchor.LocalTransform = transform;
         }
 
         /*private void OnDebugDraw()

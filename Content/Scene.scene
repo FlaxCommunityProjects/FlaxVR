@@ -227,7 +227,14 @@
 			"TypeName": "FlaxEngine.EmptyActor",
 			"ID": "93c00ddd4f8b582e9ec1b8804f93adc4",
 			"ParentID": "74a68a984824b4510d12589f199ad68f",
-			"Name": "VRCam"
+			"Name": "VRCam",
+			"Transform": {
+				"Translation": {
+					"X": 0.0,
+					"Y": 57.598472595214847,
+					"Z": 0.0
+				}
+			}
 		},
 		{
 			"TypeName": "FlaxVR.VRCamera",
@@ -240,6 +247,62 @@
 	"MirrorSource": 0,
 	"ZNear": 0.0,
 	"ZFar": 0.0
+}
+		},
+		{
+			"TypeName": "FlaxEngine.StaticModel",
+			"ID": "02b8cde4417e3d9d9938dda8930dc581",
+			"ParentID": "93c00ddd4f8b582e9ec1b8804f93adc4",
+			"Name": "Cube 0",
+			"Transform": {
+				"Translation": {
+					"X": -146.74603271484376,
+					"Y": 0.0,
+					"Z": -143.10154724121095
+				}
+			},
+			"Model": "b43f0f8f4aaba3f3156896a5a22ba493",
+			"Buffer": {
+				"Entries": [
+					{}
+				]
+			}
+		},
+		{
+			"TypeName": "FlaxVR.VRController",
+			"ID": "961b9cb34894ac539b89efb54b7717b6",
+			"ParentID": "02b8cde4417e3d9d9938dda8930dc581",
+			"V": {
+	"Role": 2,
+	"ControllerIndex": 0
+}
+		},
+		{
+			"TypeName": "FlaxEngine.StaticModel",
+			"ID": "cac95da54cac22ad54239daff02682fb",
+			"ParentID": "93c00ddd4f8b582e9ec1b8804f93adc4",
+			"Name": "Cube",
+			"Transform": {
+				"Translation": {
+					"X": 0.0,
+					"Y": 0.0,
+					"Z": -143.10154724121095
+				}
+			},
+			"Model": "b43f0f8f4aaba3f3156896a5a22ba493",
+			"Buffer": {
+				"Entries": [
+					{}
+				]
+			}
+		},
+		{
+			"TypeName": "FlaxVR.VRController",
+			"ID": "b946ffeb49d95bfc4cd55bbe8e77f5a4",
+			"ParentID": "cac95da54cac22ad54239daff02682fb",
+			"V": {
+	"Role": 1,
+	"ControllerIndex": 0
 }
 		}
 	]

@@ -21,11 +21,13 @@ namespace FlaxVR
             {
                 var transform = LocalTransform;
 
-                transform.Translation = State.Pose.DevicePosition;
-                transform.Orientation = State.Pose.DeviceRotation;
+                transform.Translation = State.Position;
+                transform.Orientation = State.Orientation;
 
                 LocalTransform = transform;
             }
         }
+
+       
     }
 }
