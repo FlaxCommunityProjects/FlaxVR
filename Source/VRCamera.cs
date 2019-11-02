@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FlaxEngine;
 using FlaxEngine.Rendering;
+using FlaxVR.OpenVR;
 using UI;
 
 namespace FlaxVR
@@ -201,43 +202,41 @@ namespace FlaxVR
         public override void OnLateUpdate()
         {
 
-            foreach (VRController controller in vrControllers)
+            if (_context != null)
             {
-                VRControllerRole role = controller.Role;
-                int cIndex;
-                if (role == VRControllerRole.LeftHand)
-                {
-                    cIndex = VRSystem.Instance.LeftControllerIndex;
-                }
-                else if (role == VRControllerRole.RightHand)
-                {
-                    cIndex = VRSystem.Instance.RightControllerIndex;
-                }
-                else
-                {
-                    cIndex = controller.ControllerIndex;
-                }
 
-                VRControllerState[] states = VRSystem.Instance.Controllers;
-                VRControllerState newState;
-
-                if (cIndex >= 0 && states != null && cIndex < states.Length)
+                foreach (VRController controller in vrControllers)
                 {
-                    newState = states[cIndex];
-                }
-                else
-                {
-                    newState = new VRControllerState();
-                }
+                    VRControllerRole role = controller.Role;
+                    int cIndex;
+                    if (role == VRControllerRole.LeftHand)
+                    {
+                        cIndex = _context.LeftControllerIndex;
+                    }
+                    else if (role == VRControllerRole.RightHand)
+                    {
+                        cIndex = _context.RightControllerIndex;
+                    }
+                    else
+                    {
+                        cIndex = controller.ControllerIndex;
+                    }
 
-                controller.UpdateState(newState);
+                    VRControllerState[] states = _context.Controllers.ToArray();
+                    VRControllerState newState;
+
+                    if (cIndex >= 0 && states != null && cIndex < states.Length)
+                    {
+                        newState = states[cIndex];
+                    }
+                    else
+                    {
+                        newState = new VRControllerState();
+                    }
+
+                    controller.UpdateState(newState);
+                }
             }
-            VRPose centerPose = eyes[2].Pose;
-            transform = CenterEyeAnchor.LocalTransform;
-            transform.Translation = centerPose.Position;
-            transform.Orientation = centerPose.Orientation;
-
-            CenterEyeAnchor.LocalTransform = transform;
         }
 
         /*private void OnDebugDraw()

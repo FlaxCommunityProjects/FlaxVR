@@ -1,6 +1,7 @@
 ﻿using FlaxEngine.Rendering;
 using FlaxVR.OpenVR;
 using System;
+using System.Collections.Generic;
 
 namespace FlaxVR
 {
@@ -14,6 +15,12 @@ namespace FlaxVR
 
         public abstract RenderTarget LeftEyeRenderTarget { get; }
         public abstract RenderTarget RightEyeRenderTarget { get; }
+
+        public abstract List<VRControllerState> Controllers { get; }
+
+        public abstract int LeftControllerIndex { get; }
+
+        public abstract int RightControllerIndex { get; }
 
         public abstract void UpdateProjectionMatrices(float zNear, float zFar);
         public abstract HmdPoseState WaitForPoses();

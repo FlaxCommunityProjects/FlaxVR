@@ -24,10 +24,19 @@ namespace FlaxVR.OpenVR
         private readonly List<VRTrackingReference> _trackingReferences = new List<VRTrackingReference>();
         private readonly List<VRControllerState> _controllers = new List<VRControllerState>();
 
+        private int _leftControllerIndex;
+        private int _rightControllerIndex;
+
         public override RenderTarget LeftEyeRenderTarget => _leftEyeRT;
         public override RenderTarget RightEyeRenderTarget => _rightEyeRT;
 
         public override string DeviceName => _deviceName;
+
+        public override List<VRControllerState> Controllers { get
+            {
+                return _controllers;
+            }
+        }
 
         /// <summary>
         /// Gets the index of the left controller.
@@ -35,7 +44,13 @@ namespace FlaxVR.OpenVR
         /// <value>
         /// The index of the left controller.
         /// </value>
-        public int LeftControllerIndex { get; private set; }
+        
+        public override int LeftControllerIndex {
+            get
+            {
+                return _leftControllerIndex;
+            }
+        }
 
         /// <summary>
         /// Gets the index of the right controller.
@@ -43,7 +58,12 @@ namespace FlaxVR.OpenVR
         /// <value>
         /// The index of the right controller.
         /// </value>
-        public int RightControllerIndex { get; private set; }
+        public override int RightControllerIndex {
+            get
+            {
+                return _rightControllerIndex;
+            }
+        }
 
         /// <summary>
         /// Gets the left controller.
@@ -111,8 +131,8 @@ namespace FlaxVR.OpenVR
         private void UpdateDevices()
         {
             // Get indexes of left and right controllers
-            LeftControllerIndex = -1;
-            RightControllerIndex = -1;
+            _leftControllerIndex = -1;
+            _rightControllerIndex = -1;
             int lhIndex = (int)_vrSystem.GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole.LeftHand);
             int rhIndex = (int)_vrSystem.GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole.RightHand);
 
@@ -140,12 +160,12 @@ namespace FlaxVR.OpenVR
                             if (i == lhIndex)
                             {
                                 role = VRControllerRole.LeftHand;
-                                LeftControllerIndex = _controllers.Count;
+                                _leftControllerIndex = _controllers.Count;
                             }
                             else if (i == rhIndex)
                             {
                                 role = VRControllerRole.RightHand;
-                                RightControllerIndex = _controllers.Count;
+                                _rightControllerIndex = _controllers.Count;
                             }
                             else
                             {
