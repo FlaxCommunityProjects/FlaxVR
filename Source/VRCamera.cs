@@ -1,13 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using FlaxEngine;
 using FlaxEngine.Rendering;
+using FlaxVR.OpenVR;
+using UI;
 
 namespace FlaxVR
 {
-    [ExecuteInEditMode]
-	public class VRCamera : Script
-	{
+    public class VRCamera : Script
+    {
+
+        private static readonly string trackingSpaceName = "TrackingSpace";
+        private static readonly string trackerAnchorName = "TrackerAnchor";
+        private static readonly string leftControllerAnchorName = "LeftControllerAnchor";
+        private static readonly string rightControllerAnchorName = "RightControllerAnchor";
+
         VRContext _context;
 
         CustomRenderTask renderTask;
@@ -20,8 +28,10 @@ namespace FlaxVR
         /*BoundingFrustum lBoundingFrustum;
         BoundingFrustum rBoundingFrustum;*/
 
-        [Serialize] private float _zNear;
-        [Serialize] private float _zFar;
+        [Serialize]
+        private float _zNear = 8f;
+        [Serialize]
+        private float _zFar = 20000f;
 
         public bool MirrorEnabled = true;
         [VisibleIf("MirrorEnabled")]
@@ -31,7 +41,29 @@ namespace FlaxVR
         private VRMirrorBlitter blitter;
         private bool _hasNewPoses = false;
 
-        [Range(0.1f, 30000f)]
+        private List<VRController> vrControllers = new List<VRController>();
+
+        [HideInEditor]
+        public VRController LeftController;
+
+        [HideInEditor]
+        public VRController RightController;
+
+        // Anchors
+        [HideInEditor]
+        public EmptyActor TrackingSpace { get; private set; }
+
+        [HideInEditor]
+        public EmptyActor TrackerAnchor { get; private set; }
+
+        [HideInEditor]
+        public EmptyActor LeftControllerAnchor { get; private set; }
+
+        [HideInEditor]
+        public EmptyActor RightControllerAnchor { get; private set; }
+
+        [Range(8f, 30000f)]
+        [DefaultValue(20000f)]
         public float ZNear
         {
             get => _zNear;
@@ -46,6 +78,7 @@ namespace FlaxVR
         }
 
         [Range(0.1f, 30000f)]
+        [DefaultValue(0.1f)]
         public float ZFar
         {
             get => _zFar;
@@ -59,9 +92,9 @@ namespace FlaxVR
             }
         }
 
-		public override void OnUpdate()
-		{
-            if(_context != null)
+        public override void OnUpdate()
+        {
+            if (_context != null)
             {
                 // Clone settings from MainRenderTask (LOD, Quality etc..)
                 var mrtView = MainRenderTask.Instance.View;
@@ -90,6 +123,121 @@ namespace FlaxVR
                     blitter.MirrorMode = MirrorSource;
 
                 _hasNewPoses = true;
+
+                _context.UpdateDevices();
+            }
+        }
+
+
+        private EmptyActor ConfigureRootAnchor(string name)
+        {
+            EmptyActor anchor = Actor.GetChild(name) as EmptyActor;
+            if (anchor == null)
+            {
+                anchor = EmptyActor.New();
+                Actor.AddChild(anchor);
+                anchor.Name = name;
+            }
+            return anchor;
+        }
+
+        private EmptyActor ConfigureTrackerAnchor(EmptyActor root)
+        {
+            EmptyActor anchor = Actor.GetChild(trackerAnchorName) as EmptyActor;
+            if (anchor == null)
+            {
+                anchor = EmptyActor.New();
+                root.AddChild(anchor);
+                anchor.Name = trackerAnchorName;
+            }
+            return anchor;
+        }
+
+        private EmptyActor ConfigureControllerAnchor(EmptyActor root, VRControllerRole role)
+        {
+            string name = role == VRControllerRole.LeftHand ? leftControllerAnchorName : role == VRControllerRole.RightHand ? rightControllerAnchorName : string.Empty;
+
+            EmptyActor anchor = Actor.GetChild(name) as EmptyActor;
+
+            if (anchor == null)
+            {
+                anchor = EmptyActor.New();
+                var script = New<VRController>();
+                script.Role = role;
+                anchor.AddScript(script);
+                root.AddChild(anchor);
+                anchor.Name = name;
+            }
+            return anchor;
+        }
+
+        private void SetupHierarchy()
+        {
+            if (TrackingSpace == null)
+            {
+                TrackingSpace = ConfigureRootAnchor(trackingSpaceName);
+            }
+
+            if (TrackerAnchor == null)
+            {
+                TrackerAnchor = ConfigureTrackerAnchor(TrackingSpace);
+            }
+
+            if (LeftControllerAnchor == null)
+            {
+                LeftControllerAnchor = ConfigureControllerAnchor(TrackingSpace, VRControllerRole.LeftHand);
+                LeftController = LeftControllerAnchor.GetScript<VRController>();
+            }
+
+            if (RightControllerAnchor == null)
+            {
+                RightControllerAnchor = ConfigureControllerAnchor(TrackingSpace, VRControllerRole.RightHand);
+                RightController = RightControllerAnchor.GetScript<VRController>();
+            }
+
+
+            vrControllers = Actor.GetScriptsRecursive<VRController>();
+
+        }
+
+
+        public override void OnLateUpdate()
+        {
+
+            if (_context != null)
+            {
+
+                foreach (VRController controller in vrControllers)
+                {
+                    VRControllerRole role = controller.Role;
+                    int cIndex;
+                    if (role == VRControllerRole.LeftHand)
+                    {
+                        cIndex = _context.LeftControllerIndex;
+                    }
+                    else if (role == VRControllerRole.RightHand)
+                    {
+                        cIndex = _context.RightControllerIndex;
+                    }
+                    else
+                    {
+                        cIndex = controller.ControllerIndex;
+                    }
+
+                    VRControllerState[] states = _context.Controllers.ToArray();
+                    VRControllerState newState;
+
+                    if (cIndex >= 0 && states != null && cIndex < states.Length)
+                    {
+                        newState = states[cIndex];
+                    }
+                    else
+                    {
+                        newState = new VRControllerState();
+                    }
+
+                    controller.UpdateState(newState);
+                }
             }
         }
 
@@ -117,7 +265,8 @@ namespace FlaxVR
             MainRenderTask.Instance.Enabled = false;
 
             renderTask = RenderTask.Create<CustomRenderTask>();
-            renderTask.Render += (ctx) => {
+            renderTask.Render += (ctx) =>
+            {
 
                 // Only draw after WaitForPoses otherwise we get "frame already submited" exceptions 
                 // TODO: Run pose update seaparate from standard update loop (probably in render task or sth)
@@ -126,7 +275,7 @@ namespace FlaxVR
                     return;
 
                 _hasNewPoses = false;
-                    
+
 
                 if (lRenderBuffers == null)
                     lRenderBuffers = RenderBuffers.New();
@@ -138,12 +287,14 @@ namespace FlaxVR
                     return;
 
                 lRenderBuffers.Size = _context.LeftEyeRenderTarget.Size;
-                rRenderBuffers.Size = _context.LeftEyeRenderTarget.Size;
+                rRenderBuffers.Size = _context.RightEyeRenderTarget.Size;
 
                 lRenderView.Flags = lRenderView.Flags & ~ViewFlags.MotionBlur;
-                rRenderView.Flags = lRenderView.Flags & ~ViewFlags.MotionBlur;
-                ctx.DrawScene(renderTask, _context.LeftEyeRenderTarget, lRenderBuffers, ref lRenderView, new List<Actor>(), ActorsSources.Scenes, null);
-                ctx.DrawScene(renderTask, _context.RightEyeRenderTarget, rRenderBuffers, ref rRenderView, new List<Actor>(), ActorsSources.Scenes, null);
+                lRenderView.Near = ZNear;
+                lRenderView.Far = ZFar;
+                rRenderView.Flags = rRenderView.Flags & ~ViewFlags.MotionBlur;
+                ctx.DrawScene(renderTask, _context.LeftEyeRenderTarget, lRenderBuffers, ref lRenderView, Utils.GetEmptyArray<Actor>(), ActorsSources.Scenes, null);
+                ctx.DrawScene(renderTask, _context.RightEyeRenderTarget, rRenderBuffers, ref rRenderView, Utils.GetEmptyArray<Actor>(), ActorsSources.Scenes, null);
 
                 _context?.SubmitFrame();
             };
@@ -155,6 +306,8 @@ namespace FlaxVR
             blitter = canvas.GUI.GetChild<VRMirrorBlitter>() ?? canvas.GUI.AddChild(new VRMirrorBlitter(_context));
 
             MainRenderTask.Instance.Begin += UpdateMRT;
+
+            SetupHierarchy();
         }
 
         private void UpdateMRT(SceneRenderTask task, GPUContext context)
@@ -169,7 +322,7 @@ namespace FlaxVR
 
         public override void OnDestroy()
         {
-            if(_context != null)
+            if (_context != null)
             {
                 _context.Dispose();
                 _context = null;
@@ -198,12 +351,12 @@ namespace FlaxVR
                 rRenderBuffers = null;
             }
 
-            if(blitter != null)
+            if (blitter != null)
             {
                 blitter = null;
             }
 
-            if(canvas != null)
+            if (canvas != null)
             {
                 Destroy(canvas);
                 canvas = null;
