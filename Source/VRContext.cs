@@ -1,4 +1,4 @@
-﻿using FlaxEngine.Rendering;
+﻿using FlaxEngine;
 using FlaxVR.OpenVR;
 using System;
 using System.Collections.Generic;
@@ -13,8 +13,8 @@ namespace FlaxVR
 
         public abstract string DeviceName { get; }
 
-        public abstract RenderTarget LeftEyeRenderTarget { get; }
-        public abstract RenderTarget RightEyeRenderTarget { get; }
+        public abstract GPUTexture LeftEyeGPUTexture { get; }
+        public abstract GPUTexture RightEyeGPUTexture { get; }
 
         public abstract List<VRControllerState> Controllers { get; }
 
