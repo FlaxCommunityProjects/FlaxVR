@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using FlaxEngine;
@@ -60,8 +60,9 @@ namespace FlaxVR
         [HideInEditor]
         public EmptyActor RightControllerAnchor { get; private set; }
 
-        [Range(8f, 30000f)]
-        [DefaultValue(20000f)]
+        [Range(0.1f, 30000f)]
+        [DefaultValue(8f)]
+        [EditorOrder(0)]
         public float ZNear
         {
             get => _zNear;
@@ -76,7 +77,8 @@ namespace FlaxVR
         }
 
         [Range(0.1f, 30000f)]
-        [DefaultValue(0.1f)]
+        [DefaultValue(20000f)]
+        [EditorOrder(1)]
         public float ZFar
         {
             get => _zFar;
@@ -292,6 +294,8 @@ namespace FlaxVR
                 lRenderView.Near = ZNear;
                 lRenderView.Far = ZFar;
                 rRenderView.Flags = rRenderView.Flags & ~ViewFlags.MotionBlur;
+                rRenderView.Near = ZNear;
+                rRenderView.Far = ZFar;
                 ctx.DrawScene(renderTask, _context.LeftEyeGPUTexture, lRenderBuffers, ref lRenderView, Utils.GetEmptyArray<Actor>(), ActorsSources.Scenes, null);
                 ctx.DrawScene(renderTask, _context.RightEyeGPUTexture, rRenderBuffers, ref rRenderView, Utils.GetEmptyArray<Actor>(), ActorsSources.Scenes, null);
 
