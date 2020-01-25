@@ -3,7 +3,6 @@ using FlaxEngine;
 using System.Text;
 using Valve.VR;
 using OVR = Valve.VR.OpenVR;
-using FlaxEngine.Rendering;
 using System.Collections.Generic;
 
 namespace FlaxVR.OpenVR
@@ -14,8 +13,8 @@ namespace FlaxVR.OpenVR
         private readonly CVRCompositor _compositor;
         private readonly VRContextOptions _options;
         private string _deviceName;
-        private RenderTarget _leftEyeRT;
-        private RenderTarget _rightEyeRT;
+        private GPUTexture _leftEyeGT;
+        private GPUTexture _rightEyeGT;
         private Matrix _projLeft;
         private Matrix _projRight;
         private Matrix _headToEyeLeft;
@@ -27,8 +26,8 @@ namespace FlaxVR.OpenVR
         private int _leftControllerIndex;
         private int _rightControllerIndex;
 
-        public override RenderTarget LeftEyeRenderTarget => _leftEyeRT;
-        public override RenderTarget RightEyeRenderTarget => _rightEyeRT;
+        public override GPUTexture LeftEyeGPUTexture => _leftEyeGT;
+        public override GPUTexture RightEyeGPUTexture => _rightEyeGT;
 
         public override string DeviceName => _deviceName;
 
@@ -191,8 +190,6 @@ namespace FlaxVR.OpenVR
 
         public override void Dispose()
         {
-            _leftEyeRT.Dispose();
-            _rightEyeRT.Dispose();
             OVR.Shutdown();
         }
 
@@ -215,11 +212,13 @@ namespace FlaxVR.OpenVR
             uint eyeHeight = 0;
             _vrSystem.GetRecommendedRenderTargetSize(ref eyeWidth, ref eyeHeight);
 
-            _leftEyeRT = RenderTarget.New();
-            _leftEyeRT.Init(PixelFormat.R8G8B8A8_UNorm, (int)eyeWidth, (int)eyeHeight, multiSampleLevel: _options.EyeRenderTargetSampleCount);
+            _leftEyeGT = GPUDevice.CreateTexture();
+            var descLeftEye = GPUTextureDescription.New2D((int)eyeWidth, (int)eyeHeight, 1, PixelFormat.R8G8B8A8_UNorm, msaaLevel: _options.EyeRenderTargetSampleCount);
+            _leftEyeGT.Init(ref descLeftEye);
 
-            _rightEyeRT = RenderTarget.New();
-            _rightEyeRT.Init(PixelFormat.R8G8B8A8_UNorm, (int)eyeWidth, (int)eyeHeight, multiSampleLevel: _options.EyeRenderTargetSampleCount);
+            _rightEyeGT = GPUDevice.CreateTexture();
+            var descRightEye = GPUTextureDescription.New2D((int)eyeWidth, (int)eyeHeight, 1, PixelFormat.R8G8B8A8_UNorm, msaaLevel: _options.EyeRenderTargetSampleCount);
+            _rightEyeGT.Init(ref descRightEye);
 
             Matrix eyeToHeadLeft = ToSysMatrix(_vrSystem.GetEyeToHeadTransform(EVREye.Eye_Left));
             Matrix.Invert(ref eyeToHeadLeft, out _headToEyeLeft);
@@ -269,14 +268,14 @@ namespace FlaxVR.OpenVR
 
         public override void SubmitFrame()
         {
-            SubmitTexture(_compositor, LeftEyeRenderTarget, EVREye.Eye_Left);
-            SubmitTexture(_compositor, RightEyeRenderTarget, EVREye.Eye_Right);
+            SubmitTexture(_compositor, LeftEyeGPUTexture, EVREye.Eye_Left);
+            SubmitTexture(_compositor, RightEyeGPUTexture, EVREye.Eye_Right);
         }
-        private void SubmitTexture(CVRCompositor compositor, RenderTarget colorTex, EVREye eye)
+        private void SubmitTexture(CVRCompositor compositor, GPUTexture colorTex, EVREye eye)
         {
             Texture_t texT;
 
-            var renderer = GraphicsDevice.RendererType;
+            var renderer = GPUDevice.RendererType;
 
             if (renderer == RendererType.DirectX10 || renderer == RendererType.DirectX10_1 || renderer == RendererType.DirectX11)
             {

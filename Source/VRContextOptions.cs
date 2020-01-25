@@ -1,4 +1,5 @@
-﻿using FlaxEngine.Rendering;
+﻿
+using FlaxEngine;
 
 namespace FlaxVR
 {

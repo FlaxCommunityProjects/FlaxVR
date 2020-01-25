@@ -1,10 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using FlaxEngine;
-using FlaxEngine.Rendering;
 using FlaxVR.OpenVR;
-using UI;
 
 namespace FlaxVR
 {
@@ -62,8 +60,9 @@ namespace FlaxVR
         [HideInEditor]
         public EmptyActor RightControllerAnchor { get; private set; }
 
-        [Range(8f, 30000f)]
-        [DefaultValue(20000f)]
+        [Range(0.1f, 30000f)]
+        [DefaultValue(8f)]
+        [EditorOrder(0)]
         public float ZNear
         {
             get => _zNear;
@@ -78,7 +77,8 @@ namespace FlaxVR
         }
 
         [Range(0.1f, 30000f)]
-        [DefaultValue(0.1f)]
+        [DefaultValue(20000f)]
+        [EditorOrder(1)]
         public float ZFar
         {
             get => _zFar;
@@ -196,7 +196,7 @@ namespace FlaxVR
             }
 
 
-            vrControllers = Actor.GetScriptsRecursive<VRController>();
+            vrControllers = new List<VRController>(Actor.GetScriptsInChildren<VRController>());
 
         }
 
@@ -264,7 +264,8 @@ namespace FlaxVR
 
             MainRenderTask.Instance.Enabled = false;
 
-            renderTask = RenderTask.Create<CustomRenderTask>();
+
+            renderTask = FlaxEngine.Object.New<CustomRenderTask>();
             renderTask.Render += (ctx) =>
             {
 
@@ -283,18 +284,20 @@ namespace FlaxVR
                 if (rRenderBuffers == null)
                     rRenderBuffers = RenderBuffers.New();
 
-                if (_context.LeftEyeRenderTarget == null || _context.RightEyeRenderTarget == null)
+                if (_context.LeftEyeGPUTexture == null || _context.RightEyeGPUTexture == null)
                     return;
 
-                lRenderBuffers.Size = _context.LeftEyeRenderTarget.Size;
-                rRenderBuffers.Size = _context.RightEyeRenderTarget.Size;
+                lRenderBuffers.Size = _context.LeftEyeGPUTexture.Size;
+                rRenderBuffers.Size = _context.RightEyeGPUTexture.Size;
 
                 lRenderView.Flags = lRenderView.Flags & ~ViewFlags.MotionBlur;
                 lRenderView.Near = ZNear;
                 lRenderView.Far = ZFar;
                 rRenderView.Flags = rRenderView.Flags & ~ViewFlags.MotionBlur;
-                ctx.DrawScene(renderTask, _context.LeftEyeRenderTarget, lRenderBuffers, ref lRenderView, Utils.GetEmptyArray<Actor>(), ActorsSources.Scenes, null);
-                ctx.DrawScene(renderTask, _context.RightEyeRenderTarget, rRenderBuffers, ref rRenderView, Utils.GetEmptyArray<Actor>(), ActorsSources.Scenes, null);
+                rRenderView.Near = ZNear;
+                rRenderView.Far = ZFar;
+                ctx.DrawScene(renderTask, _context.LeftEyeGPUTexture, lRenderBuffers, ref lRenderView, Utils.GetEmptyArray<Actor>(), ActorsSources.Scenes, null);
+                ctx.DrawScene(renderTask, _context.RightEyeGPUTexture, rRenderBuffers, ref rRenderView, Utils.GetEmptyArray<Actor>(), ActorsSources.Scenes, null);
 
                 _context?.SubmitFrame();
             };
