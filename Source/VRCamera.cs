@@ -106,16 +106,22 @@ namespace FlaxVR
                 // TODO: Move actor itself here and update controllers
 
                 // Update left eye
-                var leftView = poses.CreateView(VREye.Left, Actor.Position, Vector3.UnitZ, Vector3.UnitY);
+                var leftView = poses.CreateView(VREye.Left, Actor.Position, Vector3.UnitZ, Vector3.UnitY, out Vector3 lEyePos, out Vector3 lDirection);
                 var leftProjection = poses.LeftEyeProjection;
                 //lBoundingFrustum = new BoundingFrustum(leftView * leftProjection);
                 lRenderView.SetUp(ref leftView, ref leftProjection);
+                // And set the position and direction
+                lRenderView.Position = lEyePos;
+                lRenderView.Direction = lDirection;
 
                 // Update right eye
-                var rightView = poses.CreateView(VREye.Right, Actor.Position, Vector3.UnitZ, Vector3.UnitY);
+                var rightView = poses.CreateView(VREye.Right, Actor.Position, Vector3.UnitZ, Vector3.UnitY, out Vector3 rEyePos, out Vector3 rDirection);
                 var rightProjection = poses.RightEyeProjection;
                 //rBoundingFrustum = new BoundingFrustum(rightView * rightProjection);
                 rRenderView.SetUp(ref rightView, ref rightProjection);
+                // And set the position and direction
+                rRenderView.Position = rEyePos;
+                rRenderView.Direction = rDirection;
 
                 canvas.IsActive = MirrorEnabled;
 

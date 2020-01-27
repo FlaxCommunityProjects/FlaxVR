@@ -53,13 +53,14 @@ namespace FlaxVR
             }
         }
 
-        public Matrix CreateView(VREye eye, Vector3 positionOffset, Vector3 forward, Vector3 up)
+        public Matrix CreateView(VREye eye, Vector3 positionOffset, Vector3 forward, Vector3 up, out Vector3 eyePos, out Vector3 target)
         {
-            Vector3 eyePos = GetEyePosition(eye) + positionOffset;
+            eyePos = GetEyePosition(eye) + positionOffset;
             Quaternion eyeQuat = GetEyeRotation(eye);
             Vector3 forwardTransformed = Vector3.Transform(forward, eyeQuat);
             Vector3 upTransformed = Vector3.Transform(up, eyeQuat);
-            return Matrix.LookAt(eyePos, eyePos + forwardTransformed, upTransformed);
+            target = eyePos + forwardTransformed;
+            return Matrix.LookAt(eyePos, target, upTransformed);
         }
     }
 }
