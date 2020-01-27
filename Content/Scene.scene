@@ -239,14 +239,12 @@
 			"ID": "0bd7e22743838f13e0a55686d982a7be",
 			"ParentID": "93c00ddd4f8b582e9ec1b8804f93adc4",
 			"V": {
-	"_zNear": 20000.0,
-	"_zFar": 0.1,
+	"_zNear": 8.0,
+	"_zFar": 20000.0,
 	"MirrorEnabled": true,
 	"MirrorSource": 0,
-	"LeftController": "27807cd54b025901bfcc3780859d4190",
-	"RightController": "bac6caac4ff64f6f9d8d7998396c9418",
-	"ZNear": 20000.0,
-	"ZFar": 0.1
+	"ZNear": 8.0,
+	"ZFar": 20000.0
 }
 		},
 		{
