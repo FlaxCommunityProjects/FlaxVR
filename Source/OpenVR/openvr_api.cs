@@ -36,15 +36,19 @@
 //
 //=============================================================================
 
-// Changes in Veldrid.OpenVR: All types made non-internal.
-
 using System;
 using System.Runtime.InteropServices;
+using Valve.VR;
+
+#if UNITY_5_3_OR_NEWER
+using UnityEngine;
+#endif
 
 namespace Valve.VR
 {
+
     [StructLayout(LayoutKind.Sequential)]
-    internal struct IVRSystem
+    public struct IVRSystem
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate void _GetRecommendedRenderTargetSize(ref uint pnWidth, ref uint pnHeight);
@@ -262,11 +266,6 @@ namespace Valve.VR
         internal _ShouldApplicationReduceRenderingWork ShouldApplicationReduceRenderingWork;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate uint _DriverDebugRequest(uint unDeviceIndex, string pchRequest, System.Text.StringBuilder pchResponseBuffer, uint unResponseBufferSize);
-        [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _DriverDebugRequest DriverDebugRequest;
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate EVRFirmwareError _PerformFirmwareUpdate(uint unDeviceIndex);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _PerformFirmwareUpdate PerformFirmwareUpdate;
@@ -277,14 +276,19 @@ namespace Valve.VR
         internal _AcknowledgeQuit_Exiting AcknowledgeQuit_Exiting;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate void _AcknowledgeQuit_UserPrompt();
+        internal delegate uint _GetAppContainerFilePaths(System.Text.StringBuilder pchBuffer, uint unBufferSize);
         [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _AcknowledgeQuit_UserPrompt AcknowledgeQuit_UserPrompt;
+        internal _GetAppContainerFilePaths GetAppContainerFilePaths;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate IntPtr _GetRuntimeVersion();
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _GetRuntimeVersion GetRuntimeVersion;
 
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct IVRExtendedDisplay
+    public struct IVRExtendedDisplay
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate void _GetWindowBounds(ref int pnX, ref int pnY, ref uint pnWidth, ref uint pnHeight);
@@ -304,7 +308,7 @@ namespace Valve.VR
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct IVRTrackedCamera
+    public struct IVRTrackedCamera
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate IntPtr _GetCameraErrorNameFromEnum(EVRTrackedCameraError eCameraError);
@@ -322,12 +326,12 @@ namespace Valve.VR
         internal _GetCameraFrameSize GetCameraFrameSize;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate EVRTrackedCameraError _GetCameraIntrinsics(uint nDeviceIndex, EVRTrackedCameraFrameType eFrameType, ref HmdVector2_t pFocalLength, ref HmdVector2_t pCenter);
+        internal delegate EVRTrackedCameraError _GetCameraIntrinsics(uint nDeviceIndex, uint nCameraIndex, EVRTrackedCameraFrameType eFrameType, ref HmdVector2_t pFocalLength, ref HmdVector2_t pCenter);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _GetCameraIntrinsics GetCameraIntrinsics;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate EVRTrackedCameraError _GetCameraProjection(uint nDeviceIndex, EVRTrackedCameraFrameType eFrameType, float flZNear, float flZFar, ref HmdMatrix44_t pProjection);
+        internal delegate EVRTrackedCameraError _GetCameraProjection(uint nDeviceIndex, uint nCameraIndex, EVRTrackedCameraFrameType eFrameType, float flZNear, float flZFar, ref HmdMatrix44_t pProjection);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _GetCameraProjection GetCameraProjection;
 
@@ -366,10 +370,20 @@ namespace Valve.VR
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _ReleaseVideoStreamTextureGL ReleaseVideoStreamTextureGL;
 
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate void _SetCameraTrackingSpace(ETrackingUniverseOrigin eUniverse);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _SetCameraTrackingSpace SetCameraTrackingSpace;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate ETrackingUniverseOrigin _GetCameraTrackingSpace();
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _GetCameraTrackingSpace GetCameraTrackingSpace;
+
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct IVRApplications
+    public struct IVRApplications
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate EVRApplicationError _AddApplicationManifest(string pchApplicationManifestFullPath, bool bTemporary);
@@ -497,9 +511,9 @@ namespace Valve.VR
         internal _GetStartingApplication GetStartingApplication;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate EVRApplicationTransitionState _GetTransitionState();
+        internal delegate EVRSceneApplicationState _GetSceneApplicationState();
         [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _GetTransitionState GetTransitionState;
+        internal _GetSceneApplicationState GetSceneApplicationState;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate EVRApplicationError _PerformApplicationPrelaunchCheck(string pchAppKey);
@@ -507,14 +521,9 @@ namespace Valve.VR
         internal _PerformApplicationPrelaunchCheck PerformApplicationPrelaunchCheck;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate IntPtr _GetApplicationsTransitionStateNameFromEnum(EVRApplicationTransitionState state);
+        internal delegate IntPtr _GetSceneApplicationStateNameFromEnum(EVRSceneApplicationState state);
         [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _GetApplicationsTransitionStateNameFromEnum GetApplicationsTransitionStateNameFromEnum;
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate bool _IsQuitUserPromptRequested();
-        [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _IsQuitUserPromptRequested IsQuitUserPromptRequested;
+        internal _GetSceneApplicationStateNameFromEnum GetSceneApplicationStateNameFromEnum;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate EVRApplicationError _LaunchInternalProcess(string pchBinaryPath, string pchArguments, string pchWorkingDirectory);
@@ -529,7 +538,7 @@ namespace Valve.VR
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct IVRChaperone
+    public struct IVRChaperone
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate ChaperoneCalibrationState _GetCalibrationState();
@@ -574,7 +583,7 @@ namespace Valve.VR
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct IVRChaperoneSetup
+    public struct IVRChaperoneSetup
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate bool _CommitWorkingCopy(EChaperoneConfigFile configFile);
@@ -627,6 +636,11 @@ namespace Valve.VR
         internal _SetWorkingCollisionBoundsInfo SetWorkingCollisionBoundsInfo;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate void _SetWorkingPerimeter([In, Out] HmdVector2_t[] pPointBuffer, uint unPointCount);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _SetWorkingPerimeter SetWorkingPerimeter;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate void _SetWorkingSeatedZeroPoseToRawTrackingPose(ref HmdMatrix34_t pMatSeatedZeroPoseToRawTrackingPose);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _SetWorkingSeatedZeroPoseToRawTrackingPose SetWorkingSeatedZeroPoseToRawTrackingPose;
@@ -647,26 +661,6 @@ namespace Valve.VR
         internal _GetLiveSeatedZeroPoseToRawTrackingPose GetLiveSeatedZeroPoseToRawTrackingPose;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate void _SetWorkingCollisionBoundsTagsInfo([In, Out] byte[] pTagsBuffer, uint unTagCount);
-        [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _SetWorkingCollisionBoundsTagsInfo SetWorkingCollisionBoundsTagsInfo;
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate bool _GetLiveCollisionBoundsTagsInfo([In, Out] byte[] pTagsBuffer, ref uint punTagCount);
-        [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _GetLiveCollisionBoundsTagsInfo GetLiveCollisionBoundsTagsInfo;
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate bool _SetWorkingPhysicalBoundsInfo([In, Out] HmdQuad_t[] pQuadsBuffer, uint unQuadsCount);
-        [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _SetWorkingPhysicalBoundsInfo SetWorkingPhysicalBoundsInfo;
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate bool _GetLivePhysicalBoundsInfo([In, Out] HmdQuad_t[] pQuadsBuffer, ref uint punQuadsCount);
-        [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _GetLivePhysicalBoundsInfo GetLivePhysicalBoundsInfo;
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate bool _ExportLiveToBuffer(System.Text.StringBuilder pBuffer, ref uint pnBufferLength);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _ExportLiveToBuffer ExportLiveToBuffer;
@@ -676,10 +670,25 @@ namespace Valve.VR
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _ImportFromBufferToWorking ImportFromBufferToWorking;
 
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate void _ShowWorkingSetPreview();
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _ShowWorkingSetPreview ShowWorkingSetPreview;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate void _HideWorkingSetPreview();
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _HideWorkingSetPreview HideWorkingSetPreview;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate void _RoomSetupStarting();
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _RoomSetupStarting RoomSetupStarting;
+
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct IVRCompositor
+    public struct IVRCompositor
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate void _SetTrackingSpace(ETrackingUniverseOrigin eOrigin);
@@ -727,7 +736,7 @@ namespace Valve.VR
         internal _GetFrameTiming GetFrameTiming;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate uint _GetFrameTimings(ref Compositor_FrameTiming pTiming, uint nFrames);
+        internal delegate uint _GetFrameTimings([In, Out] Compositor_FrameTiming[] pTiming, uint nFrames);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _GetFrameTimings GetFrameTimings;
 
@@ -896,10 +905,35 @@ namespace Valve.VR
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _SubmitExplicitTimingData SubmitExplicitTimingData;
 
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate bool _IsMotionSmoothingEnabled();
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _IsMotionSmoothingEnabled IsMotionSmoothingEnabled;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate bool _IsMotionSmoothingSupported();
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _IsMotionSmoothingSupported IsMotionSmoothingSupported;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate bool _IsCurrentSceneFocusAppLoading();
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _IsCurrentSceneFocusAppLoading IsCurrentSceneFocusAppLoading;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVRCompositorError _SetStageOverride_Async(string pchRenderModelPath, ref HmdMatrix34_t pTransform, ref Compositor_StageRenderSettings pRenderSettings, uint nSizeOfRenderSettings);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _SetStageOverride_Async SetStageOverride_Async;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate void _ClearStageOverride();
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _ClearStageOverride ClearStageOverride;
+
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct IVROverlay
+    public struct IVROverlay
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate EVROverlayError _FindOverlay(string pchOverlayKey, ref ulong pOverlayHandle);
@@ -915,16 +949,6 @@ namespace Valve.VR
         internal delegate EVROverlayError _DestroyOverlay(ulong ulOverlayHandle);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _DestroyOverlay DestroyOverlay;
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate EVROverlayError _SetHighQualityOverlay(ulong ulOverlayHandle);
-        [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _SetHighQualityOverlay SetHighQualityOverlay;
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate ulong _GetHighQualityOverlay();
-        [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _GetHighQualityOverlay GetHighQualityOverlay;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate uint _GetOverlayKey(ulong ulOverlayHandle, System.Text.StringBuilder pchValue, uint unBufferSize, ref EVROverlayError pError);
@@ -970,6 +994,11 @@ namespace Valve.VR
         internal delegate EVROverlayError _GetOverlayFlag(ulong ulOverlayHandle, VROverlayFlags eOverlayFlag, ref bool pbEnabled);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _GetOverlayFlag GetOverlayFlag;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVROverlayError _GetOverlayFlags(ulong ulOverlayHandle, ref uint pFlags);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _GetOverlayFlags GetOverlayFlags;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate EVROverlayError _SetOverlayColor(ulong ulOverlayHandle, float fRed, float fGreen, float fBlue);
@@ -1022,14 +1051,14 @@ namespace Valve.VR
         internal _GetOverlayWidthInMeters GetOverlayWidthInMeters;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate EVROverlayError _SetOverlayAutoCurveDistanceRangeInMeters(ulong ulOverlayHandle, float fMinDistanceInMeters, float fMaxDistanceInMeters);
+        internal delegate EVROverlayError _SetOverlayCurvature(ulong ulOverlayHandle, float fCurvature);
         [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _SetOverlayAutoCurveDistanceRangeInMeters SetOverlayAutoCurveDistanceRangeInMeters;
+        internal _SetOverlayCurvature SetOverlayCurvature;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate EVROverlayError _GetOverlayAutoCurveDistanceRangeInMeters(ulong ulOverlayHandle, ref float pfMinDistanceInMeters, ref float pfMaxDistanceInMeters);
+        internal delegate EVROverlayError _GetOverlayCurvature(ulong ulOverlayHandle, ref float pfCurvature);
         [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _GetOverlayAutoCurveDistanceRangeInMeters GetOverlayAutoCurveDistanceRangeInMeters;
+        internal _GetOverlayCurvature GetOverlayCurvature;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate EVROverlayError _SetOverlayTextureColorSpace(ulong ulOverlayHandle, EColorSpace eTextureColorSpace);
@@ -1107,6 +1136,16 @@ namespace Valve.VR
         internal _SetOverlayTransformOverlayRelative SetOverlayTransformOverlayRelative;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVROverlayError _SetOverlayTransformCursor(ulong ulCursorOverlayHandle, ref HmdVector2_t pvHotspot);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _SetOverlayTransformCursor SetOverlayTransformCursor;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVROverlayError _GetOverlayTransformCursor(ulong ulOverlayHandle, ref HmdVector2_t pvHotspot);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _GetOverlayTransformCursor GetOverlayTransformCursor;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate EVROverlayError _ShowOverlay(ulong ulOverlayHandle);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _ShowOverlay ShowOverlay;
@@ -1162,27 +1201,7 @@ namespace Valve.VR
         internal _IsHoverTargetOverlay IsHoverTargetOverlay;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate ulong _GetGamepadFocusOverlay();
-        [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _GetGamepadFocusOverlay GetGamepadFocusOverlay;
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate EVROverlayError _SetGamepadFocusOverlay(ulong ulNewFocusOverlay);
-        [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _SetGamepadFocusOverlay SetGamepadFocusOverlay;
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate EVROverlayError _SetOverlayNeighbor(EOverlayDirection eDirection, ulong ulFrom, ulong ulTo);
-        [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _SetOverlayNeighbor SetOverlayNeighbor;
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate EVROverlayError _MoveGamepadFocusToNeighbor(EOverlayDirection eDirection, ulong ulFrom);
-        [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _MoveGamepadFocusToNeighbor MoveGamepadFocusToNeighbor;
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate EVROverlayError _SetOverlayDualAnalogTransform(ulong ulOverlay, EDualAnalogWhich eWhich, IntPtr vCenter, float fRadius);
+        internal delegate EVROverlayError _SetOverlayDualAnalogTransform(ulong ulOverlay, EDualAnalogWhich eWhich, ref HmdVector2_t pvCenter, float fRadius);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _SetOverlayDualAnalogTransform SetOverlayDualAnalogTransform;
 
@@ -1190,6 +1209,31 @@ namespace Valve.VR
         internal delegate EVROverlayError _GetOverlayDualAnalogTransform(ulong ulOverlay, EDualAnalogWhich eWhich, ref HmdVector2_t pvCenter, ref float pfRadius);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _GetOverlayDualAnalogTransform GetOverlayDualAnalogTransform;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVROverlayError _SetOverlayIntersectionMask(ulong ulOverlayHandle, ref VROverlayIntersectionMaskPrimitive_t pMaskPrimitives, uint unNumMaskPrimitives, uint unPrimitiveSize);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _SetOverlayIntersectionMask SetOverlayIntersectionMask;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVROverlayError _TriggerLaserMouseHapticVibration(ulong ulOverlayHandle, float fDurationSeconds, float fFrequency, float fAmplitude);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _TriggerLaserMouseHapticVibration TriggerLaserMouseHapticVibration;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVROverlayError _SetOverlayCursor(ulong ulOverlayHandle, ulong ulCursorHandle);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _SetOverlayCursor SetOverlayCursor;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVROverlayError _SetOverlayCursorPositionOverride(ulong ulOverlayHandle, ref HmdVector2_t pvCursor);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _SetOverlayCursorPositionOverride SetOverlayCursorPositionOverride;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVROverlayError _ClearOverlayCursorPositionOverride(ulong ulOverlayHandle);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _ClearOverlayCursorPositionOverride ClearOverlayCursorPositionOverride;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate EVROverlayError _SetOverlayTexture(ulong ulOverlayHandle, ref Texture_t pTexture);
@@ -1202,7 +1246,7 @@ namespace Valve.VR
         internal _ClearOverlayTexture ClearOverlayTexture;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate EVROverlayError _SetOverlayRaw(ulong ulOverlayHandle, IntPtr pvBuffer, uint unWidth, uint unHeight, uint unDepth);
+        internal delegate EVROverlayError _SetOverlayRaw(ulong ulOverlayHandle, IntPtr pvBuffer, uint unWidth, uint unHeight, uint unBytesPerPixel);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _SetOverlayRaw SetOverlayRaw;
 
@@ -1292,16 +1336,6 @@ namespace Valve.VR
         internal _SetKeyboardPositionForOverlay SetKeyboardPositionForOverlay;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate EVROverlayError _SetOverlayIntersectionMask(ulong ulOverlayHandle, ref VROverlayIntersectionMaskPrimitive_t pMaskPrimitives, uint unNumMaskPrimitives, uint unPrimitiveSize);
-        [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _SetOverlayIntersectionMask SetOverlayIntersectionMask;
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate EVROverlayError _GetOverlayFlags(ulong ulOverlayHandle, ref uint pFlags);
-        [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _GetOverlayFlags GetOverlayFlags;
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate VRMessageOverlayResponse _ShowMessageOverlay(string pchText, string pchCaption, string pchButton0Text, string pchButton1Text, string pchButton2Text, string pchButton3Text);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _ShowMessageOverlay ShowMessageOverlay;
@@ -1314,7 +1348,7 @@ namespace Valve.VR
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct IVRRenderModels
+    public struct IVRRenderModels
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate EVRRenderModelError _LoadRenderModel_Async(string pchRenderModelName, ref IntPtr ppRenderModel);
@@ -1414,7 +1448,7 @@ namespace Valve.VR
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct IVRNotifications
+    public struct IVRNotifications
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate EVRNotificationError _CreateNotification(ulong ulOverlayHandle, ulong ulUserValue, EVRNotificationType type, string pchText, EVRNotificationStyle style, ref NotificationBitmap_t pImage, ref uint pNotificationId);
@@ -1429,17 +1463,12 @@ namespace Valve.VR
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct IVRSettings
+    public struct IVRSettings
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate IntPtr _GetSettingsErrorNameFromEnum(EVRSettingsError eError);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _GetSettingsErrorNameFromEnum GetSettingsErrorNameFromEnum;
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate bool _Sync(bool bForce, ref EVRSettingsError peError);
-        [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _Sync Sync;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate void _SetBool(string pchSection, string pchSettingsKey, bool bValue, ref EVRSettingsError peError);
@@ -1494,7 +1523,7 @@ namespace Valve.VR
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct IVRScreenshots
+    public struct IVRScreenshots
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate EVRScreenshotError _RequestScreenshot(ref uint pOutScreenshotHandle, EVRScreenshotType type, string pchPreviewFilename, string pchVRFilename);
@@ -1534,7 +1563,7 @@ namespace Valve.VR
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct IVRResources
+    public struct IVRResources
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate uint _LoadSharedResource(string pchResourceName, string pchBuffer, uint unBufferLen);
@@ -1549,7 +1578,7 @@ namespace Valve.VR
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct IVRDriverManager
+    public struct IVRDriverManager
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate uint _GetDriverCount();
@@ -1566,10 +1595,15 @@ namespace Valve.VR
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _GetDriverHandle GetDriverHandle;
 
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate bool _IsEnabled(uint nDriver);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _IsEnabled IsEnabled;
+
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct IVRInput
+    public struct IVRInput
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate EVRInputError _SetActionManifestPath(string pchActionManifestPath);
@@ -1607,27 +1641,62 @@ namespace Valve.VR
         internal _GetAnalogActionData GetAnalogActionData;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate EVRInputError _GetPoseActionData(ulong action, ETrackingUniverseOrigin eOrigin, float fPredictedSecondsFromNow, ref InputPoseActionData_t pActionData, uint unActionDataSize, ulong ulRestrictToDevice);
+        internal delegate EVRInputError _GetPoseActionDataRelativeToNow(ulong action, ETrackingUniverseOrigin eOrigin, float fPredictedSecondsFromNow, ref InputPoseActionData_t pActionData, uint unActionDataSize, ulong ulRestrictToDevice);
         [MarshalAs(UnmanagedType.FunctionPtr)]
-        internal _GetPoseActionData GetPoseActionData;
+        internal _GetPoseActionDataRelativeToNow GetPoseActionDataRelativeToNow;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate EVRInputError _GetSkeletalActionData(ulong action, ref InputSkeletalActionData_t pActionData, uint unActionDataSize, ulong ulRestrictToDevice);
+        internal delegate EVRInputError _GetPoseActionDataForNextFrame(ulong action, ETrackingUniverseOrigin eOrigin, ref InputPoseActionData_t pActionData, uint unActionDataSize, ulong ulRestrictToDevice);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _GetPoseActionDataForNextFrame GetPoseActionDataForNextFrame;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVRInputError _GetSkeletalActionData(ulong action, ref InputSkeletalActionData_t pActionData, uint unActionDataSize);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _GetSkeletalActionData GetSkeletalActionData;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate EVRInputError _GetSkeletalBoneData(ulong action, EVRSkeletalTransformSpace eTransformSpace, EVRSkeletalMotionRange eMotionRange, [In, Out] VRBoneTransform_t[] pTransformArray, uint unTransformArrayCount, ulong ulRestrictToDevice);
+        internal delegate EVRInputError _GetBoneCount(ulong action, ref uint pBoneCount);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _GetBoneCount GetBoneCount;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVRInputError _GetBoneHierarchy(ulong action, [In, Out] int[] pParentIndices, uint unIndexArayCount);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _GetBoneHierarchy GetBoneHierarchy;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVRInputError _GetBoneName(ulong action, int nBoneIndex, System.Text.StringBuilder pchBoneName, uint unNameBufferSize);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _GetBoneName GetBoneName;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVRInputError _GetSkeletalReferenceTransforms(ulong action, EVRSkeletalTransformSpace eTransformSpace, EVRSkeletalReferencePose eReferencePose, [In, Out] VRBoneTransform_t[] pTransformArray, uint unTransformArrayCount);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _GetSkeletalReferenceTransforms GetSkeletalReferenceTransforms;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVRInputError _GetSkeletalTrackingLevel(ulong action, ref EVRSkeletalTrackingLevel pSkeletalTrackingLevel);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _GetSkeletalTrackingLevel GetSkeletalTrackingLevel;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVRInputError _GetSkeletalBoneData(ulong action, EVRSkeletalTransformSpace eTransformSpace, EVRSkeletalMotionRange eMotionRange, [In, Out] VRBoneTransform_t[] pTransformArray, uint unTransformArrayCount);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _GetSkeletalBoneData GetSkeletalBoneData;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate EVRInputError _GetSkeletalBoneDataCompressed(ulong action, EVRSkeletalTransformSpace eTransformSpace, EVRSkeletalMotionRange eMotionRange, IntPtr pvCompressedData, uint unCompressedSize, ref uint punRequiredCompressedSize, ulong ulRestrictToDevice);
+        internal delegate EVRInputError _GetSkeletalSummaryData(ulong action, EVRSummaryType eSummaryType, ref VRSkeletalSummaryData_t pSkeletalSummaryData);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _GetSkeletalSummaryData GetSkeletalSummaryData;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVRInputError _GetSkeletalBoneDataCompressed(ulong action, EVRSkeletalMotionRange eMotionRange, IntPtr pvCompressedData, uint unCompressedSize, ref uint punRequiredCompressedSize);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _GetSkeletalBoneDataCompressed GetSkeletalBoneDataCompressed;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate EVRInputError _DecompressSkeletalBoneData(IntPtr pvCompressedBuffer, uint unCompressedBufferSize, ref EVRSkeletalTransformSpace peTransformSpace, [In, Out] VRBoneTransform_t[] pTransformArray, uint unTransformArrayCount);
+        internal delegate EVRInputError _DecompressSkeletalBoneData(IntPtr pvCompressedBuffer, uint unCompressedBufferSize, EVRSkeletalTransformSpace eTransformSpace, [In, Out] VRBoneTransform_t[] pTransformArray, uint unTransformArrayCount);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _DecompressSkeletalBoneData DecompressSkeletalBoneData;
 
@@ -1642,7 +1711,7 @@ namespace Valve.VR
         internal _GetActionOrigins GetActionOrigins;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate EVRInputError _GetOriginLocalizedName(ulong origin, System.Text.StringBuilder pchNameArray, uint unNameArraySize);
+        internal delegate EVRInputError _GetOriginLocalizedName(ulong origin, System.Text.StringBuilder pchNameArray, uint unNameArraySize, int unStringSectionsToInclude);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _GetOriginLocalizedName GetOriginLocalizedName;
 
@@ -1650,6 +1719,11 @@ namespace Valve.VR
         internal delegate EVRInputError _GetOriginTrackedDeviceInfo(ulong origin, ref InputOriginInfo_t pOriginInfo, uint unOriginInfoSize);
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _GetOriginTrackedDeviceInfo GetOriginTrackedDeviceInfo;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVRInputError _GetActionBindingInfo(ulong action, ref InputBindingInfo_t pOriginInfo, uint unBindingInfoSize, uint unBindingInfoCount, ref uint punReturnedBindingInfoCount);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _GetActionBindingInfo GetActionBindingInfo;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate EVRInputError _ShowActionOrigins(ulong actionSetHandle, ulong ulActionHandle);
@@ -1661,10 +1735,20 @@ namespace Valve.VR
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _ShowBindingsForActionSet ShowBindingsForActionSet;
 
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate bool _IsUsingLegacyInput();
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _IsUsingLegacyInput IsUsingLegacyInput;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVRInputError _OpenBindingUI(string pchAppKey, ulong ulActionSetHandle, ulong ulDeviceHandle, bool bShowOnDesktop);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _OpenBindingUI OpenBindingUI;
+
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct IVRIOBuffer
+    public struct IVRIOBuffer
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate EIOBufferError _Open(string pchPath, EIOBufferMode mode, uint unElementSize, uint unElements, ref ulong pulBuffer);
@@ -1691,10 +1775,15 @@ namespace Valve.VR
         [MarshalAs(UnmanagedType.FunctionPtr)]
         internal _PropertyContainer PropertyContainer;
 
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate bool _HasReaders(ulong ulBuffer);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _HasReaders HasReaders;
+
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct IVRSpatialAnchors
+    public struct IVRSpatialAnchors
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate EVRSpatialAnchorError _CreateSpatialAnchorFromDescriptor(string pchDescriptor, ref uint pHandleOut);
@@ -1718,26 +1807,51 @@ namespace Valve.VR
 
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct IVRDebug
+    {
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVRDebugError _EmitVrProfilerEvent(string pchMessage);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _EmitVrProfilerEvent EmitVrProfilerEvent;
 
-    internal class CVRSystem
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVRDebugError _BeginVrProfilerEvent(ref ulong pHandleOut);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _BeginVrProfilerEvent BeginVrProfilerEvent;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate EVRDebugError _FinishVrProfilerEvent(ulong hHandle, string pchMessage);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _FinishVrProfilerEvent FinishVrProfilerEvent;
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate uint _DriverDebugRequest(uint unDeviceIndex, string pchRequest, System.Text.StringBuilder pchResponseBuffer, uint unResponseBufferSize);
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal _DriverDebugRequest DriverDebugRequest;
+
+    }
+
+
+    public class CVRSystem
     {
         IVRSystem FnTable;
         internal CVRSystem(IntPtr pInterface)
         {
             FnTable = (IVRSystem)Marshal.PtrToStructure(pInterface, typeof(IVRSystem));
         }
-        internal void GetRecommendedRenderTargetSize(ref uint pnWidth, ref uint pnHeight)
+        public void GetRecommendedRenderTargetSize(ref uint pnWidth, ref uint pnHeight)
         {
             pnWidth = 0;
             pnHeight = 0;
             FnTable.GetRecommendedRenderTargetSize(ref pnWidth, ref pnHeight);
         }
-        internal HmdMatrix44_t GetProjectionMatrix(EVREye eEye, float fNearZ, float fFarZ)
+        public HmdMatrix44_t GetProjectionMatrix(EVREye eEye, float fNearZ, float fFarZ)
         {
             HmdMatrix44_t result = FnTable.GetProjectionMatrix(eEye, fNearZ, fFarZ);
             return result;
         }
-        internal void GetProjectionRaw(EVREye eEye, ref float pfLeft, ref float pfRight, ref float pfTop, ref float pfBottom)
+        public void GetProjectionRaw(EVREye eEye, ref float pfLeft, ref float pfRight, ref float pfTop, ref float pfBottom)
         {
             pfLeft = 0;
             pfRight = 0;
@@ -1745,136 +1859,136 @@ namespace Valve.VR
             pfBottom = 0;
             FnTable.GetProjectionRaw(eEye, ref pfLeft, ref pfRight, ref pfTop, ref pfBottom);
         }
-        internal bool ComputeDistortion(EVREye eEye, float fU, float fV, ref DistortionCoordinates_t pDistortionCoordinates)
+        public bool ComputeDistortion(EVREye eEye, float fU, float fV, ref DistortionCoordinates_t pDistortionCoordinates)
         {
             bool result = FnTable.ComputeDistortion(eEye, fU, fV, ref pDistortionCoordinates);
             return result;
         }
-        internal HmdMatrix34_t GetEyeToHeadTransform(EVREye eEye)
+        public HmdMatrix34_t GetEyeToHeadTransform(EVREye eEye)
         {
             HmdMatrix34_t result = FnTable.GetEyeToHeadTransform(eEye);
             return result;
         }
-        internal bool GetTimeSinceLastVsync(ref float pfSecondsSinceLastVsync, ref ulong pulFrameCounter)
+        public bool GetTimeSinceLastVsync(ref float pfSecondsSinceLastVsync, ref ulong pulFrameCounter)
         {
             pfSecondsSinceLastVsync = 0;
             pulFrameCounter = 0;
             bool result = FnTable.GetTimeSinceLastVsync(ref pfSecondsSinceLastVsync, ref pulFrameCounter);
             return result;
         }
-        internal int GetD3D9AdapterIndex()
+        public int GetD3D9AdapterIndex()
         {
             int result = FnTable.GetD3D9AdapterIndex();
             return result;
         }
-        internal void GetDXGIOutputInfo(ref int pnAdapterIndex)
+        public void GetDXGIOutputInfo(ref int pnAdapterIndex)
         {
             pnAdapterIndex = 0;
             FnTable.GetDXGIOutputInfo(ref pnAdapterIndex);
         }
-        internal void GetOutputDevice(ref ulong pnDevice, ETextureType textureType, IntPtr pInstance)
+        public void GetOutputDevice(ref ulong pnDevice, ETextureType textureType, IntPtr pInstance)
         {
             pnDevice = 0;
             FnTable.GetOutputDevice(ref pnDevice, textureType, pInstance);
         }
-        internal bool IsDisplayOnDesktop()
+        public bool IsDisplayOnDesktop()
         {
             bool result = FnTable.IsDisplayOnDesktop();
             return result;
         }
-        internal bool SetDisplayVisibility(bool bIsVisibleOnDesktop)
+        public bool SetDisplayVisibility(bool bIsVisibleOnDesktop)
         {
             bool result = FnTable.SetDisplayVisibility(bIsVisibleOnDesktop);
             return result;
         }
-        internal void GetDeviceToAbsoluteTrackingPose(ETrackingUniverseOrigin eOrigin, float fPredictedSecondsToPhotonsFromNow, TrackedDevicePose_t[] pTrackedDevicePoseArray)
+        public void GetDeviceToAbsoluteTrackingPose(ETrackingUniverseOrigin eOrigin, float fPredictedSecondsToPhotonsFromNow, TrackedDevicePose_t[] pTrackedDevicePoseArray)
         {
             FnTable.GetDeviceToAbsoluteTrackingPose(eOrigin, fPredictedSecondsToPhotonsFromNow, pTrackedDevicePoseArray, (uint)pTrackedDevicePoseArray.Length);
         }
-        internal void ResetSeatedZeroPose()
+        public void ResetSeatedZeroPose()
         {
             FnTable.ResetSeatedZeroPose();
         }
-        internal HmdMatrix34_t GetSeatedZeroPoseToStandingAbsoluteTrackingPose()
+        public HmdMatrix34_t GetSeatedZeroPoseToStandingAbsoluteTrackingPose()
         {
             HmdMatrix34_t result = FnTable.GetSeatedZeroPoseToStandingAbsoluteTrackingPose();
             return result;
         }
-        internal HmdMatrix34_t GetRawZeroPoseToStandingAbsoluteTrackingPose()
+        public HmdMatrix34_t GetRawZeroPoseToStandingAbsoluteTrackingPose()
         {
             HmdMatrix34_t result = FnTable.GetRawZeroPoseToStandingAbsoluteTrackingPose();
             return result;
         }
-        internal uint GetSortedTrackedDeviceIndicesOfClass(ETrackedDeviceClass eTrackedDeviceClass, uint[] punTrackedDeviceIndexArray, uint unRelativeToTrackedDeviceIndex)
+        public uint GetSortedTrackedDeviceIndicesOfClass(ETrackedDeviceClass eTrackedDeviceClass, uint[] punTrackedDeviceIndexArray, uint unRelativeToTrackedDeviceIndex)
         {
             uint result = FnTable.GetSortedTrackedDeviceIndicesOfClass(eTrackedDeviceClass, punTrackedDeviceIndexArray, (uint)punTrackedDeviceIndexArray.Length, unRelativeToTrackedDeviceIndex);
             return result;
         }
-        internal EDeviceActivityLevel GetTrackedDeviceActivityLevel(uint unDeviceId)
+        public EDeviceActivityLevel GetTrackedDeviceActivityLevel(uint unDeviceId)
         {
             EDeviceActivityLevel result = FnTable.GetTrackedDeviceActivityLevel(unDeviceId);
             return result;
         }
-        internal void ApplyTransform(ref TrackedDevicePose_t pOutputPose, ref TrackedDevicePose_t pTrackedDevicePose, ref HmdMatrix34_t pTransform)
+        public void ApplyTransform(ref TrackedDevicePose_t pOutputPose, ref TrackedDevicePose_t pTrackedDevicePose, ref HmdMatrix34_t pTransform)
         {
             FnTable.ApplyTransform(ref pOutputPose, ref pTrackedDevicePose, ref pTransform);
         }
-        internal uint GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole unDeviceType)
+        public uint GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole unDeviceType)
         {
             uint result = FnTable.GetTrackedDeviceIndexForControllerRole(unDeviceType);
             return result;
         }
-        internal ETrackedControllerRole GetControllerRoleForTrackedDeviceIndex(uint unDeviceIndex)
+        public ETrackedControllerRole GetControllerRoleForTrackedDeviceIndex(uint unDeviceIndex)
         {
             ETrackedControllerRole result = FnTable.GetControllerRoleForTrackedDeviceIndex(unDeviceIndex);
             return result;
         }
-        internal ETrackedDeviceClass GetTrackedDeviceClass(uint unDeviceIndex)
+        public ETrackedDeviceClass GetTrackedDeviceClass(uint unDeviceIndex)
         {
             ETrackedDeviceClass result = FnTable.GetTrackedDeviceClass(unDeviceIndex);
             return result;
         }
-        internal bool IsTrackedDeviceConnected(uint unDeviceIndex)
+        public bool IsTrackedDeviceConnected(uint unDeviceIndex)
         {
             bool result = FnTable.IsTrackedDeviceConnected(unDeviceIndex);
             return result;
         }
-        internal bool GetBoolTrackedDeviceProperty(uint unDeviceIndex, ETrackedDeviceProperty prop, ref ETrackedPropertyError pError)
+        public bool GetBoolTrackedDeviceProperty(uint unDeviceIndex, ETrackedDeviceProperty prop, ref ETrackedPropertyError pError)
         {
             bool result = FnTable.GetBoolTrackedDeviceProperty(unDeviceIndex, prop, ref pError);
             return result;
         }
-        internal float GetFloatTrackedDeviceProperty(uint unDeviceIndex, ETrackedDeviceProperty prop, ref ETrackedPropertyError pError)
+        public float GetFloatTrackedDeviceProperty(uint unDeviceIndex, ETrackedDeviceProperty prop, ref ETrackedPropertyError pError)
         {
             float result = FnTable.GetFloatTrackedDeviceProperty(unDeviceIndex, prop, ref pError);
             return result;
         }
-        internal int GetInt32TrackedDeviceProperty(uint unDeviceIndex, ETrackedDeviceProperty prop, ref ETrackedPropertyError pError)
+        public int GetInt32TrackedDeviceProperty(uint unDeviceIndex, ETrackedDeviceProperty prop, ref ETrackedPropertyError pError)
         {
             int result = FnTable.GetInt32TrackedDeviceProperty(unDeviceIndex, prop, ref pError);
             return result;
         }
-        internal ulong GetUint64TrackedDeviceProperty(uint unDeviceIndex, ETrackedDeviceProperty prop, ref ETrackedPropertyError pError)
+        public ulong GetUint64TrackedDeviceProperty(uint unDeviceIndex, ETrackedDeviceProperty prop, ref ETrackedPropertyError pError)
         {
             ulong result = FnTable.GetUint64TrackedDeviceProperty(unDeviceIndex, prop, ref pError);
             return result;
         }
-        internal HmdMatrix34_t GetMatrix34TrackedDeviceProperty(uint unDeviceIndex, ETrackedDeviceProperty prop, ref ETrackedPropertyError pError)
+        public HmdMatrix34_t GetMatrix34TrackedDeviceProperty(uint unDeviceIndex, ETrackedDeviceProperty prop, ref ETrackedPropertyError pError)
         {
             HmdMatrix34_t result = FnTable.GetMatrix34TrackedDeviceProperty(unDeviceIndex, prop, ref pError);
             return result;
         }
-        internal uint GetArrayTrackedDeviceProperty(uint unDeviceIndex, ETrackedDeviceProperty prop, uint propType, IntPtr pBuffer, uint unBufferSize, ref ETrackedPropertyError pError)
+        public uint GetArrayTrackedDeviceProperty(uint unDeviceIndex, ETrackedDeviceProperty prop, uint propType, IntPtr pBuffer, uint unBufferSize, ref ETrackedPropertyError pError)
         {
             uint result = FnTable.GetArrayTrackedDeviceProperty(unDeviceIndex, prop, propType, pBuffer, unBufferSize, ref pError);
             return result;
         }
-        internal uint GetStringTrackedDeviceProperty(uint unDeviceIndex, ETrackedDeviceProperty prop, System.Text.StringBuilder pchValue, uint unBufferSize, ref ETrackedPropertyError pError)
+        public uint GetStringTrackedDeviceProperty(uint unDeviceIndex, ETrackedDeviceProperty prop, System.Text.StringBuilder pchValue, uint unBufferSize, ref ETrackedPropertyError pError)
         {
             uint result = FnTable.GetStringTrackedDeviceProperty(unDeviceIndex, prop, pchValue, unBufferSize, ref pError);
             return result;
         }
-        internal string GetPropErrorNameFromEnum(ETrackedPropertyError error)
+        public string GetPropErrorNameFromEnum(ETrackedPropertyError error)
         {
             IntPtr result = FnTable.GetPropErrorNameFromEnum(error);
             return Marshal.PtrToStringAnsi(result);
@@ -1887,11 +2001,11 @@ namespace Valve.VR
         struct PollNextEventUnion
         {
             [FieldOffset(0)]
-            internal IVRSystem._PollNextEvent pPollNextEvent;
+            public IVRSystem._PollNextEvent pPollNextEvent;
             [FieldOffset(0)]
-            internal _PollNextEventPacked pPollNextEventPacked;
+            public _PollNextEventPacked pPollNextEventPacked;
         }
-        internal bool PollNextEvent(ref VREvent_t pEvent, uint uncbVREvent)
+        public bool PollNextEvent(ref VREvent_t pEvent, uint uncbVREvent)
         {
 #if !UNITY_METRO
             if ((System.Environment.OSVersion.Platform == System.PlatformID.MacOSX) ||
@@ -1910,17 +2024,17 @@ namespace Valve.VR
             bool result = FnTable.PollNextEvent(ref pEvent, uncbVREvent);
             return result;
         }
-        internal bool PollNextEventWithPose(ETrackingUniverseOrigin eOrigin, ref VREvent_t pEvent, uint uncbVREvent, ref TrackedDevicePose_t pTrackedDevicePose)
+        public bool PollNextEventWithPose(ETrackingUniverseOrigin eOrigin, ref VREvent_t pEvent, uint uncbVREvent, ref TrackedDevicePose_t pTrackedDevicePose)
         {
             bool result = FnTable.PollNextEventWithPose(eOrigin, ref pEvent, uncbVREvent, ref pTrackedDevicePose);
             return result;
         }
-        internal string GetEventTypeNameFromEnum(EVREventType eType)
+        public string GetEventTypeNameFromEnum(EVREventType eType)
         {
             IntPtr result = FnTable.GetEventTypeNameFromEnum(eType);
             return Marshal.PtrToStringAnsi(result);
         }
-        internal HiddenAreaMesh_t GetHiddenAreaMesh(EVREye eEye, EHiddenAreaMeshType type)
+        public HiddenAreaMesh_t GetHiddenAreaMesh(EVREye eEye, EHiddenAreaMeshType type)
         {
             HiddenAreaMesh_t result = FnTable.GetHiddenAreaMesh(eEye, type);
             return result;
@@ -1933,11 +2047,11 @@ namespace Valve.VR
         struct GetControllerStateUnion
         {
             [FieldOffset(0)]
-            internal IVRSystem._GetControllerState pGetControllerState;
+            public IVRSystem._GetControllerState pGetControllerState;
             [FieldOffset(0)]
-            internal _GetControllerStatePacked pGetControllerStatePacked;
+            public _GetControllerStatePacked pGetControllerStatePacked;
         }
-        internal bool GetControllerState(uint unControllerDeviceIndex, ref VRControllerState_t pControllerState, uint unControllerStateSize)
+        public bool GetControllerState(uint unControllerDeviceIndex, ref VRControllerState_t pControllerState, uint unControllerStateSize)
         {
 #if !UNITY_METRO
             if ((System.Environment.OSVersion.Platform == System.PlatformID.MacOSX) ||
@@ -1964,11 +2078,11 @@ namespace Valve.VR
         struct GetControllerStateWithPoseUnion
         {
             [FieldOffset(0)]
-            internal IVRSystem._GetControllerStateWithPose pGetControllerStateWithPose;
+            public IVRSystem._GetControllerStateWithPose pGetControllerStateWithPose;
             [FieldOffset(0)]
-            internal _GetControllerStateWithPosePacked pGetControllerStateWithPosePacked;
+            public _GetControllerStateWithPosePacked pGetControllerStateWithPosePacked;
         }
-        internal bool GetControllerStateWithPose(ETrackingUniverseOrigin eOrigin, uint unControllerDeviceIndex, ref VRControllerState_t pControllerState, uint unControllerStateSize, ref TrackedDevicePose_t pTrackedDevicePose)
+        public bool GetControllerStateWithPose(ETrackingUniverseOrigin eOrigin, uint unControllerDeviceIndex, ref VRControllerState_t pControllerState, uint unControllerStateSize, ref TrackedDevicePose_t pTrackedDevicePose)
         {
 #if !UNITY_METRO
             if ((System.Environment.OSVersion.Platform == System.PlatformID.MacOSX) ||
@@ -1987,69 +2101,70 @@ namespace Valve.VR
             bool result = FnTable.GetControllerStateWithPose(eOrigin, unControllerDeviceIndex, ref pControllerState, unControllerStateSize, ref pTrackedDevicePose);
             return result;
         }
-        internal void TriggerHapticPulse(uint unControllerDeviceIndex, uint unAxisId, ushort usDurationMicroSec)
+        public void TriggerHapticPulse(uint unControllerDeviceIndex, uint unAxisId, ushort usDurationMicroSec)
         {
             FnTable.TriggerHapticPulse(unControllerDeviceIndex, unAxisId, usDurationMicroSec);
         }
-        internal string GetButtonIdNameFromEnum(EVRButtonId eButtonId)
+        public string GetButtonIdNameFromEnum(EVRButtonId eButtonId)
         {
             IntPtr result = FnTable.GetButtonIdNameFromEnum(eButtonId);
             return Marshal.PtrToStringAnsi(result);
         }
-        internal string GetControllerAxisTypeNameFromEnum(EVRControllerAxisType eAxisType)
+        public string GetControllerAxisTypeNameFromEnum(EVRControllerAxisType eAxisType)
         {
             IntPtr result = FnTable.GetControllerAxisTypeNameFromEnum(eAxisType);
             return Marshal.PtrToStringAnsi(result);
         }
-        internal bool IsInputAvailable()
+        public bool IsInputAvailable()
         {
             bool result = FnTable.IsInputAvailable();
             return result;
         }
-        internal bool IsSteamVRDrawingControllers()
+        public bool IsSteamVRDrawingControllers()
         {
             bool result = FnTable.IsSteamVRDrawingControllers();
             return result;
         }
-        internal bool ShouldApplicationPause()
+        public bool ShouldApplicationPause()
         {
             bool result = FnTable.ShouldApplicationPause();
             return result;
         }
-        internal bool ShouldApplicationReduceRenderingWork()
+        public bool ShouldApplicationReduceRenderingWork()
         {
             bool result = FnTable.ShouldApplicationReduceRenderingWork();
             return result;
         }
-        internal uint DriverDebugRequest(uint unDeviceIndex, string pchRequest, System.Text.StringBuilder pchResponseBuffer, uint unResponseBufferSize)
-        {
-            uint result = FnTable.DriverDebugRequest(unDeviceIndex, pchRequest, pchResponseBuffer, unResponseBufferSize);
-            return result;
-        }
-        internal EVRFirmwareError PerformFirmwareUpdate(uint unDeviceIndex)
+        public EVRFirmwareError PerformFirmwareUpdate(uint unDeviceIndex)
         {
             EVRFirmwareError result = FnTable.PerformFirmwareUpdate(unDeviceIndex);
             return result;
         }
-        internal void AcknowledgeQuit_Exiting()
+        public void AcknowledgeQuit_Exiting()
         {
             FnTable.AcknowledgeQuit_Exiting();
         }
-        internal void AcknowledgeQuit_UserPrompt()
+        public uint GetAppContainerFilePaths(System.Text.StringBuilder pchBuffer, uint unBufferSize)
         {
-            FnTable.AcknowledgeQuit_UserPrompt();
+            uint result = FnTable.GetAppContainerFilePaths(pchBuffer, unBufferSize);
+            return result;
+        }
+        public string GetRuntimeVersion()
+        {
+            IntPtr result = FnTable.GetRuntimeVersion();
+            return Marshal.PtrToStringAnsi(result);
         }
     }
 
 
-    internal class CVRExtendedDisplay
+    public class CVRExtendedDisplay
     {
         IVRExtendedDisplay FnTable;
         internal CVRExtendedDisplay(IntPtr pInterface)
         {
             FnTable = (IVRExtendedDisplay)Marshal.PtrToStructure(pInterface, typeof(IVRExtendedDisplay));
         }
-        internal void GetWindowBounds(ref int pnX, ref int pnY, ref uint pnWidth, ref uint pnHeight)
+        public void GetWindowBounds(ref int pnX, ref int pnY, ref uint pnWidth, ref uint pnHeight)
         {
             pnX = 0;
             pnY = 0;
@@ -2057,7 +2172,7 @@ namespace Valve.VR
             pnHeight = 0;
             FnTable.GetWindowBounds(ref pnX, ref pnY, ref pnWidth, ref pnHeight);
         }
-        internal void GetEyeOutputViewport(EVREye eEye, ref uint pnX, ref uint pnY, ref uint pnWidth, ref uint pnHeight)
+        public void GetEyeOutputViewport(EVREye eEye, ref uint pnX, ref uint pnY, ref uint pnWidth, ref uint pnHeight)
         {
             pnX = 0;
             pnY = 0;
@@ -2065,7 +2180,7 @@ namespace Valve.VR
             pnHeight = 0;
             FnTable.GetEyeOutputViewport(eEye, ref pnX, ref pnY, ref pnWidth, ref pnHeight);
         }
-        internal void GetDXGIOutputInfo(ref int pnAdapterIndex, ref int pnAdapterOutputIndex)
+        public void GetDXGIOutputInfo(ref int pnAdapterIndex, ref int pnAdapterOutputIndex)
         {
             pnAdapterIndex = 0;
             pnAdapterOutputIndex = 0;
@@ -2074,25 +2189,25 @@ namespace Valve.VR
     }
 
 
-    internal class CVRTrackedCamera
+    public class CVRTrackedCamera
     {
         IVRTrackedCamera FnTable;
         internal CVRTrackedCamera(IntPtr pInterface)
         {
             FnTable = (IVRTrackedCamera)Marshal.PtrToStructure(pInterface, typeof(IVRTrackedCamera));
         }
-        internal string GetCameraErrorNameFromEnum(EVRTrackedCameraError eCameraError)
+        public string GetCameraErrorNameFromEnum(EVRTrackedCameraError eCameraError)
         {
             IntPtr result = FnTable.GetCameraErrorNameFromEnum(eCameraError);
             return Marshal.PtrToStringAnsi(result);
         }
-        internal EVRTrackedCameraError HasCamera(uint nDeviceIndex, ref bool pHasCamera)
+        public EVRTrackedCameraError HasCamera(uint nDeviceIndex, ref bool pHasCamera)
         {
             pHasCamera = false;
             EVRTrackedCameraError result = FnTable.HasCamera(nDeviceIndex, ref pHasCamera);
             return result;
         }
-        internal EVRTrackedCameraError GetCameraFrameSize(uint nDeviceIndex, EVRTrackedCameraFrameType eFrameType, ref uint pnWidth, ref uint pnHeight, ref uint pnFrameBufferSize)
+        public EVRTrackedCameraError GetCameraFrameSize(uint nDeviceIndex, EVRTrackedCameraFrameType eFrameType, ref uint pnWidth, ref uint pnHeight, ref uint pnFrameBufferSize)
         {
             pnWidth = 0;
             pnHeight = 0;
@@ -2100,216 +2215,220 @@ namespace Valve.VR
             EVRTrackedCameraError result = FnTable.GetCameraFrameSize(nDeviceIndex, eFrameType, ref pnWidth, ref pnHeight, ref pnFrameBufferSize);
             return result;
         }
-        internal EVRTrackedCameraError GetCameraIntrinsics(uint nDeviceIndex, EVRTrackedCameraFrameType eFrameType, ref HmdVector2_t pFocalLength, ref HmdVector2_t pCenter)
+        public EVRTrackedCameraError GetCameraIntrinsics(uint nDeviceIndex, uint nCameraIndex, EVRTrackedCameraFrameType eFrameType, ref HmdVector2_t pFocalLength, ref HmdVector2_t pCenter)
         {
-            EVRTrackedCameraError result = FnTable.GetCameraIntrinsics(nDeviceIndex, eFrameType, ref pFocalLength, ref pCenter);
+            EVRTrackedCameraError result = FnTable.GetCameraIntrinsics(nDeviceIndex, nCameraIndex, eFrameType, ref pFocalLength, ref pCenter);
             return result;
         }
-        internal EVRTrackedCameraError GetCameraProjection(uint nDeviceIndex, EVRTrackedCameraFrameType eFrameType, float flZNear, float flZFar, ref HmdMatrix44_t pProjection)
+        public EVRTrackedCameraError GetCameraProjection(uint nDeviceIndex, uint nCameraIndex, EVRTrackedCameraFrameType eFrameType, float flZNear, float flZFar, ref HmdMatrix44_t pProjection)
         {
-            EVRTrackedCameraError result = FnTable.GetCameraProjection(nDeviceIndex, eFrameType, flZNear, flZFar, ref pProjection);
+            EVRTrackedCameraError result = FnTable.GetCameraProjection(nDeviceIndex, nCameraIndex, eFrameType, flZNear, flZFar, ref pProjection);
             return result;
         }
-        internal EVRTrackedCameraError AcquireVideoStreamingService(uint nDeviceIndex, ref ulong pHandle)
+        public EVRTrackedCameraError AcquireVideoStreamingService(uint nDeviceIndex, ref ulong pHandle)
         {
             pHandle = 0;
             EVRTrackedCameraError result = FnTable.AcquireVideoStreamingService(nDeviceIndex, ref pHandle);
             return result;
         }
-        internal EVRTrackedCameraError ReleaseVideoStreamingService(ulong hTrackedCamera)
+        public EVRTrackedCameraError ReleaseVideoStreamingService(ulong hTrackedCamera)
         {
             EVRTrackedCameraError result = FnTable.ReleaseVideoStreamingService(hTrackedCamera);
             return result;
         }
-        internal EVRTrackedCameraError GetVideoStreamFrameBuffer(ulong hTrackedCamera, EVRTrackedCameraFrameType eFrameType, IntPtr pFrameBuffer, uint nFrameBufferSize, ref CameraVideoStreamFrameHeader_t pFrameHeader, uint nFrameHeaderSize)
+        public EVRTrackedCameraError GetVideoStreamFrameBuffer(ulong hTrackedCamera, EVRTrackedCameraFrameType eFrameType, IntPtr pFrameBuffer, uint nFrameBufferSize, ref CameraVideoStreamFrameHeader_t pFrameHeader, uint nFrameHeaderSize)
         {
             EVRTrackedCameraError result = FnTable.GetVideoStreamFrameBuffer(hTrackedCamera, eFrameType, pFrameBuffer, nFrameBufferSize, ref pFrameHeader, nFrameHeaderSize);
             return result;
         }
-        internal EVRTrackedCameraError GetVideoStreamTextureSize(uint nDeviceIndex, EVRTrackedCameraFrameType eFrameType, ref VRTextureBounds_t pTextureBounds, ref uint pnWidth, ref uint pnHeight)
+        public EVRTrackedCameraError GetVideoStreamTextureSize(uint nDeviceIndex, EVRTrackedCameraFrameType eFrameType, ref VRTextureBounds_t pTextureBounds, ref uint pnWidth, ref uint pnHeight)
         {
             pnWidth = 0;
             pnHeight = 0;
             EVRTrackedCameraError result = FnTable.GetVideoStreamTextureSize(nDeviceIndex, eFrameType, ref pTextureBounds, ref pnWidth, ref pnHeight);
             return result;
         }
-        internal EVRTrackedCameraError GetVideoStreamTextureD3D11(ulong hTrackedCamera, EVRTrackedCameraFrameType eFrameType, IntPtr pD3D11DeviceOrResource, ref IntPtr ppD3D11ShaderResourceView, ref CameraVideoStreamFrameHeader_t pFrameHeader, uint nFrameHeaderSize)
+        public EVRTrackedCameraError GetVideoStreamTextureD3D11(ulong hTrackedCamera, EVRTrackedCameraFrameType eFrameType, IntPtr pD3D11DeviceOrResource, ref IntPtr ppD3D11ShaderResourceView, ref CameraVideoStreamFrameHeader_t pFrameHeader, uint nFrameHeaderSize)
         {
             EVRTrackedCameraError result = FnTable.GetVideoStreamTextureD3D11(hTrackedCamera, eFrameType, pD3D11DeviceOrResource, ref ppD3D11ShaderResourceView, ref pFrameHeader, nFrameHeaderSize);
             return result;
         }
-        internal EVRTrackedCameraError GetVideoStreamTextureGL(ulong hTrackedCamera, EVRTrackedCameraFrameType eFrameType, ref uint pglTextureId, ref CameraVideoStreamFrameHeader_t pFrameHeader, uint nFrameHeaderSize)
+        public EVRTrackedCameraError GetVideoStreamTextureGL(ulong hTrackedCamera, EVRTrackedCameraFrameType eFrameType, ref uint pglTextureId, ref CameraVideoStreamFrameHeader_t pFrameHeader, uint nFrameHeaderSize)
         {
             pglTextureId = 0;
             EVRTrackedCameraError result = FnTable.GetVideoStreamTextureGL(hTrackedCamera, eFrameType, ref pglTextureId, ref pFrameHeader, nFrameHeaderSize);
             return result;
         }
-        internal EVRTrackedCameraError ReleaseVideoStreamTextureGL(ulong hTrackedCamera, uint glTextureId)
+        public EVRTrackedCameraError ReleaseVideoStreamTextureGL(ulong hTrackedCamera, uint glTextureId)
         {
             EVRTrackedCameraError result = FnTable.ReleaseVideoStreamTextureGL(hTrackedCamera, glTextureId);
+            return result;
+        }
+        public void SetCameraTrackingSpace(ETrackingUniverseOrigin eUniverse)
+        {
+            FnTable.SetCameraTrackingSpace(eUniverse);
+        }
+        public ETrackingUniverseOrigin GetCameraTrackingSpace()
+        {
+            ETrackingUniverseOrigin result = FnTable.GetCameraTrackingSpace();
             return result;
         }
     }
 
 
-    internal class CVRApplications
+    public class CVRApplications
     {
         IVRApplications FnTable;
         internal CVRApplications(IntPtr pInterface)
         {
             FnTable = (IVRApplications)Marshal.PtrToStructure(pInterface, typeof(IVRApplications));
         }
-        internal EVRApplicationError AddApplicationManifest(string pchApplicationManifestFullPath, bool bTemporary)
+        public EVRApplicationError AddApplicationManifest(string pchApplicationManifestFullPath, bool bTemporary)
         {
             EVRApplicationError result = FnTable.AddApplicationManifest(pchApplicationManifestFullPath, bTemporary);
             return result;
         }
-        internal EVRApplicationError RemoveApplicationManifest(string pchApplicationManifestFullPath)
+        public EVRApplicationError RemoveApplicationManifest(string pchApplicationManifestFullPath)
         {
             EVRApplicationError result = FnTable.RemoveApplicationManifest(pchApplicationManifestFullPath);
             return result;
         }
-        internal bool IsApplicationInstalled(string pchAppKey)
+        public bool IsApplicationInstalled(string pchAppKey)
         {
             bool result = FnTable.IsApplicationInstalled(pchAppKey);
             return result;
         }
-        internal uint GetApplicationCount()
+        public uint GetApplicationCount()
         {
             uint result = FnTable.GetApplicationCount();
             return result;
         }
-        internal EVRApplicationError GetApplicationKeyByIndex(uint unApplicationIndex, System.Text.StringBuilder pchAppKeyBuffer, uint unAppKeyBufferLen)
+        public EVRApplicationError GetApplicationKeyByIndex(uint unApplicationIndex, System.Text.StringBuilder pchAppKeyBuffer, uint unAppKeyBufferLen)
         {
             EVRApplicationError result = FnTable.GetApplicationKeyByIndex(unApplicationIndex, pchAppKeyBuffer, unAppKeyBufferLen);
             return result;
         }
-        internal EVRApplicationError GetApplicationKeyByProcessId(uint unProcessId, System.Text.StringBuilder pchAppKeyBuffer, uint unAppKeyBufferLen)
+        public EVRApplicationError GetApplicationKeyByProcessId(uint unProcessId, System.Text.StringBuilder pchAppKeyBuffer, uint unAppKeyBufferLen)
         {
             EVRApplicationError result = FnTable.GetApplicationKeyByProcessId(unProcessId, pchAppKeyBuffer, unAppKeyBufferLen);
             return result;
         }
-        internal EVRApplicationError LaunchApplication(string pchAppKey)
+        public EVRApplicationError LaunchApplication(string pchAppKey)
         {
             EVRApplicationError result = FnTable.LaunchApplication(pchAppKey);
             return result;
         }
-        internal EVRApplicationError LaunchTemplateApplication(string pchTemplateAppKey, string pchNewAppKey, AppOverrideKeys_t[] pKeys)
+        public EVRApplicationError LaunchTemplateApplication(string pchTemplateAppKey, string pchNewAppKey, AppOverrideKeys_t[] pKeys)
         {
             EVRApplicationError result = FnTable.LaunchTemplateApplication(pchTemplateAppKey, pchNewAppKey, pKeys, (uint)pKeys.Length);
             return result;
         }
-        internal EVRApplicationError LaunchApplicationFromMimeType(string pchMimeType, string pchArgs)
+        public EVRApplicationError LaunchApplicationFromMimeType(string pchMimeType, string pchArgs)
         {
             EVRApplicationError result = FnTable.LaunchApplicationFromMimeType(pchMimeType, pchArgs);
             return result;
         }
-        internal EVRApplicationError LaunchDashboardOverlay(string pchAppKey)
+        public EVRApplicationError LaunchDashboardOverlay(string pchAppKey)
         {
             EVRApplicationError result = FnTable.LaunchDashboardOverlay(pchAppKey);
             return result;
         }
-        internal bool CancelApplicationLaunch(string pchAppKey)
+        public bool CancelApplicationLaunch(string pchAppKey)
         {
             bool result = FnTable.CancelApplicationLaunch(pchAppKey);
             return result;
         }
-        internal EVRApplicationError IdentifyApplication(uint unProcessId, string pchAppKey)
+        public EVRApplicationError IdentifyApplication(uint unProcessId, string pchAppKey)
         {
             EVRApplicationError result = FnTable.IdentifyApplication(unProcessId, pchAppKey);
             return result;
         }
-        internal uint GetApplicationProcessId(string pchAppKey)
+        public uint GetApplicationProcessId(string pchAppKey)
         {
             uint result = FnTable.GetApplicationProcessId(pchAppKey);
             return result;
         }
-        internal string GetApplicationsErrorNameFromEnum(EVRApplicationError error)
+        public string GetApplicationsErrorNameFromEnum(EVRApplicationError error)
         {
             IntPtr result = FnTable.GetApplicationsErrorNameFromEnum(error);
             return Marshal.PtrToStringAnsi(result);
         }
-        internal uint GetApplicationPropertyString(string pchAppKey, EVRApplicationProperty eProperty, System.Text.StringBuilder pchPropertyValueBuffer, uint unPropertyValueBufferLen, ref EVRApplicationError peError)
+        public uint GetApplicationPropertyString(string pchAppKey, EVRApplicationProperty eProperty, System.Text.StringBuilder pchPropertyValueBuffer, uint unPropertyValueBufferLen, ref EVRApplicationError peError)
         {
             uint result = FnTable.GetApplicationPropertyString(pchAppKey, eProperty, pchPropertyValueBuffer, unPropertyValueBufferLen, ref peError);
             return result;
         }
-        internal bool GetApplicationPropertyBool(string pchAppKey, EVRApplicationProperty eProperty, ref EVRApplicationError peError)
+        public bool GetApplicationPropertyBool(string pchAppKey, EVRApplicationProperty eProperty, ref EVRApplicationError peError)
         {
             bool result = FnTable.GetApplicationPropertyBool(pchAppKey, eProperty, ref peError);
             return result;
         }
-        internal ulong GetApplicationPropertyUint64(string pchAppKey, EVRApplicationProperty eProperty, ref EVRApplicationError peError)
+        public ulong GetApplicationPropertyUint64(string pchAppKey, EVRApplicationProperty eProperty, ref EVRApplicationError peError)
         {
             ulong result = FnTable.GetApplicationPropertyUint64(pchAppKey, eProperty, ref peError);
             return result;
         }
-        internal EVRApplicationError SetApplicationAutoLaunch(string pchAppKey, bool bAutoLaunch)
+        public EVRApplicationError SetApplicationAutoLaunch(string pchAppKey, bool bAutoLaunch)
         {
             EVRApplicationError result = FnTable.SetApplicationAutoLaunch(pchAppKey, bAutoLaunch);
             return result;
         }
-        internal bool GetApplicationAutoLaunch(string pchAppKey)
+        public bool GetApplicationAutoLaunch(string pchAppKey)
         {
             bool result = FnTable.GetApplicationAutoLaunch(pchAppKey);
             return result;
         }
-        internal EVRApplicationError SetDefaultApplicationForMimeType(string pchAppKey, string pchMimeType)
+        public EVRApplicationError SetDefaultApplicationForMimeType(string pchAppKey, string pchMimeType)
         {
             EVRApplicationError result = FnTable.SetDefaultApplicationForMimeType(pchAppKey, pchMimeType);
             return result;
         }
-        internal bool GetDefaultApplicationForMimeType(string pchMimeType, System.Text.StringBuilder pchAppKeyBuffer, uint unAppKeyBufferLen)
+        public bool GetDefaultApplicationForMimeType(string pchMimeType, System.Text.StringBuilder pchAppKeyBuffer, uint unAppKeyBufferLen)
         {
             bool result = FnTable.GetDefaultApplicationForMimeType(pchMimeType, pchAppKeyBuffer, unAppKeyBufferLen);
             return result;
         }
-        internal bool GetApplicationSupportedMimeTypes(string pchAppKey, System.Text.StringBuilder pchMimeTypesBuffer, uint unMimeTypesBuffer)
+        public bool GetApplicationSupportedMimeTypes(string pchAppKey, System.Text.StringBuilder pchMimeTypesBuffer, uint unMimeTypesBuffer)
         {
             bool result = FnTable.GetApplicationSupportedMimeTypes(pchAppKey, pchMimeTypesBuffer, unMimeTypesBuffer);
             return result;
         }
-        internal uint GetApplicationsThatSupportMimeType(string pchMimeType, System.Text.StringBuilder pchAppKeysThatSupportBuffer, uint unAppKeysThatSupportBuffer)
+        public uint GetApplicationsThatSupportMimeType(string pchMimeType, System.Text.StringBuilder pchAppKeysThatSupportBuffer, uint unAppKeysThatSupportBuffer)
         {
             uint result = FnTable.GetApplicationsThatSupportMimeType(pchMimeType, pchAppKeysThatSupportBuffer, unAppKeysThatSupportBuffer);
             return result;
         }
-        internal uint GetApplicationLaunchArguments(uint unHandle, System.Text.StringBuilder pchArgs, uint unArgs)
+        public uint GetApplicationLaunchArguments(uint unHandle, System.Text.StringBuilder pchArgs, uint unArgs)
         {
             uint result = FnTable.GetApplicationLaunchArguments(unHandle, pchArgs, unArgs);
             return result;
         }
-        internal EVRApplicationError GetStartingApplication(System.Text.StringBuilder pchAppKeyBuffer, uint unAppKeyBufferLen)
+        public EVRApplicationError GetStartingApplication(System.Text.StringBuilder pchAppKeyBuffer, uint unAppKeyBufferLen)
         {
             EVRApplicationError result = FnTable.GetStartingApplication(pchAppKeyBuffer, unAppKeyBufferLen);
             return result;
         }
-        internal EVRApplicationTransitionState GetTransitionState()
+        public EVRSceneApplicationState GetSceneApplicationState()
         {
-            EVRApplicationTransitionState result = FnTable.GetTransitionState();
+            EVRSceneApplicationState result = FnTable.GetSceneApplicationState();
             return result;
         }
-        internal EVRApplicationError PerformApplicationPrelaunchCheck(string pchAppKey)
+        public EVRApplicationError PerformApplicationPrelaunchCheck(string pchAppKey)
         {
             EVRApplicationError result = FnTable.PerformApplicationPrelaunchCheck(pchAppKey);
             return result;
         }
-        internal string GetApplicationsTransitionStateNameFromEnum(EVRApplicationTransitionState state)
+        public string GetSceneApplicationStateNameFromEnum(EVRSceneApplicationState state)
         {
-            IntPtr result = FnTable.GetApplicationsTransitionStateNameFromEnum(state);
+            IntPtr result = FnTable.GetSceneApplicationStateNameFromEnum(state);
             return Marshal.PtrToStringAnsi(result);
         }
-        internal bool IsQuitUserPromptRequested()
-        {
-            bool result = FnTable.IsQuitUserPromptRequested();
-            return result;
-        }
-        internal EVRApplicationError LaunchInternalProcess(string pchBinaryPath, string pchArguments, string pchWorkingDirectory)
+        public EVRApplicationError LaunchInternalProcess(string pchBinaryPath, string pchArguments, string pchWorkingDirectory)
         {
             EVRApplicationError result = FnTable.LaunchInternalProcess(pchBinaryPath, pchArguments, pchWorkingDirectory);
             return result;
         }
-        internal uint GetCurrentSceneProcessId()
+        public uint GetCurrentSceneProcessId()
         {
             uint result = FnTable.GetCurrentSceneProcessId();
             return result;
@@ -2317,83 +2436,83 @@ namespace Valve.VR
     }
 
 
-    internal class CVRChaperone
+    public class CVRChaperone
     {
         IVRChaperone FnTable;
         internal CVRChaperone(IntPtr pInterface)
         {
             FnTable = (IVRChaperone)Marshal.PtrToStructure(pInterface, typeof(IVRChaperone));
         }
-        internal ChaperoneCalibrationState GetCalibrationState()
+        public ChaperoneCalibrationState GetCalibrationState()
         {
             ChaperoneCalibrationState result = FnTable.GetCalibrationState();
             return result;
         }
-        internal bool GetPlayAreaSize(ref float pSizeX, ref float pSizeZ)
+        public bool GetPlayAreaSize(ref float pSizeX, ref float pSizeZ)
         {
             pSizeX = 0;
             pSizeZ = 0;
             bool result = FnTable.GetPlayAreaSize(ref pSizeX, ref pSizeZ);
             return result;
         }
-        internal bool GetPlayAreaRect(ref HmdQuad_t rect)
+        public bool GetPlayAreaRect(ref HmdQuad_t rect)
         {
             bool result = FnTable.GetPlayAreaRect(ref rect);
             return result;
         }
-        internal void ReloadInfo()
+        public void ReloadInfo()
         {
             FnTable.ReloadInfo();
         }
-        internal void SetSceneColor(HmdColor_t color)
+        public void SetSceneColor(HmdColor_t color)
         {
             FnTable.SetSceneColor(color);
         }
-        internal void GetBoundsColor(ref HmdColor_t pOutputColorArray, int nNumOutputColors, float flCollisionBoundsFadeDistance, ref HmdColor_t pOutputCameraColor)
+        public void GetBoundsColor(ref HmdColor_t pOutputColorArray, int nNumOutputColors, float flCollisionBoundsFadeDistance, ref HmdColor_t pOutputCameraColor)
         {
             FnTable.GetBoundsColor(ref pOutputColorArray, nNumOutputColors, flCollisionBoundsFadeDistance, ref pOutputCameraColor);
         }
-        internal bool AreBoundsVisible()
+        public bool AreBoundsVisible()
         {
             bool result = FnTable.AreBoundsVisible();
             return result;
         }
-        internal void ForceBoundsVisible(bool bForce)
+        public void ForceBoundsVisible(bool bForce)
         {
             FnTable.ForceBoundsVisible(bForce);
         }
     }
 
 
-    internal class CVRChaperoneSetup
+    public class CVRChaperoneSetup
     {
         IVRChaperoneSetup FnTable;
         internal CVRChaperoneSetup(IntPtr pInterface)
         {
             FnTable = (IVRChaperoneSetup)Marshal.PtrToStructure(pInterface, typeof(IVRChaperoneSetup));
         }
-        internal bool CommitWorkingCopy(EChaperoneConfigFile configFile)
+        public bool CommitWorkingCopy(EChaperoneConfigFile configFile)
         {
             bool result = FnTable.CommitWorkingCopy(configFile);
             return result;
         }
-        internal void RevertWorkingCopy()
+        public void RevertWorkingCopy()
         {
             FnTable.RevertWorkingCopy();
         }
-        internal bool GetWorkingPlayAreaSize(ref float pSizeX, ref float pSizeZ)
+        public bool GetWorkingPlayAreaSize(ref float pSizeX, ref float pSizeZ)
         {
             pSizeX = 0;
             pSizeZ = 0;
             bool result = FnTable.GetWorkingPlayAreaSize(ref pSizeX, ref pSizeZ);
             return result;
         }
-        internal bool GetWorkingPlayAreaRect(ref HmdQuad_t rect)
+        public bool GetWorkingPlayAreaRect(ref HmdQuad_t rect)
         {
             bool result = FnTable.GetWorkingPlayAreaRect(ref rect);
             return result;
         }
-        internal bool GetWorkingCollisionBoundsInfo(out HmdQuad_t[] pQuadsBuffer)
+        public bool GetWorkingCollisionBoundsInfo(out HmdQuad_t[] pQuadsBuffer)
         {
             uint punQuadsCount = 0;
             bool result = FnTable.GetWorkingCollisionBoundsInfo(null, ref punQuadsCount);
@@ -2401,7 +2520,7 @@ namespace Valve.VR
             result = FnTable.GetWorkingCollisionBoundsInfo(pQuadsBuffer, ref punQuadsCount);
             return result;
         }
-        internal bool GetLiveCollisionBoundsInfo(out HmdQuad_t[] pQuadsBuffer)
+        public bool GetLiveCollisionBoundsInfo(out HmdQuad_t[] pQuadsBuffer)
         {
             uint punQuadsCount = 0;
             bool result = FnTable.GetLiveCollisionBoundsInfo(null, ref punQuadsCount);
@@ -2409,374 +2528,385 @@ namespace Valve.VR
             result = FnTable.GetLiveCollisionBoundsInfo(pQuadsBuffer, ref punQuadsCount);
             return result;
         }
-        internal bool GetWorkingSeatedZeroPoseToRawTrackingPose(ref HmdMatrix34_t pmatSeatedZeroPoseToRawTrackingPose)
+        public bool GetWorkingSeatedZeroPoseToRawTrackingPose(ref HmdMatrix34_t pmatSeatedZeroPoseToRawTrackingPose)
         {
             bool result = FnTable.GetWorkingSeatedZeroPoseToRawTrackingPose(ref pmatSeatedZeroPoseToRawTrackingPose);
             return result;
         }
-        internal bool GetWorkingStandingZeroPoseToRawTrackingPose(ref HmdMatrix34_t pmatStandingZeroPoseToRawTrackingPose)
+        public bool GetWorkingStandingZeroPoseToRawTrackingPose(ref HmdMatrix34_t pmatStandingZeroPoseToRawTrackingPose)
         {
             bool result = FnTable.GetWorkingStandingZeroPoseToRawTrackingPose(ref pmatStandingZeroPoseToRawTrackingPose);
             return result;
         }
-        internal void SetWorkingPlayAreaSize(float sizeX, float sizeZ)
+        public void SetWorkingPlayAreaSize(float sizeX, float sizeZ)
         {
             FnTable.SetWorkingPlayAreaSize(sizeX, sizeZ);
         }
-        internal void SetWorkingCollisionBoundsInfo(HmdQuad_t[] pQuadsBuffer)
+        public void SetWorkingCollisionBoundsInfo(HmdQuad_t[] pQuadsBuffer)
         {
             FnTable.SetWorkingCollisionBoundsInfo(pQuadsBuffer, (uint)pQuadsBuffer.Length);
         }
-        internal void SetWorkingSeatedZeroPoseToRawTrackingPose(ref HmdMatrix34_t pMatSeatedZeroPoseToRawTrackingPose)
+        public void SetWorkingPerimeter(HmdVector2_t[] pPointBuffer)
+        {
+            FnTable.SetWorkingPerimeter(pPointBuffer, (uint)pPointBuffer.Length);
+        }
+        public void SetWorkingSeatedZeroPoseToRawTrackingPose(ref HmdMatrix34_t pMatSeatedZeroPoseToRawTrackingPose)
         {
             FnTable.SetWorkingSeatedZeroPoseToRawTrackingPose(ref pMatSeatedZeroPoseToRawTrackingPose);
         }
-        internal void SetWorkingStandingZeroPoseToRawTrackingPose(ref HmdMatrix34_t pMatStandingZeroPoseToRawTrackingPose)
+        public void SetWorkingStandingZeroPoseToRawTrackingPose(ref HmdMatrix34_t pMatStandingZeroPoseToRawTrackingPose)
         {
             FnTable.SetWorkingStandingZeroPoseToRawTrackingPose(ref pMatStandingZeroPoseToRawTrackingPose);
         }
-        internal void ReloadFromDisk(EChaperoneConfigFile configFile)
+        public void ReloadFromDisk(EChaperoneConfigFile configFile)
         {
             FnTable.ReloadFromDisk(configFile);
         }
-        internal bool GetLiveSeatedZeroPoseToRawTrackingPose(ref HmdMatrix34_t pmatSeatedZeroPoseToRawTrackingPose)
+        public bool GetLiveSeatedZeroPoseToRawTrackingPose(ref HmdMatrix34_t pmatSeatedZeroPoseToRawTrackingPose)
         {
             bool result = FnTable.GetLiveSeatedZeroPoseToRawTrackingPose(ref pmatSeatedZeroPoseToRawTrackingPose);
             return result;
         }
-        internal void SetWorkingCollisionBoundsTagsInfo(byte[] pTagsBuffer)
-        {
-            FnTable.SetWorkingCollisionBoundsTagsInfo(pTagsBuffer, (uint)pTagsBuffer.Length);
-        }
-        internal bool GetLiveCollisionBoundsTagsInfo(out byte[] pTagsBuffer)
-        {
-            uint punTagCount = 0;
-            bool result = FnTable.GetLiveCollisionBoundsTagsInfo(null, ref punTagCount);
-            pTagsBuffer = new byte[punTagCount];
-            result = FnTable.GetLiveCollisionBoundsTagsInfo(pTagsBuffer, ref punTagCount);
-            return result;
-        }
-        internal bool SetWorkingPhysicalBoundsInfo(HmdQuad_t[] pQuadsBuffer)
-        {
-            bool result = FnTable.SetWorkingPhysicalBoundsInfo(pQuadsBuffer, (uint)pQuadsBuffer.Length);
-            return result;
-        }
-        internal bool GetLivePhysicalBoundsInfo(out HmdQuad_t[] pQuadsBuffer)
-        {
-            uint punQuadsCount = 0;
-            bool result = FnTable.GetLivePhysicalBoundsInfo(null, ref punQuadsCount);
-            pQuadsBuffer = new HmdQuad_t[punQuadsCount];
-            result = FnTable.GetLivePhysicalBoundsInfo(pQuadsBuffer, ref punQuadsCount);
-            return result;
-        }
-        internal bool ExportLiveToBuffer(System.Text.StringBuilder pBuffer, ref uint pnBufferLength)
+        public bool ExportLiveToBuffer(System.Text.StringBuilder pBuffer, ref uint pnBufferLength)
         {
             pnBufferLength = 0;
             bool result = FnTable.ExportLiveToBuffer(pBuffer, ref pnBufferLength);
             return result;
         }
-        internal bool ImportFromBufferToWorking(string pBuffer, uint nImportFlags)
+        public bool ImportFromBufferToWorking(string pBuffer, uint nImportFlags)
         {
             bool result = FnTable.ImportFromBufferToWorking(pBuffer, nImportFlags);
             return result;
         }
+        public void ShowWorkingSetPreview()
+        {
+            FnTable.ShowWorkingSetPreview();
+        }
+        public void HideWorkingSetPreview()
+        {
+            FnTable.HideWorkingSetPreview();
+        }
+        public void RoomSetupStarting()
+        {
+            FnTable.RoomSetupStarting();
+        }
     }
 
 
-    internal class CVRCompositor
+    public class CVRCompositor
     {
         IVRCompositor FnTable;
         internal CVRCompositor(IntPtr pInterface)
         {
             FnTable = (IVRCompositor)Marshal.PtrToStructure(pInterface, typeof(IVRCompositor));
         }
-        internal void SetTrackingSpace(ETrackingUniverseOrigin eOrigin)
+        public void SetTrackingSpace(ETrackingUniverseOrigin eOrigin)
         {
             FnTable.SetTrackingSpace(eOrigin);
         }
-        internal ETrackingUniverseOrigin GetTrackingSpace()
+        public ETrackingUniverseOrigin GetTrackingSpace()
         {
             ETrackingUniverseOrigin result = FnTable.GetTrackingSpace();
             return result;
         }
-        internal EVRCompositorError WaitGetPoses(TrackedDevicePose_t[] pRenderPoseArray, TrackedDevicePose_t[] pGamePoseArray)
+        public EVRCompositorError WaitGetPoses(TrackedDevicePose_t[] pRenderPoseArray, TrackedDevicePose_t[] pGamePoseArray)
         {
             EVRCompositorError result = FnTable.WaitGetPoses(pRenderPoseArray, (uint)pRenderPoseArray.Length, pGamePoseArray, (uint)pGamePoseArray.Length);
             return result;
         }
-        internal EVRCompositorError GetLastPoses(TrackedDevicePose_t[] pRenderPoseArray, TrackedDevicePose_t[] pGamePoseArray)
+        public EVRCompositorError GetLastPoses(TrackedDevicePose_t[] pRenderPoseArray, TrackedDevicePose_t[] pGamePoseArray)
         {
             EVRCompositorError result = FnTable.GetLastPoses(pRenderPoseArray, (uint)pRenderPoseArray.Length, pGamePoseArray, (uint)pGamePoseArray.Length);
             return result;
         }
-        internal EVRCompositorError GetLastPoseForTrackedDeviceIndex(uint unDeviceIndex, ref TrackedDevicePose_t pOutputPose, ref TrackedDevicePose_t pOutputGamePose)
+        public EVRCompositorError GetLastPoseForTrackedDeviceIndex(uint unDeviceIndex, ref TrackedDevicePose_t pOutputPose, ref TrackedDevicePose_t pOutputGamePose)
         {
             EVRCompositorError result = FnTable.GetLastPoseForTrackedDeviceIndex(unDeviceIndex, ref pOutputPose, ref pOutputGamePose);
             return result;
         }
-        internal EVRCompositorError Submit(EVREye eEye, ref Texture_t pTexture, ref VRTextureBounds_t pBounds, EVRSubmitFlags nSubmitFlags)
+        public EVRCompositorError Submit(EVREye eEye, ref Texture_t pTexture, ref VRTextureBounds_t pBounds, EVRSubmitFlags nSubmitFlags)
         {
             EVRCompositorError result = FnTable.Submit(eEye, ref pTexture, ref pBounds, nSubmitFlags);
             return result;
         }
-        internal void ClearLastSubmittedFrame()
+        public void ClearLastSubmittedFrame()
         {
             FnTable.ClearLastSubmittedFrame();
         }
-        internal void PostPresentHandoff()
+        public void PostPresentHandoff()
         {
             FnTable.PostPresentHandoff();
         }
-        internal bool GetFrameTiming(ref Compositor_FrameTiming pTiming, uint unFramesAgo)
+        public bool GetFrameTiming(ref Compositor_FrameTiming pTiming, uint unFramesAgo)
         {
             bool result = FnTable.GetFrameTiming(ref pTiming, unFramesAgo);
             return result;
         }
-        internal uint GetFrameTimings(ref Compositor_FrameTiming pTiming, uint nFrames)
+        public uint GetFrameTimings(Compositor_FrameTiming[] pTiming)
         {
-            uint result = FnTable.GetFrameTimings(ref pTiming, nFrames);
+            uint result = FnTable.GetFrameTimings(pTiming, (uint)pTiming.Length);
             return result;
         }
-        internal float GetFrameTimeRemaining()
+        public float GetFrameTimeRemaining()
         {
             float result = FnTable.GetFrameTimeRemaining();
             return result;
         }
-        internal void GetCumulativeStats(ref Compositor_CumulativeStats pStats, uint nStatsSizeInBytes)
+        public void GetCumulativeStats(ref Compositor_CumulativeStats pStats, uint nStatsSizeInBytes)
         {
             FnTable.GetCumulativeStats(ref pStats, nStatsSizeInBytes);
         }
-        internal void FadeToColor(float fSeconds, float fRed, float fGreen, float fBlue, float fAlpha, bool bBackground)
+        public void FadeToColor(float fSeconds, float fRed, float fGreen, float fBlue, float fAlpha, bool bBackground)
         {
             FnTable.FadeToColor(fSeconds, fRed, fGreen, fBlue, fAlpha, bBackground);
         }
-        internal HmdColor_t GetCurrentFadeColor(bool bBackground)
+        public HmdColor_t GetCurrentFadeColor(bool bBackground)
         {
             HmdColor_t result = FnTable.GetCurrentFadeColor(bBackground);
             return result;
         }
-        internal void FadeGrid(float fSeconds, bool bFadeIn)
+        public void FadeGrid(float fSeconds, bool bFadeIn)
         {
             FnTable.FadeGrid(fSeconds, bFadeIn);
         }
-        internal float GetCurrentGridAlpha()
+        public float GetCurrentGridAlpha()
         {
             float result = FnTable.GetCurrentGridAlpha();
             return result;
         }
-        internal EVRCompositorError SetSkyboxOverride(Texture_t[] pTextures)
+        public EVRCompositorError SetSkyboxOverride(Texture_t[] pTextures)
         {
             EVRCompositorError result = FnTable.SetSkyboxOverride(pTextures, (uint)pTextures.Length);
             return result;
         }
-        internal void ClearSkyboxOverride()
+        public void ClearSkyboxOverride()
         {
             FnTable.ClearSkyboxOverride();
         }
-        internal void CompositorBringToFront()
+        public void CompositorBringToFront()
         {
             FnTable.CompositorBringToFront();
         }
-        internal void CompositorGoToBack()
+        public void CompositorGoToBack()
         {
             FnTable.CompositorGoToBack();
         }
-        internal void CompositorQuit()
+        public void CompositorQuit()
         {
             FnTable.CompositorQuit();
         }
-        internal bool IsFullscreen()
+        public bool IsFullscreen()
         {
             bool result = FnTable.IsFullscreen();
             return result;
         }
-        internal uint GetCurrentSceneFocusProcess()
+        public uint GetCurrentSceneFocusProcess()
         {
             uint result = FnTable.GetCurrentSceneFocusProcess();
             return result;
         }
-        internal uint GetLastFrameRenderer()
+        public uint GetLastFrameRenderer()
         {
             uint result = FnTable.GetLastFrameRenderer();
             return result;
         }
-        internal bool CanRenderScene()
+        public bool CanRenderScene()
         {
             bool result = FnTable.CanRenderScene();
             return result;
         }
-        internal void ShowMirrorWindow()
+        public void ShowMirrorWindow()
         {
             FnTable.ShowMirrorWindow();
         }
-        internal void HideMirrorWindow()
+        public void HideMirrorWindow()
         {
             FnTable.HideMirrorWindow();
         }
-        internal bool IsMirrorWindowVisible()
+        public bool IsMirrorWindowVisible()
         {
             bool result = FnTable.IsMirrorWindowVisible();
             return result;
         }
-        internal void CompositorDumpImages()
+        public void CompositorDumpImages()
         {
             FnTable.CompositorDumpImages();
         }
-        internal bool ShouldAppRenderWithLowResources()
+        public bool ShouldAppRenderWithLowResources()
         {
             bool result = FnTable.ShouldAppRenderWithLowResources();
             return result;
         }
-        internal void ForceInterleavedReprojectionOn(bool bOverride)
+        public void ForceInterleavedReprojectionOn(bool bOverride)
         {
             FnTable.ForceInterleavedReprojectionOn(bOverride);
         }
-        internal void ForceReconnectProcess()
+        public void ForceReconnectProcess()
         {
             FnTable.ForceReconnectProcess();
         }
-        internal void SuspendRendering(bool bSuspend)
+        public void SuspendRendering(bool bSuspend)
         {
             FnTable.SuspendRendering(bSuspend);
         }
-        internal EVRCompositorError GetMirrorTextureD3D11(EVREye eEye, IntPtr pD3D11DeviceOrResource, ref IntPtr ppD3D11ShaderResourceView)
+        public EVRCompositorError GetMirrorTextureD3D11(EVREye eEye, IntPtr pD3D11DeviceOrResource, ref IntPtr ppD3D11ShaderResourceView)
         {
             EVRCompositorError result = FnTable.GetMirrorTextureD3D11(eEye, pD3D11DeviceOrResource, ref ppD3D11ShaderResourceView);
             return result;
         }
-        internal void ReleaseMirrorTextureD3D11(IntPtr pD3D11ShaderResourceView)
+        public void ReleaseMirrorTextureD3D11(IntPtr pD3D11ShaderResourceView)
         {
             FnTable.ReleaseMirrorTextureD3D11(pD3D11ShaderResourceView);
         }
-        internal EVRCompositorError GetMirrorTextureGL(EVREye eEye, ref uint pglTextureId, IntPtr pglSharedTextureHandle)
+        public EVRCompositorError GetMirrorTextureGL(EVREye eEye, ref uint pglTextureId, IntPtr pglSharedTextureHandle)
         {
             pglTextureId = 0;
             EVRCompositorError result = FnTable.GetMirrorTextureGL(eEye, ref pglTextureId, pglSharedTextureHandle);
             return result;
         }
-        internal bool ReleaseSharedGLTexture(uint glTextureId, IntPtr glSharedTextureHandle)
+        public bool ReleaseSharedGLTexture(uint glTextureId, IntPtr glSharedTextureHandle)
         {
             bool result = FnTable.ReleaseSharedGLTexture(glTextureId, glSharedTextureHandle);
             return result;
         }
-        internal void LockGLSharedTextureForAccess(IntPtr glSharedTextureHandle)
+        public void LockGLSharedTextureForAccess(IntPtr glSharedTextureHandle)
         {
             FnTable.LockGLSharedTextureForAccess(glSharedTextureHandle);
         }
-        internal void UnlockGLSharedTextureForAccess(IntPtr glSharedTextureHandle)
+        public void UnlockGLSharedTextureForAccess(IntPtr glSharedTextureHandle)
         {
             FnTable.UnlockGLSharedTextureForAccess(glSharedTextureHandle);
         }
-        internal uint GetVulkanInstanceExtensionsRequired(System.Text.StringBuilder pchValue, uint unBufferSize)
+        public uint GetVulkanInstanceExtensionsRequired(System.Text.StringBuilder pchValue, uint unBufferSize)
         {
             uint result = FnTable.GetVulkanInstanceExtensionsRequired(pchValue, unBufferSize);
             return result;
         }
-        internal uint GetVulkanDeviceExtensionsRequired(IntPtr pPhysicalDevice, System.Text.StringBuilder pchValue, uint unBufferSize)
+        public uint GetVulkanDeviceExtensionsRequired(IntPtr pPhysicalDevice, System.Text.StringBuilder pchValue, uint unBufferSize)
         {
             uint result = FnTable.GetVulkanDeviceExtensionsRequired(pPhysicalDevice, pchValue, unBufferSize);
             return result;
         }
-        internal void SetExplicitTimingMode(EVRCompositorTimingMode eTimingMode)
+        public void SetExplicitTimingMode(EVRCompositorTimingMode eTimingMode)
         {
             FnTable.SetExplicitTimingMode(eTimingMode);
         }
-        internal EVRCompositorError SubmitExplicitTimingData()
+        public EVRCompositorError SubmitExplicitTimingData()
         {
             EVRCompositorError result = FnTable.SubmitExplicitTimingData();
             return result;
         }
+        public bool IsMotionSmoothingEnabled()
+        {
+            bool result = FnTable.IsMotionSmoothingEnabled();
+            return result;
+        }
+        public bool IsMotionSmoothingSupported()
+        {
+            bool result = FnTable.IsMotionSmoothingSupported();
+            return result;
+        }
+        public bool IsCurrentSceneFocusAppLoading()
+        {
+            bool result = FnTable.IsCurrentSceneFocusAppLoading();
+            return result;
+        }
+        public EVRCompositorError SetStageOverride_Async(string pchRenderModelPath, ref HmdMatrix34_t pTransform, ref Compositor_StageRenderSettings pRenderSettings, uint nSizeOfRenderSettings)
+        {
+            EVRCompositorError result = FnTable.SetStageOverride_Async(pchRenderModelPath, ref pTransform, ref pRenderSettings, nSizeOfRenderSettings);
+            return result;
+        }
+        public void ClearStageOverride()
+        {
+            FnTable.ClearStageOverride();
+        }
     }
 
 
-    internal class CVROverlay
+    public class CVROverlay
     {
         IVROverlay FnTable;
         internal CVROverlay(IntPtr pInterface)
         {
             FnTable = (IVROverlay)Marshal.PtrToStructure(pInterface, typeof(IVROverlay));
         }
-        internal EVROverlayError FindOverlay(string pchOverlayKey, ref ulong pOverlayHandle)
+        public EVROverlayError FindOverlay(string pchOverlayKey, ref ulong pOverlayHandle)
         {
             pOverlayHandle = 0;
             EVROverlayError result = FnTable.FindOverlay(pchOverlayKey, ref pOverlayHandle);
             return result;
         }
-        internal EVROverlayError CreateOverlay(string pchOverlayKey, string pchOverlayName, ref ulong pOverlayHandle)
+        public EVROverlayError CreateOverlay(string pchOverlayKey, string pchOverlayName, ref ulong pOverlayHandle)
         {
             pOverlayHandle = 0;
             EVROverlayError result = FnTable.CreateOverlay(pchOverlayKey, pchOverlayName, ref pOverlayHandle);
             return result;
         }
-        internal EVROverlayError DestroyOverlay(ulong ulOverlayHandle)
+        public EVROverlayError DestroyOverlay(ulong ulOverlayHandle)
         {
             EVROverlayError result = FnTable.DestroyOverlay(ulOverlayHandle);
             return result;
         }
-        internal EVROverlayError SetHighQualityOverlay(ulong ulOverlayHandle)
-        {
-            EVROverlayError result = FnTable.SetHighQualityOverlay(ulOverlayHandle);
-            return result;
-        }
-        internal ulong GetHighQualityOverlay()
-        {
-            ulong result = FnTable.GetHighQualityOverlay();
-            return result;
-        }
-        internal uint GetOverlayKey(ulong ulOverlayHandle, System.Text.StringBuilder pchValue, uint unBufferSize, ref EVROverlayError pError)
+        public uint GetOverlayKey(ulong ulOverlayHandle, System.Text.StringBuilder pchValue, uint unBufferSize, ref EVROverlayError pError)
         {
             uint result = FnTable.GetOverlayKey(ulOverlayHandle, pchValue, unBufferSize, ref pError);
             return result;
         }
-        internal uint GetOverlayName(ulong ulOverlayHandle, System.Text.StringBuilder pchValue, uint unBufferSize, ref EVROverlayError pError)
+        public uint GetOverlayName(ulong ulOverlayHandle, System.Text.StringBuilder pchValue, uint unBufferSize, ref EVROverlayError pError)
         {
             uint result = FnTable.GetOverlayName(ulOverlayHandle, pchValue, unBufferSize, ref pError);
             return result;
         }
-        internal EVROverlayError SetOverlayName(ulong ulOverlayHandle, string pchName)
+        public EVROverlayError SetOverlayName(ulong ulOverlayHandle, string pchName)
         {
             EVROverlayError result = FnTable.SetOverlayName(ulOverlayHandle, pchName);
             return result;
         }
-        internal EVROverlayError GetOverlayImageData(ulong ulOverlayHandle, IntPtr pvBuffer, uint unBufferSize, ref uint punWidth, ref uint punHeight)
+        public EVROverlayError GetOverlayImageData(ulong ulOverlayHandle, IntPtr pvBuffer, uint unBufferSize, ref uint punWidth, ref uint punHeight)
         {
             punWidth = 0;
             punHeight = 0;
             EVROverlayError result = FnTable.GetOverlayImageData(ulOverlayHandle, pvBuffer, unBufferSize, ref punWidth, ref punHeight);
             return result;
         }
-        internal string GetOverlayErrorNameFromEnum(EVROverlayError error)
+        public string GetOverlayErrorNameFromEnum(EVROverlayError error)
         {
             IntPtr result = FnTable.GetOverlayErrorNameFromEnum(error);
             return Marshal.PtrToStringAnsi(result);
         }
-        internal EVROverlayError SetOverlayRenderingPid(ulong ulOverlayHandle, uint unPID)
+        public EVROverlayError SetOverlayRenderingPid(ulong ulOverlayHandle, uint unPID)
         {
             EVROverlayError result = FnTable.SetOverlayRenderingPid(ulOverlayHandle, unPID);
             return result;
         }
-        internal uint GetOverlayRenderingPid(ulong ulOverlayHandle)
+        public uint GetOverlayRenderingPid(ulong ulOverlayHandle)
         {
             uint result = FnTable.GetOverlayRenderingPid(ulOverlayHandle);
             return result;
         }
-        internal EVROverlayError SetOverlayFlag(ulong ulOverlayHandle, VROverlayFlags eOverlayFlag, bool bEnabled)
+        public EVROverlayError SetOverlayFlag(ulong ulOverlayHandle, VROverlayFlags eOverlayFlag, bool bEnabled)
         {
             EVROverlayError result = FnTable.SetOverlayFlag(ulOverlayHandle, eOverlayFlag, bEnabled);
             return result;
         }
-        internal EVROverlayError GetOverlayFlag(ulong ulOverlayHandle, VROverlayFlags eOverlayFlag, ref bool pbEnabled)
+        public EVROverlayError GetOverlayFlag(ulong ulOverlayHandle, VROverlayFlags eOverlayFlag, ref bool pbEnabled)
         {
             pbEnabled = false;
             EVROverlayError result = FnTable.GetOverlayFlag(ulOverlayHandle, eOverlayFlag, ref pbEnabled);
             return result;
         }
-        internal EVROverlayError SetOverlayColor(ulong ulOverlayHandle, float fRed, float fGreen, float fBlue)
+        public EVROverlayError GetOverlayFlags(ulong ulOverlayHandle, ref uint pFlags)
+        {
+            pFlags = 0;
+            EVROverlayError result = FnTable.GetOverlayFlags(ulOverlayHandle, ref pFlags);
+            return result;
+        }
+        public EVROverlayError SetOverlayColor(ulong ulOverlayHandle, float fRed, float fGreen, float fBlue)
         {
             EVROverlayError result = FnTable.SetOverlayColor(ulOverlayHandle, fRed, fGreen, fBlue);
             return result;
         }
-        internal EVROverlayError GetOverlayColor(ulong ulOverlayHandle, ref float pfRed, ref float pfGreen, ref float pfBlue)
+        public EVROverlayError GetOverlayColor(ulong ulOverlayHandle, ref float pfRed, ref float pfGreen, ref float pfBlue)
         {
             pfRed = 0;
             pfGreen = 0;
@@ -2784,156 +2914,165 @@ namespace Valve.VR
             EVROverlayError result = FnTable.GetOverlayColor(ulOverlayHandle, ref pfRed, ref pfGreen, ref pfBlue);
             return result;
         }
-        internal EVROverlayError SetOverlayAlpha(ulong ulOverlayHandle, float fAlpha)
+        public EVROverlayError SetOverlayAlpha(ulong ulOverlayHandle, float fAlpha)
         {
             EVROverlayError result = FnTable.SetOverlayAlpha(ulOverlayHandle, fAlpha);
             return result;
         }
-        internal EVROverlayError GetOverlayAlpha(ulong ulOverlayHandle, ref float pfAlpha)
+        public EVROverlayError GetOverlayAlpha(ulong ulOverlayHandle, ref float pfAlpha)
         {
             pfAlpha = 0;
             EVROverlayError result = FnTable.GetOverlayAlpha(ulOverlayHandle, ref pfAlpha);
             return result;
         }
-        internal EVROverlayError SetOverlayTexelAspect(ulong ulOverlayHandle, float fTexelAspect)
+        public EVROverlayError SetOverlayTexelAspect(ulong ulOverlayHandle, float fTexelAspect)
         {
             EVROverlayError result = FnTable.SetOverlayTexelAspect(ulOverlayHandle, fTexelAspect);
             return result;
         }
-        internal EVROverlayError GetOverlayTexelAspect(ulong ulOverlayHandle, ref float pfTexelAspect)
+        public EVROverlayError GetOverlayTexelAspect(ulong ulOverlayHandle, ref float pfTexelAspect)
         {
             pfTexelAspect = 0;
             EVROverlayError result = FnTable.GetOverlayTexelAspect(ulOverlayHandle, ref pfTexelAspect);
             return result;
         }
-        internal EVROverlayError SetOverlaySortOrder(ulong ulOverlayHandle, uint unSortOrder)
+        public EVROverlayError SetOverlaySortOrder(ulong ulOverlayHandle, uint unSortOrder)
         {
             EVROverlayError result = FnTable.SetOverlaySortOrder(ulOverlayHandle, unSortOrder);
             return result;
         }
-        internal EVROverlayError GetOverlaySortOrder(ulong ulOverlayHandle, ref uint punSortOrder)
+        public EVROverlayError GetOverlaySortOrder(ulong ulOverlayHandle, ref uint punSortOrder)
         {
             punSortOrder = 0;
             EVROverlayError result = FnTable.GetOverlaySortOrder(ulOverlayHandle, ref punSortOrder);
             return result;
         }
-        internal EVROverlayError SetOverlayWidthInMeters(ulong ulOverlayHandle, float fWidthInMeters)
+        public EVROverlayError SetOverlayWidthInMeters(ulong ulOverlayHandle, float fWidthInMeters)
         {
             EVROverlayError result = FnTable.SetOverlayWidthInMeters(ulOverlayHandle, fWidthInMeters);
             return result;
         }
-        internal EVROverlayError GetOverlayWidthInMeters(ulong ulOverlayHandle, ref float pfWidthInMeters)
+        public EVROverlayError GetOverlayWidthInMeters(ulong ulOverlayHandle, ref float pfWidthInMeters)
         {
             pfWidthInMeters = 0;
             EVROverlayError result = FnTable.GetOverlayWidthInMeters(ulOverlayHandle, ref pfWidthInMeters);
             return result;
         }
-        internal EVROverlayError SetOverlayAutoCurveDistanceRangeInMeters(ulong ulOverlayHandle, float fMinDistanceInMeters, float fMaxDistanceInMeters)
+        public EVROverlayError SetOverlayCurvature(ulong ulOverlayHandle, float fCurvature)
         {
-            EVROverlayError result = FnTable.SetOverlayAutoCurveDistanceRangeInMeters(ulOverlayHandle, fMinDistanceInMeters, fMaxDistanceInMeters);
+            EVROverlayError result = FnTable.SetOverlayCurvature(ulOverlayHandle, fCurvature);
             return result;
         }
-        internal EVROverlayError GetOverlayAutoCurveDistanceRangeInMeters(ulong ulOverlayHandle, ref float pfMinDistanceInMeters, ref float pfMaxDistanceInMeters)
+        public EVROverlayError GetOverlayCurvature(ulong ulOverlayHandle, ref float pfCurvature)
         {
-            pfMinDistanceInMeters = 0;
-            pfMaxDistanceInMeters = 0;
-            EVROverlayError result = FnTable.GetOverlayAutoCurveDistanceRangeInMeters(ulOverlayHandle, ref pfMinDistanceInMeters, ref pfMaxDistanceInMeters);
+            pfCurvature = 0;
+            EVROverlayError result = FnTable.GetOverlayCurvature(ulOverlayHandle, ref pfCurvature);
             return result;
         }
-        internal EVROverlayError SetOverlayTextureColorSpace(ulong ulOverlayHandle, EColorSpace eTextureColorSpace)
+        public EVROverlayError SetOverlayTextureColorSpace(ulong ulOverlayHandle, EColorSpace eTextureColorSpace)
         {
             EVROverlayError result = FnTable.SetOverlayTextureColorSpace(ulOverlayHandle, eTextureColorSpace);
             return result;
         }
-        internal EVROverlayError GetOverlayTextureColorSpace(ulong ulOverlayHandle, ref EColorSpace peTextureColorSpace)
+        public EVROverlayError GetOverlayTextureColorSpace(ulong ulOverlayHandle, ref EColorSpace peTextureColorSpace)
         {
             EVROverlayError result = FnTable.GetOverlayTextureColorSpace(ulOverlayHandle, ref peTextureColorSpace);
             return result;
         }
-        internal EVROverlayError SetOverlayTextureBounds(ulong ulOverlayHandle, ref VRTextureBounds_t pOverlayTextureBounds)
+        public EVROverlayError SetOverlayTextureBounds(ulong ulOverlayHandle, ref VRTextureBounds_t pOverlayTextureBounds)
         {
             EVROverlayError result = FnTable.SetOverlayTextureBounds(ulOverlayHandle, ref pOverlayTextureBounds);
             return result;
         }
-        internal EVROverlayError GetOverlayTextureBounds(ulong ulOverlayHandle, ref VRTextureBounds_t pOverlayTextureBounds)
+        public EVROverlayError GetOverlayTextureBounds(ulong ulOverlayHandle, ref VRTextureBounds_t pOverlayTextureBounds)
         {
             EVROverlayError result = FnTable.GetOverlayTextureBounds(ulOverlayHandle, ref pOverlayTextureBounds);
             return result;
         }
-        internal uint GetOverlayRenderModel(ulong ulOverlayHandle, System.Text.StringBuilder pchValue, uint unBufferSize, ref HmdColor_t pColor, ref EVROverlayError pError)
+        public uint GetOverlayRenderModel(ulong ulOverlayHandle, System.Text.StringBuilder pchValue, uint unBufferSize, ref HmdColor_t pColor, ref EVROverlayError pError)
         {
             uint result = FnTable.GetOverlayRenderModel(ulOverlayHandle, pchValue, unBufferSize, ref pColor, ref pError);
             return result;
         }
-        internal EVROverlayError SetOverlayRenderModel(ulong ulOverlayHandle, string pchRenderModel, ref HmdColor_t pColor)
+        public EVROverlayError SetOverlayRenderModel(ulong ulOverlayHandle, string pchRenderModel, ref HmdColor_t pColor)
         {
             EVROverlayError result = FnTable.SetOverlayRenderModel(ulOverlayHandle, pchRenderModel, ref pColor);
             return result;
         }
-        internal EVROverlayError GetOverlayTransformType(ulong ulOverlayHandle, ref VROverlayTransformType peTransformType)
+        public EVROverlayError GetOverlayTransformType(ulong ulOverlayHandle, ref VROverlayTransformType peTransformType)
         {
             EVROverlayError result = FnTable.GetOverlayTransformType(ulOverlayHandle, ref peTransformType);
             return result;
         }
-        internal EVROverlayError SetOverlayTransformAbsolute(ulong ulOverlayHandle, ETrackingUniverseOrigin eTrackingOrigin, ref HmdMatrix34_t pmatTrackingOriginToOverlayTransform)
+        public EVROverlayError SetOverlayTransformAbsolute(ulong ulOverlayHandle, ETrackingUniverseOrigin eTrackingOrigin, ref HmdMatrix34_t pmatTrackingOriginToOverlayTransform)
         {
             EVROverlayError result = FnTable.SetOverlayTransformAbsolute(ulOverlayHandle, eTrackingOrigin, ref pmatTrackingOriginToOverlayTransform);
             return result;
         }
-        internal EVROverlayError GetOverlayTransformAbsolute(ulong ulOverlayHandle, ref ETrackingUniverseOrigin peTrackingOrigin, ref HmdMatrix34_t pmatTrackingOriginToOverlayTransform)
+        public EVROverlayError GetOverlayTransformAbsolute(ulong ulOverlayHandle, ref ETrackingUniverseOrigin peTrackingOrigin, ref HmdMatrix34_t pmatTrackingOriginToOverlayTransform)
         {
             EVROverlayError result = FnTable.GetOverlayTransformAbsolute(ulOverlayHandle, ref peTrackingOrigin, ref pmatTrackingOriginToOverlayTransform);
             return result;
         }
-        internal EVROverlayError SetOverlayTransformTrackedDeviceRelative(ulong ulOverlayHandle, uint unTrackedDevice, ref HmdMatrix34_t pmatTrackedDeviceToOverlayTransform)
+        public EVROverlayError SetOverlayTransformTrackedDeviceRelative(ulong ulOverlayHandle, uint unTrackedDevice, ref HmdMatrix34_t pmatTrackedDeviceToOverlayTransform)
         {
             EVROverlayError result = FnTable.SetOverlayTransformTrackedDeviceRelative(ulOverlayHandle, unTrackedDevice, ref pmatTrackedDeviceToOverlayTransform);
             return result;
         }
-        internal EVROverlayError GetOverlayTransformTrackedDeviceRelative(ulong ulOverlayHandle, ref uint punTrackedDevice, ref HmdMatrix34_t pmatTrackedDeviceToOverlayTransform)
+        public EVROverlayError GetOverlayTransformTrackedDeviceRelative(ulong ulOverlayHandle, ref uint punTrackedDevice, ref HmdMatrix34_t pmatTrackedDeviceToOverlayTransform)
         {
             punTrackedDevice = 0;
             EVROverlayError result = FnTable.GetOverlayTransformTrackedDeviceRelative(ulOverlayHandle, ref punTrackedDevice, ref pmatTrackedDeviceToOverlayTransform);
             return result;
         }
-        internal EVROverlayError SetOverlayTransformTrackedDeviceComponent(ulong ulOverlayHandle, uint unDeviceIndex, string pchComponentName)
+        public EVROverlayError SetOverlayTransformTrackedDeviceComponent(ulong ulOverlayHandle, uint unDeviceIndex, string pchComponentName)
         {
             EVROverlayError result = FnTable.SetOverlayTransformTrackedDeviceComponent(ulOverlayHandle, unDeviceIndex, pchComponentName);
             return result;
         }
-        internal EVROverlayError GetOverlayTransformTrackedDeviceComponent(ulong ulOverlayHandle, ref uint punDeviceIndex, System.Text.StringBuilder pchComponentName, uint unComponentNameSize)
+        public EVROverlayError GetOverlayTransformTrackedDeviceComponent(ulong ulOverlayHandle, ref uint punDeviceIndex, System.Text.StringBuilder pchComponentName, uint unComponentNameSize)
         {
             punDeviceIndex = 0;
             EVROverlayError result = FnTable.GetOverlayTransformTrackedDeviceComponent(ulOverlayHandle, ref punDeviceIndex, pchComponentName, unComponentNameSize);
             return result;
         }
-        internal EVROverlayError GetOverlayTransformOverlayRelative(ulong ulOverlayHandle, ref ulong ulOverlayHandleParent, ref HmdMatrix34_t pmatParentOverlayToOverlayTransform)
+        public EVROverlayError GetOverlayTransformOverlayRelative(ulong ulOverlayHandle, ref ulong ulOverlayHandleParent, ref HmdMatrix34_t pmatParentOverlayToOverlayTransform)
         {
             ulOverlayHandleParent = 0;
             EVROverlayError result = FnTable.GetOverlayTransformOverlayRelative(ulOverlayHandle, ref ulOverlayHandleParent, ref pmatParentOverlayToOverlayTransform);
             return result;
         }
-        internal EVROverlayError SetOverlayTransformOverlayRelative(ulong ulOverlayHandle, ulong ulOverlayHandleParent, ref HmdMatrix34_t pmatParentOverlayToOverlayTransform)
+        public EVROverlayError SetOverlayTransformOverlayRelative(ulong ulOverlayHandle, ulong ulOverlayHandleParent, ref HmdMatrix34_t pmatParentOverlayToOverlayTransform)
         {
             EVROverlayError result = FnTable.SetOverlayTransformOverlayRelative(ulOverlayHandle, ulOverlayHandleParent, ref pmatParentOverlayToOverlayTransform);
             return result;
         }
-        internal EVROverlayError ShowOverlay(ulong ulOverlayHandle)
+        public EVROverlayError SetOverlayTransformCursor(ulong ulCursorOverlayHandle, ref HmdVector2_t pvHotspot)
+        {
+            EVROverlayError result = FnTable.SetOverlayTransformCursor(ulCursorOverlayHandle, ref pvHotspot);
+            return result;
+        }
+        public EVROverlayError GetOverlayTransformCursor(ulong ulOverlayHandle, ref HmdVector2_t pvHotspot)
+        {
+            EVROverlayError result = FnTable.GetOverlayTransformCursor(ulOverlayHandle, ref pvHotspot);
+            return result;
+        }
+        public EVROverlayError ShowOverlay(ulong ulOverlayHandle)
         {
             EVROverlayError result = FnTable.ShowOverlay(ulOverlayHandle);
             return result;
         }
-        internal EVROverlayError HideOverlay(ulong ulOverlayHandle)
+        public EVROverlayError HideOverlay(ulong ulOverlayHandle)
         {
             EVROverlayError result = FnTable.HideOverlay(ulOverlayHandle);
             return result;
         }
-        internal bool IsOverlayVisible(ulong ulOverlayHandle)
+        public bool IsOverlayVisible(ulong ulOverlayHandle)
         {
             bool result = FnTable.IsOverlayVisible(ulOverlayHandle);
             return result;
         }
-        internal EVROverlayError GetTransformForOverlayCoordinates(ulong ulOverlayHandle, ETrackingUniverseOrigin eTrackingOrigin, HmdVector2_t coordinatesInOverlay, ref HmdMatrix34_t pmatTransform)
+        public EVROverlayError GetTransformForOverlayCoordinates(ulong ulOverlayHandle, ETrackingUniverseOrigin eTrackingOrigin, HmdVector2_t coordinatesInOverlay, ref HmdMatrix34_t pmatTransform)
         {
             EVROverlayError result = FnTable.GetTransformForOverlayCoordinates(ulOverlayHandle, eTrackingOrigin, coordinatesInOverlay, ref pmatTransform);
             return result;
@@ -2946,11 +3085,11 @@ namespace Valve.VR
         struct PollNextOverlayEventUnion
         {
             [FieldOffset(0)]
-            internal IVROverlay._PollNextOverlayEvent pPollNextOverlayEvent;
+            public IVROverlay._PollNextOverlayEvent pPollNextOverlayEvent;
             [FieldOffset(0)]
-            internal _PollNextOverlayEventPacked pPollNextOverlayEventPacked;
+            public _PollNextOverlayEventPacked pPollNextOverlayEventPacked;
         }
-        internal bool PollNextOverlayEvent(ulong ulOverlayHandle, ref VREvent_t pEvent, uint uncbVREvent)
+        public bool PollNextOverlayEvent(ulong ulOverlayHandle, ref VREvent_t pEvent, uint uncbVREvent)
         {
 #if !UNITY_METRO
             if ((System.Environment.OSVersion.Platform == System.PlatformID.MacOSX) ||
@@ -2969,88 +3108,93 @@ namespace Valve.VR
             bool result = FnTable.PollNextOverlayEvent(ulOverlayHandle, ref pEvent, uncbVREvent);
             return result;
         }
-        internal EVROverlayError GetOverlayInputMethod(ulong ulOverlayHandle, ref VROverlayInputMethod peInputMethod)
+        public EVROverlayError GetOverlayInputMethod(ulong ulOverlayHandle, ref VROverlayInputMethod peInputMethod)
         {
             EVROverlayError result = FnTable.GetOverlayInputMethod(ulOverlayHandle, ref peInputMethod);
             return result;
         }
-        internal EVROverlayError SetOverlayInputMethod(ulong ulOverlayHandle, VROverlayInputMethod eInputMethod)
+        public EVROverlayError SetOverlayInputMethod(ulong ulOverlayHandle, VROverlayInputMethod eInputMethod)
         {
             EVROverlayError result = FnTable.SetOverlayInputMethod(ulOverlayHandle, eInputMethod);
             return result;
         }
-        internal EVROverlayError GetOverlayMouseScale(ulong ulOverlayHandle, ref HmdVector2_t pvecMouseScale)
+        public EVROverlayError GetOverlayMouseScale(ulong ulOverlayHandle, ref HmdVector2_t pvecMouseScale)
         {
             EVROverlayError result = FnTable.GetOverlayMouseScale(ulOverlayHandle, ref pvecMouseScale);
             return result;
         }
-        internal EVROverlayError SetOverlayMouseScale(ulong ulOverlayHandle, ref HmdVector2_t pvecMouseScale)
+        public EVROverlayError SetOverlayMouseScale(ulong ulOverlayHandle, ref HmdVector2_t pvecMouseScale)
         {
             EVROverlayError result = FnTable.SetOverlayMouseScale(ulOverlayHandle, ref pvecMouseScale);
             return result;
         }
-        internal bool ComputeOverlayIntersection(ulong ulOverlayHandle, ref VROverlayIntersectionParams_t pParams, ref VROverlayIntersectionResults_t pResults)
+        public bool ComputeOverlayIntersection(ulong ulOverlayHandle, ref VROverlayIntersectionParams_t pParams, ref VROverlayIntersectionResults_t pResults)
         {
             bool result = FnTable.ComputeOverlayIntersection(ulOverlayHandle, ref pParams, ref pResults);
             return result;
         }
-        internal bool IsHoverTargetOverlay(ulong ulOverlayHandle)
+        public bool IsHoverTargetOverlay(ulong ulOverlayHandle)
         {
             bool result = FnTable.IsHoverTargetOverlay(ulOverlayHandle);
             return result;
         }
-        internal ulong GetGamepadFocusOverlay()
+        public EVROverlayError SetOverlayDualAnalogTransform(ulong ulOverlay, EDualAnalogWhich eWhich, ref HmdVector2_t pvCenter, float fRadius)
         {
-            ulong result = FnTable.GetGamepadFocusOverlay();
+            EVROverlayError result = FnTable.SetOverlayDualAnalogTransform(ulOverlay, eWhich, ref pvCenter, fRadius);
             return result;
         }
-        internal EVROverlayError SetGamepadFocusOverlay(ulong ulNewFocusOverlay)
-        {
-            EVROverlayError result = FnTable.SetGamepadFocusOverlay(ulNewFocusOverlay);
-            return result;
-        }
-        internal EVROverlayError SetOverlayNeighbor(EOverlayDirection eDirection, ulong ulFrom, ulong ulTo)
-        {
-            EVROverlayError result = FnTable.SetOverlayNeighbor(eDirection, ulFrom, ulTo);
-            return result;
-        }
-        internal EVROverlayError MoveGamepadFocusToNeighbor(EOverlayDirection eDirection, ulong ulFrom)
-        {
-            EVROverlayError result = FnTable.MoveGamepadFocusToNeighbor(eDirection, ulFrom);
-            return result;
-        }
-        internal EVROverlayError SetOverlayDualAnalogTransform(ulong ulOverlay, EDualAnalogWhich eWhich, IntPtr vCenter, float fRadius)
-        {
-            EVROverlayError result = FnTable.SetOverlayDualAnalogTransform(ulOverlay, eWhich, vCenter, fRadius);
-            return result;
-        }
-        internal EVROverlayError GetOverlayDualAnalogTransform(ulong ulOverlay, EDualAnalogWhich eWhich, ref HmdVector2_t pvCenter, ref float pfRadius)
+        public EVROverlayError GetOverlayDualAnalogTransform(ulong ulOverlay, EDualAnalogWhich eWhich, ref HmdVector2_t pvCenter, ref float pfRadius)
         {
             pfRadius = 0;
             EVROverlayError result = FnTable.GetOverlayDualAnalogTransform(ulOverlay, eWhich, ref pvCenter, ref pfRadius);
             return result;
         }
-        internal EVROverlayError SetOverlayTexture(ulong ulOverlayHandle, ref Texture_t pTexture)
+        public EVROverlayError SetOverlayIntersectionMask(ulong ulOverlayHandle, ref VROverlayIntersectionMaskPrimitive_t pMaskPrimitives, uint unNumMaskPrimitives, uint unPrimitiveSize)
+        {
+            EVROverlayError result = FnTable.SetOverlayIntersectionMask(ulOverlayHandle, ref pMaskPrimitives, unNumMaskPrimitives, unPrimitiveSize);
+            return result;
+        }
+        public EVROverlayError TriggerLaserMouseHapticVibration(ulong ulOverlayHandle, float fDurationSeconds, float fFrequency, float fAmplitude)
+        {
+            EVROverlayError result = FnTable.TriggerLaserMouseHapticVibration(ulOverlayHandle, fDurationSeconds, fFrequency, fAmplitude);
+            return result;
+        }
+        public EVROverlayError SetOverlayCursor(ulong ulOverlayHandle, ulong ulCursorHandle)
+        {
+            EVROverlayError result = FnTable.SetOverlayCursor(ulOverlayHandle, ulCursorHandle);
+            return result;
+        }
+        public EVROverlayError SetOverlayCursorPositionOverride(ulong ulOverlayHandle, ref HmdVector2_t pvCursor)
+        {
+            EVROverlayError result = FnTable.SetOverlayCursorPositionOverride(ulOverlayHandle, ref pvCursor);
+            return result;
+        }
+        public EVROverlayError ClearOverlayCursorPositionOverride(ulong ulOverlayHandle)
+        {
+            EVROverlayError result = FnTable.ClearOverlayCursorPositionOverride(ulOverlayHandle);
+            return result;
+        }
+        public EVROverlayError SetOverlayTexture(ulong ulOverlayHandle, ref Texture_t pTexture)
         {
             EVROverlayError result = FnTable.SetOverlayTexture(ulOverlayHandle, ref pTexture);
             return result;
         }
-        internal EVROverlayError ClearOverlayTexture(ulong ulOverlayHandle)
+        public EVROverlayError ClearOverlayTexture(ulong ulOverlayHandle)
         {
             EVROverlayError result = FnTable.ClearOverlayTexture(ulOverlayHandle);
             return result;
         }
-        internal EVROverlayError SetOverlayRaw(ulong ulOverlayHandle, IntPtr pvBuffer, uint unWidth, uint unHeight, uint unDepth)
+        public EVROverlayError SetOverlayRaw(ulong ulOverlayHandle, IntPtr pvBuffer, uint unWidth, uint unHeight, uint unBytesPerPixel)
         {
-            EVROverlayError result = FnTable.SetOverlayRaw(ulOverlayHandle, pvBuffer, unWidth, unHeight, unDepth);
+            EVROverlayError result = FnTable.SetOverlayRaw(ulOverlayHandle, pvBuffer, unWidth, unHeight, unBytesPerPixel);
             return result;
         }
-        internal EVROverlayError SetOverlayFromFile(ulong ulOverlayHandle, string pchFilePath)
+        public EVROverlayError SetOverlayFromFile(ulong ulOverlayHandle, string pchFilePath)
         {
             EVROverlayError result = FnTable.SetOverlayFromFile(ulOverlayHandle, pchFilePath);
             return result;
         }
-        internal EVROverlayError GetOverlayTexture(ulong ulOverlayHandle, ref IntPtr pNativeTextureHandle, IntPtr pNativeTextureRef, ref uint pWidth, ref uint pHeight, ref uint pNativeFormat, ref ETextureType pAPIType, ref EColorSpace pColorSpace, ref VRTextureBounds_t pTextureBounds)
+        public EVROverlayError GetOverlayTexture(ulong ulOverlayHandle, ref IntPtr pNativeTextureHandle, IntPtr pNativeTextureRef, ref uint pWidth, ref uint pHeight, ref uint pNativeFormat, ref ETextureType pAPIType, ref EColorSpace pColorSpace, ref VRTextureBounds_t pTextureBounds)
         {
             pWidth = 0;
             pHeight = 0;
@@ -3058,175 +3202,164 @@ namespace Valve.VR
             EVROverlayError result = FnTable.GetOverlayTexture(ulOverlayHandle, ref pNativeTextureHandle, pNativeTextureRef, ref pWidth, ref pHeight, ref pNativeFormat, ref pAPIType, ref pColorSpace, ref pTextureBounds);
             return result;
         }
-        internal EVROverlayError ReleaseNativeOverlayHandle(ulong ulOverlayHandle, IntPtr pNativeTextureHandle)
+        public EVROverlayError ReleaseNativeOverlayHandle(ulong ulOverlayHandle, IntPtr pNativeTextureHandle)
         {
             EVROverlayError result = FnTable.ReleaseNativeOverlayHandle(ulOverlayHandle, pNativeTextureHandle);
             return result;
         }
-        internal EVROverlayError GetOverlayTextureSize(ulong ulOverlayHandle, ref uint pWidth, ref uint pHeight)
+        public EVROverlayError GetOverlayTextureSize(ulong ulOverlayHandle, ref uint pWidth, ref uint pHeight)
         {
             pWidth = 0;
             pHeight = 0;
             EVROverlayError result = FnTable.GetOverlayTextureSize(ulOverlayHandle, ref pWidth, ref pHeight);
             return result;
         }
-        internal EVROverlayError CreateDashboardOverlay(string pchOverlayKey, string pchOverlayFriendlyName, ref ulong pMainHandle, ref ulong pThumbnailHandle)
+        public EVROverlayError CreateDashboardOverlay(string pchOverlayKey, string pchOverlayFriendlyName, ref ulong pMainHandle, ref ulong pThumbnailHandle)
         {
             pMainHandle = 0;
             pThumbnailHandle = 0;
             EVROverlayError result = FnTable.CreateDashboardOverlay(pchOverlayKey, pchOverlayFriendlyName, ref pMainHandle, ref pThumbnailHandle);
             return result;
         }
-        internal bool IsDashboardVisible()
+        public bool IsDashboardVisible()
         {
             bool result = FnTable.IsDashboardVisible();
             return result;
         }
-        internal bool IsActiveDashboardOverlay(ulong ulOverlayHandle)
+        public bool IsActiveDashboardOverlay(ulong ulOverlayHandle)
         {
             bool result = FnTable.IsActiveDashboardOverlay(ulOverlayHandle);
             return result;
         }
-        internal EVROverlayError SetDashboardOverlaySceneProcess(ulong ulOverlayHandle, uint unProcessId)
+        public EVROverlayError SetDashboardOverlaySceneProcess(ulong ulOverlayHandle, uint unProcessId)
         {
             EVROverlayError result = FnTable.SetDashboardOverlaySceneProcess(ulOverlayHandle, unProcessId);
             return result;
         }
-        internal EVROverlayError GetDashboardOverlaySceneProcess(ulong ulOverlayHandle, ref uint punProcessId)
+        public EVROverlayError GetDashboardOverlaySceneProcess(ulong ulOverlayHandle, ref uint punProcessId)
         {
             punProcessId = 0;
             EVROverlayError result = FnTable.GetDashboardOverlaySceneProcess(ulOverlayHandle, ref punProcessId);
             return result;
         }
-        internal void ShowDashboard(string pchOverlayToShow)
+        public void ShowDashboard(string pchOverlayToShow)
         {
             FnTable.ShowDashboard(pchOverlayToShow);
         }
-        internal uint GetPrimaryDashboardDevice()
+        public uint GetPrimaryDashboardDevice()
         {
             uint result = FnTable.GetPrimaryDashboardDevice();
             return result;
         }
-        internal EVROverlayError ShowKeyboard(int eInputMode, int eLineInputMode, string pchDescription, uint unCharMax, string pchExistingText, bool bUseMinimalMode, ulong uUserValue)
+        public EVROverlayError ShowKeyboard(int eInputMode, int eLineInputMode, string pchDescription, uint unCharMax, string pchExistingText, bool bUseMinimalMode, ulong uUserValue)
         {
             EVROverlayError result = FnTable.ShowKeyboard(eInputMode, eLineInputMode, pchDescription, unCharMax, pchExistingText, bUseMinimalMode, uUserValue);
             return result;
         }
-        internal EVROverlayError ShowKeyboardForOverlay(ulong ulOverlayHandle, int eInputMode, int eLineInputMode, string pchDescription, uint unCharMax, string pchExistingText, bool bUseMinimalMode, ulong uUserValue)
+        public EVROverlayError ShowKeyboardForOverlay(ulong ulOverlayHandle, int eInputMode, int eLineInputMode, string pchDescription, uint unCharMax, string pchExistingText, bool bUseMinimalMode, ulong uUserValue)
         {
             EVROverlayError result = FnTable.ShowKeyboardForOverlay(ulOverlayHandle, eInputMode, eLineInputMode, pchDescription, unCharMax, pchExistingText, bUseMinimalMode, uUserValue);
             return result;
         }
-        internal uint GetKeyboardText(System.Text.StringBuilder pchText, uint cchText)
+        public uint GetKeyboardText(System.Text.StringBuilder pchText, uint cchText)
         {
             uint result = FnTable.GetKeyboardText(pchText, cchText);
             return result;
         }
-        internal void HideKeyboard()
+        public void HideKeyboard()
         {
             FnTable.HideKeyboard();
         }
-        internal void SetKeyboardTransformAbsolute(ETrackingUniverseOrigin eTrackingOrigin, ref HmdMatrix34_t pmatTrackingOriginToKeyboardTransform)
+        public void SetKeyboardTransformAbsolute(ETrackingUniverseOrigin eTrackingOrigin, ref HmdMatrix34_t pmatTrackingOriginToKeyboardTransform)
         {
             FnTable.SetKeyboardTransformAbsolute(eTrackingOrigin, ref pmatTrackingOriginToKeyboardTransform);
         }
-        internal void SetKeyboardPositionForOverlay(ulong ulOverlayHandle, HmdRect2_t avoidRect)
+        public void SetKeyboardPositionForOverlay(ulong ulOverlayHandle, HmdRect2_t avoidRect)
         {
             FnTable.SetKeyboardPositionForOverlay(ulOverlayHandle, avoidRect);
         }
-        internal EVROverlayError SetOverlayIntersectionMask(ulong ulOverlayHandle, ref VROverlayIntersectionMaskPrimitive_t pMaskPrimitives, uint unNumMaskPrimitives, uint unPrimitiveSize)
-        {
-            EVROverlayError result = FnTable.SetOverlayIntersectionMask(ulOverlayHandle, ref pMaskPrimitives, unNumMaskPrimitives, unPrimitiveSize);
-            return result;
-        }
-        internal EVROverlayError GetOverlayFlags(ulong ulOverlayHandle, ref uint pFlags)
-        {
-            pFlags = 0;
-            EVROverlayError result = FnTable.GetOverlayFlags(ulOverlayHandle, ref pFlags);
-            return result;
-        }
-        internal VRMessageOverlayResponse ShowMessageOverlay(string pchText, string pchCaption, string pchButton0Text, string pchButton1Text, string pchButton2Text, string pchButton3Text)
+        public VRMessageOverlayResponse ShowMessageOverlay(string pchText, string pchCaption, string pchButton0Text, string pchButton1Text, string pchButton2Text, string pchButton3Text)
         {
             VRMessageOverlayResponse result = FnTable.ShowMessageOverlay(pchText, pchCaption, pchButton0Text, pchButton1Text, pchButton2Text, pchButton3Text);
             return result;
         }
-        internal void CloseMessageOverlay()
+        public void CloseMessageOverlay()
         {
             FnTable.CloseMessageOverlay();
         }
     }
 
 
-    internal class CVRRenderModels
+    public class CVRRenderModels
     {
         IVRRenderModels FnTable;
         internal CVRRenderModels(IntPtr pInterface)
         {
             FnTable = (IVRRenderModels)Marshal.PtrToStructure(pInterface, typeof(IVRRenderModels));
         }
-        internal EVRRenderModelError LoadRenderModel_Async(string pchRenderModelName, ref IntPtr ppRenderModel)
+        public EVRRenderModelError LoadRenderModel_Async(string pchRenderModelName, ref IntPtr ppRenderModel)
         {
             EVRRenderModelError result = FnTable.LoadRenderModel_Async(pchRenderModelName, ref ppRenderModel);
             return result;
         }
-        internal void FreeRenderModel(IntPtr pRenderModel)
+        public void FreeRenderModel(IntPtr pRenderModel)
         {
             FnTable.FreeRenderModel(pRenderModel);
         }
-        internal EVRRenderModelError LoadTexture_Async(int textureId, ref IntPtr ppTexture)
+        public EVRRenderModelError LoadTexture_Async(int textureId, ref IntPtr ppTexture)
         {
             EVRRenderModelError result = FnTable.LoadTexture_Async(textureId, ref ppTexture);
             return result;
         }
-        internal void FreeTexture(IntPtr pTexture)
+        public void FreeTexture(IntPtr pTexture)
         {
             FnTable.FreeTexture(pTexture);
         }
-        internal EVRRenderModelError LoadTextureD3D11_Async(int textureId, IntPtr pD3D11Device, ref IntPtr ppD3D11Texture2D)
+        public EVRRenderModelError LoadTextureD3D11_Async(int textureId, IntPtr pD3D11Device, ref IntPtr ppD3D11Texture2D)
         {
             EVRRenderModelError result = FnTable.LoadTextureD3D11_Async(textureId, pD3D11Device, ref ppD3D11Texture2D);
             return result;
         }
-        internal EVRRenderModelError LoadIntoTextureD3D11_Async(int textureId, IntPtr pDstTexture)
+        public EVRRenderModelError LoadIntoTextureD3D11_Async(int textureId, IntPtr pDstTexture)
         {
             EVRRenderModelError result = FnTable.LoadIntoTextureD3D11_Async(textureId, pDstTexture);
             return result;
         }
-        internal void FreeTextureD3D11(IntPtr pD3D11Texture2D)
+        public void FreeTextureD3D11(IntPtr pD3D11Texture2D)
         {
             FnTable.FreeTextureD3D11(pD3D11Texture2D);
         }
-        internal uint GetRenderModelName(uint unRenderModelIndex, System.Text.StringBuilder pchRenderModelName, uint unRenderModelNameLen)
+        public uint GetRenderModelName(uint unRenderModelIndex, System.Text.StringBuilder pchRenderModelName, uint unRenderModelNameLen)
         {
             uint result = FnTable.GetRenderModelName(unRenderModelIndex, pchRenderModelName, unRenderModelNameLen);
             return result;
         }
-        internal uint GetRenderModelCount()
+        public uint GetRenderModelCount()
         {
             uint result = FnTable.GetRenderModelCount();
             return result;
         }
-        internal uint GetComponentCount(string pchRenderModelName)
+        public uint GetComponentCount(string pchRenderModelName)
         {
             uint result = FnTable.GetComponentCount(pchRenderModelName);
             return result;
         }
-        internal uint GetComponentName(string pchRenderModelName, uint unComponentIndex, System.Text.StringBuilder pchComponentName, uint unComponentNameLen)
+        public uint GetComponentName(string pchRenderModelName, uint unComponentIndex, System.Text.StringBuilder pchComponentName, uint unComponentNameLen)
         {
             uint result = FnTable.GetComponentName(pchRenderModelName, unComponentIndex, pchComponentName, unComponentNameLen);
             return result;
         }
-        internal ulong GetComponentButtonMask(string pchRenderModelName, string pchComponentName)
+        public ulong GetComponentButtonMask(string pchRenderModelName, string pchComponentName)
         {
             ulong result = FnTable.GetComponentButtonMask(pchRenderModelName, pchComponentName);
             return result;
         }
-        internal uint GetComponentRenderModelName(string pchRenderModelName, string pchComponentName, System.Text.StringBuilder pchComponentRenderModelName, uint unComponentRenderModelNameLen)
+        public uint GetComponentRenderModelName(string pchRenderModelName, string pchComponentName, System.Text.StringBuilder pchComponentRenderModelName, uint unComponentRenderModelNameLen)
         {
             uint result = FnTable.GetComponentRenderModelName(pchRenderModelName, pchComponentName, pchComponentRenderModelName, unComponentRenderModelNameLen);
             return result;
         }
-        internal bool GetComponentStateForDevicePath(string pchRenderModelName, string pchComponentName, ulong devicePath, ref RenderModel_ControllerMode_State_t pState, ref RenderModel_ComponentState_t pComponentState)
+        public bool GetComponentStateForDevicePath(string pchRenderModelName, string pchComponentName, ulong devicePath, ref RenderModel_ControllerMode_State_t pState, ref RenderModel_ComponentState_t pComponentState)
         {
             bool result = FnTable.GetComponentStateForDevicePath(pchRenderModelName, pchComponentName, devicePath, ref pState, ref pComponentState);
             return result;
@@ -3239,11 +3372,11 @@ namespace Valve.VR
         struct GetComponentStateUnion
         {
             [FieldOffset(0)]
-            internal IVRRenderModels._GetComponentState pGetComponentState;
+            public IVRRenderModels._GetComponentState pGetComponentState;
             [FieldOffset(0)]
-            internal _GetComponentStatePacked pGetComponentStatePacked;
+            public _GetComponentStatePacked pGetComponentStatePacked;
         }
-        internal bool GetComponentState(string pchRenderModelName, string pchComponentName, ref VRControllerState_t pControllerState, ref RenderModel_ControllerMode_State_t pState, ref RenderModel_ComponentState_t pComponentState)
+        public bool GetComponentState(string pchRenderModelName, string pchComponentName, ref VRControllerState_t pControllerState, ref RenderModel_ControllerMode_State_t pState, ref RenderModel_ComponentState_t pComponentState)
         {
 #if !UNITY_METRO
             if ((System.Environment.OSVersion.Platform == System.PlatformID.MacOSX) ||
@@ -3262,22 +3395,22 @@ namespace Valve.VR
             bool result = FnTable.GetComponentState(pchRenderModelName, pchComponentName, ref pControllerState, ref pState, ref pComponentState);
             return result;
         }
-        internal bool RenderModelHasComponent(string pchRenderModelName, string pchComponentName)
+        public bool RenderModelHasComponent(string pchRenderModelName, string pchComponentName)
         {
             bool result = FnTable.RenderModelHasComponent(pchRenderModelName, pchComponentName);
             return result;
         }
-        internal uint GetRenderModelThumbnailURL(string pchRenderModelName, System.Text.StringBuilder pchThumbnailURL, uint unThumbnailURLLen, ref EVRRenderModelError peError)
+        public uint GetRenderModelThumbnailURL(string pchRenderModelName, System.Text.StringBuilder pchThumbnailURL, uint unThumbnailURLLen, ref EVRRenderModelError peError)
         {
             uint result = FnTable.GetRenderModelThumbnailURL(pchRenderModelName, pchThumbnailURL, unThumbnailURLLen, ref peError);
             return result;
         }
-        internal uint GetRenderModelOriginalPath(string pchRenderModelName, System.Text.StringBuilder pchOriginalPath, uint unOriginalPathLen, ref EVRRenderModelError peError)
+        public uint GetRenderModelOriginalPath(string pchRenderModelName, System.Text.StringBuilder pchOriginalPath, uint unOriginalPathLen, ref EVRRenderModelError peError)
         {
             uint result = FnTable.GetRenderModelOriginalPath(pchRenderModelName, pchOriginalPath, unOriginalPathLen, ref peError);
             return result;
         }
-        internal string GetRenderModelErrorNameFromEnum(EVRRenderModelError error)
+        public string GetRenderModelErrorNameFromEnum(EVRRenderModelError error)
         {
             IntPtr result = FnTable.GetRenderModelErrorNameFromEnum(error);
             return Marshal.PtrToStringAnsi(result);
@@ -3285,20 +3418,20 @@ namespace Valve.VR
     }
 
 
-    internal class CVRNotifications
+    public class CVRNotifications
     {
         IVRNotifications FnTable;
         internal CVRNotifications(IntPtr pInterface)
         {
             FnTable = (IVRNotifications)Marshal.PtrToStructure(pInterface, typeof(IVRNotifications));
         }
-        internal EVRNotificationError CreateNotification(ulong ulOverlayHandle, ulong ulUserValue, EVRNotificationType type, string pchText, EVRNotificationStyle style, ref NotificationBitmap_t pImage, ref uint pNotificationId)
+        public EVRNotificationError CreateNotification(ulong ulOverlayHandle, ulong ulUserValue, EVRNotificationType type, string pchText, EVRNotificationStyle style, ref NotificationBitmap_t pImage, ref uint pNotificationId)
         {
             pNotificationId = 0;
             EVRNotificationError result = FnTable.CreateNotification(ulOverlayHandle, ulUserValue, type, pchText, style, ref pImage, ref pNotificationId);
             return result;
         }
-        internal EVRNotificationError RemoveNotification(uint notificationId)
+        public EVRNotificationError RemoveNotification(uint notificationId)
         {
             EVRNotificationError result = FnTable.RemoveNotification(notificationId);
             return result;
@@ -3306,109 +3439,104 @@ namespace Valve.VR
     }
 
 
-    internal class CVRSettings
+    public class CVRSettings
     {
         IVRSettings FnTable;
         internal CVRSettings(IntPtr pInterface)
         {
             FnTable = (IVRSettings)Marshal.PtrToStructure(pInterface, typeof(IVRSettings));
         }
-        internal string GetSettingsErrorNameFromEnum(EVRSettingsError eError)
+        public string GetSettingsErrorNameFromEnum(EVRSettingsError eError)
         {
             IntPtr result = FnTable.GetSettingsErrorNameFromEnum(eError);
             return Marshal.PtrToStringAnsi(result);
         }
-        internal bool Sync(bool bForce, ref EVRSettingsError peError)
-        {
-            bool result = FnTable.Sync(bForce, ref peError);
-            return result;
-        }
-        internal void SetBool(string pchSection, string pchSettingsKey, bool bValue, ref EVRSettingsError peError)
+        public void SetBool(string pchSection, string pchSettingsKey, bool bValue, ref EVRSettingsError peError)
         {
             FnTable.SetBool(pchSection, pchSettingsKey, bValue, ref peError);
         }
-        internal void SetInt32(string pchSection, string pchSettingsKey, int nValue, ref EVRSettingsError peError)
+        public void SetInt32(string pchSection, string pchSettingsKey, int nValue, ref EVRSettingsError peError)
         {
             FnTable.SetInt32(pchSection, pchSettingsKey, nValue, ref peError);
         }
-        internal void SetFloat(string pchSection, string pchSettingsKey, float flValue, ref EVRSettingsError peError)
+        public void SetFloat(string pchSection, string pchSettingsKey, float flValue, ref EVRSettingsError peError)
         {
             FnTable.SetFloat(pchSection, pchSettingsKey, flValue, ref peError);
         }
-        internal void SetString(string pchSection, string pchSettingsKey, string pchValue, ref EVRSettingsError peError)
+        public void SetString(string pchSection, string pchSettingsKey, string pchValue, ref EVRSettingsError peError)
         {
             FnTable.SetString(pchSection, pchSettingsKey, pchValue, ref peError);
         }
-        internal bool GetBool(string pchSection, string pchSettingsKey, ref EVRSettingsError peError)
+        public bool GetBool(string pchSection, string pchSettingsKey, ref EVRSettingsError peError)
         {
             bool result = FnTable.GetBool(pchSection, pchSettingsKey, ref peError);
             return result;
         }
-        internal int GetInt32(string pchSection, string pchSettingsKey, ref EVRSettingsError peError)
+        public int GetInt32(string pchSection, string pchSettingsKey, ref EVRSettingsError peError)
         {
             int result = FnTable.GetInt32(pchSection, pchSettingsKey, ref peError);
             return result;
         }
-        internal float GetFloat(string pchSection, string pchSettingsKey, ref EVRSettingsError peError)
+        public float GetFloat(string pchSection, string pchSettingsKey, ref EVRSettingsError peError)
         {
             float result = FnTable.GetFloat(pchSection, pchSettingsKey, ref peError);
             return result;
         }
-        internal void GetString(string pchSection, string pchSettingsKey, System.Text.StringBuilder pchValue, uint unValueLen, ref EVRSettingsError peError)
+        public void GetString(string pchSection, string pchSettingsKey, System.Text.StringBuilder pchValue, uint unValueLen, ref EVRSettingsError peError)
         {
             FnTable.GetString(pchSection, pchSettingsKey, pchValue, unValueLen, ref peError);
         }
-        internal void RemoveSection(string pchSection, ref EVRSettingsError peError)
+        public void RemoveSection(string pchSection, ref EVRSettingsError peError)
         {
             FnTable.RemoveSection(pchSection, ref peError);
         }
-        internal void RemoveKeyInSection(string pchSection, string pchSettingsKey, ref EVRSettingsError peError)
+        public void RemoveKeyInSection(string pchSection, string pchSettingsKey, ref EVRSettingsError peError)
         {
             FnTable.RemoveKeyInSection(pchSection, pchSettingsKey, ref peError);
         }
     }
 
 
-    internal class CVRScreenshots
+    public class CVRScreenshots
     {
         IVRScreenshots FnTable;
         internal CVRScreenshots(IntPtr pInterface)
         {
             FnTable = (IVRScreenshots)Marshal.PtrToStructure(pInterface, typeof(IVRScreenshots));
         }
-        internal EVRScreenshotError RequestScreenshot(ref uint pOutScreenshotHandle, EVRScreenshotType type, string pchPreviewFilename, string pchVRFilename)
+        public EVRScreenshotError RequestScreenshot(ref uint pOutScreenshotHandle, EVRScreenshotType type, string pchPreviewFilename, string pchVRFilename)
         {
             pOutScreenshotHandle = 0;
             EVRScreenshotError result = FnTable.RequestScreenshot(ref pOutScreenshotHandle, type, pchPreviewFilename, pchVRFilename);
             return result;
         }
-        internal EVRScreenshotError HookScreenshot(EVRScreenshotType[] pSupportedTypes)
+        public EVRScreenshotError HookScreenshot(EVRScreenshotType[] pSupportedTypes)
         {
             EVRScreenshotError result = FnTable.HookScreenshot(pSupportedTypes, (int)pSupportedTypes.Length);
             return result;
         }
-        internal EVRScreenshotType GetScreenshotPropertyType(uint screenshotHandle, ref EVRScreenshotError pError)
+        public EVRScreenshotType GetScreenshotPropertyType(uint screenshotHandle, ref EVRScreenshotError pError)
         {
             EVRScreenshotType result = FnTable.GetScreenshotPropertyType(screenshotHandle, ref pError);
             return result;
         }
-        internal uint GetScreenshotPropertyFilename(uint screenshotHandle, EVRScreenshotPropertyFilenames filenameType, System.Text.StringBuilder pchFilename, uint cchFilename, ref EVRScreenshotError pError)
+        public uint GetScreenshotPropertyFilename(uint screenshotHandle, EVRScreenshotPropertyFilenames filenameType, System.Text.StringBuilder pchFilename, uint cchFilename, ref EVRScreenshotError pError)
         {
             uint result = FnTable.GetScreenshotPropertyFilename(screenshotHandle, filenameType, pchFilename, cchFilename, ref pError);
             return result;
         }
-        internal EVRScreenshotError UpdateScreenshotProgress(uint screenshotHandle, float flProgress)
+        public EVRScreenshotError UpdateScreenshotProgress(uint screenshotHandle, float flProgress)
         {
             EVRScreenshotError result = FnTable.UpdateScreenshotProgress(screenshotHandle, flProgress);
             return result;
         }
-        internal EVRScreenshotError TakeStereoScreenshot(ref uint pOutScreenshotHandle, string pchPreviewFilename, string pchVRFilename)
+        public EVRScreenshotError TakeStereoScreenshot(ref uint pOutScreenshotHandle, string pchPreviewFilename, string pchVRFilename)
         {
             pOutScreenshotHandle = 0;
             EVRScreenshotError result = FnTable.TakeStereoScreenshot(ref pOutScreenshotHandle, pchPreviewFilename, pchVRFilename);
             return result;
         }
-        internal EVRScreenshotError SubmitScreenshot(uint screenshotHandle, EVRScreenshotType type, string pchSourcePreviewFilename, string pchSourceVRFilename)
+        public EVRScreenshotError SubmitScreenshot(uint screenshotHandle, EVRScreenshotType type, string pchSourcePreviewFilename, string pchSourceVRFilename)
         {
             EVRScreenshotError result = FnTable.SubmitScreenshot(screenshotHandle, type, pchSourcePreviewFilename, pchSourceVRFilename);
             return result;
@@ -3416,19 +3544,19 @@ namespace Valve.VR
     }
 
 
-    internal class CVRResources
+    public class CVRResources
     {
         IVRResources FnTable;
         internal CVRResources(IntPtr pInterface)
         {
             FnTable = (IVRResources)Marshal.PtrToStructure(pInterface, typeof(IVRResources));
         }
-        internal uint LoadSharedResource(string pchResourceName, string pchBuffer, uint unBufferLen)
+        public uint LoadSharedResource(string pchResourceName, string pchBuffer, uint unBufferLen)
         {
             uint result = FnTable.LoadSharedResource(pchResourceName, pchBuffer, unBufferLen);
             return result;
         }
-        internal uint GetResourceFullPath(string pchResourceName, string pchResourceTypeDirectory, System.Text.StringBuilder pchPathBuffer, uint unBufferLen)
+        public uint GetResourceFullPath(string pchResourceName, string pchResourceTypeDirectory, System.Text.StringBuilder pchPathBuffer, uint unBufferLen)
         {
             uint result = FnTable.GetResourceFullPath(pchResourceName, pchResourceTypeDirectory, pchPathBuffer, unBufferLen);
             return result;
@@ -3436,197 +3564,259 @@ namespace Valve.VR
     }
 
 
-    internal class CVRDriverManager
+    public class CVRDriverManager
     {
         IVRDriverManager FnTable;
         internal CVRDriverManager(IntPtr pInterface)
         {
             FnTable = (IVRDriverManager)Marshal.PtrToStructure(pInterface, typeof(IVRDriverManager));
         }
-        internal uint GetDriverCount()
+        public uint GetDriverCount()
         {
             uint result = FnTable.GetDriverCount();
             return result;
         }
-        internal uint GetDriverName(uint nDriver, System.Text.StringBuilder pchValue, uint unBufferSize)
+        public uint GetDriverName(uint nDriver, System.Text.StringBuilder pchValue, uint unBufferSize)
         {
             uint result = FnTable.GetDriverName(nDriver, pchValue, unBufferSize);
             return result;
         }
-        internal ulong GetDriverHandle(string pchDriverName)
+        public ulong GetDriverHandle(string pchDriverName)
         {
             ulong result = FnTable.GetDriverHandle(pchDriverName);
+            return result;
+        }
+        public bool IsEnabled(uint nDriver)
+        {
+            bool result = FnTable.IsEnabled(nDriver);
             return result;
         }
     }
 
 
-    internal class CVRInput
+    public class CVRInput
     {
         IVRInput FnTable;
         internal CVRInput(IntPtr pInterface)
         {
             FnTable = (IVRInput)Marshal.PtrToStructure(pInterface, typeof(IVRInput));
         }
-        internal EVRInputError SetActionManifestPath(string pchActionManifestPath)
+        public EVRInputError SetActionManifestPath(string pchActionManifestPath)
         {
             EVRInputError result = FnTable.SetActionManifestPath(pchActionManifestPath);
             return result;
         }
-        internal EVRInputError GetActionSetHandle(string pchActionSetName, ref ulong pHandle)
+        public EVRInputError GetActionSetHandle(string pchActionSetName, ref ulong pHandle)
         {
             pHandle = 0;
             EVRInputError result = FnTable.GetActionSetHandle(pchActionSetName, ref pHandle);
             return result;
         }
-        internal EVRInputError GetActionHandle(string pchActionName, ref ulong pHandle)
+        public EVRInputError GetActionHandle(string pchActionName, ref ulong pHandle)
         {
             pHandle = 0;
             EVRInputError result = FnTable.GetActionHandle(pchActionName, ref pHandle);
             return result;
         }
-        internal EVRInputError GetInputSourceHandle(string pchInputSourcePath, ref ulong pHandle)
+        public EVRInputError GetInputSourceHandle(string pchInputSourcePath, ref ulong pHandle)
         {
             pHandle = 0;
             EVRInputError result = FnTable.GetInputSourceHandle(pchInputSourcePath, ref pHandle);
             return result;
         }
-        internal EVRInputError UpdateActionState(VRActiveActionSet_t[] pSets, uint unSizeOfVRSelectedActionSet_t)
+        public EVRInputError UpdateActionState(VRActiveActionSet_t[] pSets, uint unSizeOfVRSelectedActionSet_t)
         {
             EVRInputError result = FnTable.UpdateActionState(pSets, unSizeOfVRSelectedActionSet_t, (uint)pSets.Length);
             return result;
         }
-        internal EVRInputError GetDigitalActionData(ulong action, ref InputDigitalActionData_t pActionData, uint unActionDataSize, ulong ulRestrictToDevice)
+        public EVRInputError GetDigitalActionData(ulong action, ref InputDigitalActionData_t pActionData, uint unActionDataSize, ulong ulRestrictToDevice)
         {
             EVRInputError result = FnTable.GetDigitalActionData(action, ref pActionData, unActionDataSize, ulRestrictToDevice);
             return result;
         }
-        internal EVRInputError GetAnalogActionData(ulong action, ref InputAnalogActionData_t pActionData, uint unActionDataSize, ulong ulRestrictToDevice)
+        public EVRInputError GetAnalogActionData(ulong action, ref InputAnalogActionData_t pActionData, uint unActionDataSize, ulong ulRestrictToDevice)
         {
             EVRInputError result = FnTable.GetAnalogActionData(action, ref pActionData, unActionDataSize, ulRestrictToDevice);
             return result;
         }
-        internal EVRInputError GetPoseActionData(ulong action, ETrackingUniverseOrigin eOrigin, float fPredictedSecondsFromNow, ref InputPoseActionData_t pActionData, uint unActionDataSize, ulong ulRestrictToDevice)
+        public EVRInputError GetPoseActionDataRelativeToNow(ulong action, ETrackingUniverseOrigin eOrigin, float fPredictedSecondsFromNow, ref InputPoseActionData_t pActionData, uint unActionDataSize, ulong ulRestrictToDevice)
         {
-            EVRInputError result = FnTable.GetPoseActionData(action, eOrigin, fPredictedSecondsFromNow, ref pActionData, unActionDataSize, ulRestrictToDevice);
+            EVRInputError result = FnTable.GetPoseActionDataRelativeToNow(action, eOrigin, fPredictedSecondsFromNow, ref pActionData, unActionDataSize, ulRestrictToDevice);
             return result;
         }
-        internal EVRInputError GetSkeletalActionData(ulong action, ref InputSkeletalActionData_t pActionData, uint unActionDataSize, ulong ulRestrictToDevice)
+        public EVRInputError GetPoseActionDataForNextFrame(ulong action, ETrackingUniverseOrigin eOrigin, ref InputPoseActionData_t pActionData, uint unActionDataSize, ulong ulRestrictToDevice)
         {
-            EVRInputError result = FnTable.GetSkeletalActionData(action, ref pActionData, unActionDataSize, ulRestrictToDevice);
+            EVRInputError result = FnTable.GetPoseActionDataForNextFrame(action, eOrigin, ref pActionData, unActionDataSize, ulRestrictToDevice);
             return result;
         }
-        internal EVRInputError GetSkeletalBoneData(ulong action, EVRSkeletalTransformSpace eTransformSpace, EVRSkeletalMotionRange eMotionRange, VRBoneTransform_t[] pTransformArray, ulong ulRestrictToDevice)
+        public EVRInputError GetSkeletalActionData(ulong action, ref InputSkeletalActionData_t pActionData, uint unActionDataSize)
         {
-            EVRInputError result = FnTable.GetSkeletalBoneData(action, eTransformSpace, eMotionRange, pTransformArray, (uint)pTransformArray.Length, ulRestrictToDevice);
+            EVRInputError result = FnTable.GetSkeletalActionData(action, ref pActionData, unActionDataSize);
             return result;
         }
-        internal EVRInputError GetSkeletalBoneDataCompressed(ulong action, EVRSkeletalTransformSpace eTransformSpace, EVRSkeletalMotionRange eMotionRange, IntPtr pvCompressedData, uint unCompressedSize, ref uint punRequiredCompressedSize, ulong ulRestrictToDevice)
+        public EVRInputError GetBoneCount(ulong action, ref uint pBoneCount)
+        {
+            pBoneCount = 0;
+            EVRInputError result = FnTable.GetBoneCount(action, ref pBoneCount);
+            return result;
+        }
+        public EVRInputError GetBoneHierarchy(ulong action, int[] pParentIndices)
+        {
+            EVRInputError result = FnTable.GetBoneHierarchy(action, pParentIndices, (uint)pParentIndices.Length);
+            return result;
+        }
+        public EVRInputError GetBoneName(ulong action, int nBoneIndex, System.Text.StringBuilder pchBoneName, uint unNameBufferSize)
+        {
+            EVRInputError result = FnTable.GetBoneName(action, nBoneIndex, pchBoneName, unNameBufferSize);
+            return result;
+        }
+        public EVRInputError GetSkeletalReferenceTransforms(ulong action, EVRSkeletalTransformSpace eTransformSpace, EVRSkeletalReferencePose eReferencePose, VRBoneTransform_t[] pTransformArray)
+        {
+            EVRInputError result = FnTable.GetSkeletalReferenceTransforms(action, eTransformSpace, eReferencePose, pTransformArray, (uint)pTransformArray.Length);
+            return result;
+        }
+        public EVRInputError GetSkeletalTrackingLevel(ulong action, ref EVRSkeletalTrackingLevel pSkeletalTrackingLevel)
+        {
+            EVRInputError result = FnTable.GetSkeletalTrackingLevel(action, ref pSkeletalTrackingLevel);
+            return result;
+        }
+        public EVRInputError GetSkeletalBoneData(ulong action, EVRSkeletalTransformSpace eTransformSpace, EVRSkeletalMotionRange eMotionRange, VRBoneTransform_t[] pTransformArray)
+        {
+            EVRInputError result = FnTable.GetSkeletalBoneData(action, eTransformSpace, eMotionRange, pTransformArray, (uint)pTransformArray.Length);
+            return result;
+        }
+        public EVRInputError GetSkeletalSummaryData(ulong action, EVRSummaryType eSummaryType, ref VRSkeletalSummaryData_t pSkeletalSummaryData)
+        {
+            EVRInputError result = FnTable.GetSkeletalSummaryData(action, eSummaryType, ref pSkeletalSummaryData);
+            return result;
+        }
+        public EVRInputError GetSkeletalBoneDataCompressed(ulong action, EVRSkeletalMotionRange eMotionRange, IntPtr pvCompressedData, uint unCompressedSize, ref uint punRequiredCompressedSize)
         {
             punRequiredCompressedSize = 0;
-            EVRInputError result = FnTable.GetSkeletalBoneDataCompressed(action, eTransformSpace, eMotionRange, pvCompressedData, unCompressedSize, ref punRequiredCompressedSize, ulRestrictToDevice);
+            EVRInputError result = FnTable.GetSkeletalBoneDataCompressed(action, eMotionRange, pvCompressedData, unCompressedSize, ref punRequiredCompressedSize);
             return result;
         }
-        internal EVRInputError DecompressSkeletalBoneData(IntPtr pvCompressedBuffer, uint unCompressedBufferSize, ref EVRSkeletalTransformSpace peTransformSpace, VRBoneTransform_t[] pTransformArray)
+        public EVRInputError DecompressSkeletalBoneData(IntPtr pvCompressedBuffer, uint unCompressedBufferSize, EVRSkeletalTransformSpace eTransformSpace, VRBoneTransform_t[] pTransformArray)
         {
-            EVRInputError result = FnTable.DecompressSkeletalBoneData(pvCompressedBuffer, unCompressedBufferSize, ref peTransformSpace, pTransformArray, (uint)pTransformArray.Length);
+            EVRInputError result = FnTable.DecompressSkeletalBoneData(pvCompressedBuffer, unCompressedBufferSize, eTransformSpace, pTransformArray, (uint)pTransformArray.Length);
             return result;
         }
-        internal EVRInputError TriggerHapticVibrationAction(ulong action, float fStartSecondsFromNow, float fDurationSeconds, float fFrequency, float fAmplitude, ulong ulRestrictToDevice)
+        public EVRInputError TriggerHapticVibrationAction(ulong action, float fStartSecondsFromNow, float fDurationSeconds, float fFrequency, float fAmplitude, ulong ulRestrictToDevice)
         {
             EVRInputError result = FnTable.TriggerHapticVibrationAction(action, fStartSecondsFromNow, fDurationSeconds, fFrequency, fAmplitude, ulRestrictToDevice);
             return result;
         }
-        internal EVRInputError GetActionOrigins(ulong actionSetHandle, ulong digitalActionHandle, ulong[] originsOut)
+        public EVRInputError GetActionOrigins(ulong actionSetHandle, ulong digitalActionHandle, ulong[] originsOut)
         {
             EVRInputError result = FnTable.GetActionOrigins(actionSetHandle, digitalActionHandle, originsOut, (uint)originsOut.Length);
             return result;
         }
-        internal EVRInputError GetOriginLocalizedName(ulong origin, System.Text.StringBuilder pchNameArray, uint unNameArraySize)
+        public EVRInputError GetOriginLocalizedName(ulong origin, System.Text.StringBuilder pchNameArray, uint unNameArraySize, int unStringSectionsToInclude)
         {
-            EVRInputError result = FnTable.GetOriginLocalizedName(origin, pchNameArray, unNameArraySize);
+            EVRInputError result = FnTable.GetOriginLocalizedName(origin, pchNameArray, unNameArraySize, unStringSectionsToInclude);
             return result;
         }
-        internal EVRInputError GetOriginTrackedDeviceInfo(ulong origin, ref InputOriginInfo_t pOriginInfo, uint unOriginInfoSize)
+        public EVRInputError GetOriginTrackedDeviceInfo(ulong origin, ref InputOriginInfo_t pOriginInfo, uint unOriginInfoSize)
         {
             EVRInputError result = FnTable.GetOriginTrackedDeviceInfo(origin, ref pOriginInfo, unOriginInfoSize);
             return result;
         }
-        internal EVRInputError ShowActionOrigins(ulong actionSetHandle, ulong ulActionHandle)
+        public EVRInputError GetActionBindingInfo(ulong action, ref InputBindingInfo_t pOriginInfo, uint unBindingInfoSize, uint unBindingInfoCount, ref uint punReturnedBindingInfoCount)
+        {
+            punReturnedBindingInfoCount = 0;
+            EVRInputError result = FnTable.GetActionBindingInfo(action, ref pOriginInfo, unBindingInfoSize, unBindingInfoCount, ref punReturnedBindingInfoCount);
+            return result;
+        }
+        public EVRInputError ShowActionOrigins(ulong actionSetHandle, ulong ulActionHandle)
         {
             EVRInputError result = FnTable.ShowActionOrigins(actionSetHandle, ulActionHandle);
             return result;
         }
-        internal EVRInputError ShowBindingsForActionSet(VRActiveActionSet_t[] pSets, uint unSizeOfVRSelectedActionSet_t, ulong originToHighlight)
+        public EVRInputError ShowBindingsForActionSet(VRActiveActionSet_t[] pSets, uint unSizeOfVRSelectedActionSet_t, ulong originToHighlight)
         {
             EVRInputError result = FnTable.ShowBindingsForActionSet(pSets, unSizeOfVRSelectedActionSet_t, (uint)pSets.Length, originToHighlight);
+            return result;
+        }
+        public bool IsUsingLegacyInput()
+        {
+            bool result = FnTable.IsUsingLegacyInput();
+            return result;
+        }
+        public EVRInputError OpenBindingUI(string pchAppKey, ulong ulActionSetHandle, ulong ulDeviceHandle, bool bShowOnDesktop)
+        {
+            EVRInputError result = FnTable.OpenBindingUI(pchAppKey, ulActionSetHandle, ulDeviceHandle, bShowOnDesktop);
             return result;
         }
     }
 
 
-    internal class CVRIOBuffer
+    public class CVRIOBuffer
     {
         IVRIOBuffer FnTable;
         internal CVRIOBuffer(IntPtr pInterface)
         {
             FnTable = (IVRIOBuffer)Marshal.PtrToStructure(pInterface, typeof(IVRIOBuffer));
         }
-        internal EIOBufferError Open(string pchPath, EIOBufferMode mode, uint unElementSize, uint unElements, ref ulong pulBuffer)
+        public EIOBufferError Open(string pchPath, EIOBufferMode mode, uint unElementSize, uint unElements, ref ulong pulBuffer)
         {
             pulBuffer = 0;
             EIOBufferError result = FnTable.Open(pchPath, mode, unElementSize, unElements, ref pulBuffer);
             return result;
         }
-        internal EIOBufferError Close(ulong ulBuffer)
+        public EIOBufferError Close(ulong ulBuffer)
         {
             EIOBufferError result = FnTable.Close(ulBuffer);
             return result;
         }
-        internal EIOBufferError Read(ulong ulBuffer, IntPtr pDst, uint unBytes, ref uint punRead)
+        public EIOBufferError Read(ulong ulBuffer, IntPtr pDst, uint unBytes, ref uint punRead)
         {
             punRead = 0;
             EIOBufferError result = FnTable.Read(ulBuffer, pDst, unBytes, ref punRead);
             return result;
         }
-        internal EIOBufferError Write(ulong ulBuffer, IntPtr pSrc, uint unBytes)
+        public EIOBufferError Write(ulong ulBuffer, IntPtr pSrc, uint unBytes)
         {
             EIOBufferError result = FnTable.Write(ulBuffer, pSrc, unBytes);
             return result;
         }
-        internal ulong PropertyContainer(ulong ulBuffer)
+        public ulong PropertyContainer(ulong ulBuffer)
         {
             ulong result = FnTable.PropertyContainer(ulBuffer);
+            return result;
+        }
+        public bool HasReaders(ulong ulBuffer)
+        {
+            bool result = FnTable.HasReaders(ulBuffer);
             return result;
         }
     }
 
 
-    internal class CVRSpatialAnchors
+    public class CVRSpatialAnchors
     {
         IVRSpatialAnchors FnTable;
         internal CVRSpatialAnchors(IntPtr pInterface)
         {
             FnTable = (IVRSpatialAnchors)Marshal.PtrToStructure(pInterface, typeof(IVRSpatialAnchors));
         }
-        internal EVRSpatialAnchorError CreateSpatialAnchorFromDescriptor(string pchDescriptor, ref uint pHandleOut)
+        public EVRSpatialAnchorError CreateSpatialAnchorFromDescriptor(string pchDescriptor, ref uint pHandleOut)
         {
             pHandleOut = 0;
             EVRSpatialAnchorError result = FnTable.CreateSpatialAnchorFromDescriptor(pchDescriptor, ref pHandleOut);
             return result;
         }
-        internal EVRSpatialAnchorError CreateSpatialAnchorFromPose(uint unDeviceIndex, ETrackingUniverseOrigin eOrigin, ref SpatialAnchorPose_t pPose, ref uint pHandleOut)
+        public EVRSpatialAnchorError CreateSpatialAnchorFromPose(uint unDeviceIndex, ETrackingUniverseOrigin eOrigin, ref SpatialAnchorPose_t pPose, ref uint pHandleOut)
         {
             pHandleOut = 0;
             EVRSpatialAnchorError result = FnTable.CreateSpatialAnchorFromPose(unDeviceIndex, eOrigin, ref pPose, ref pHandleOut);
             return result;
         }
-        internal EVRSpatialAnchorError GetSpatialAnchorPose(uint unHandle, ETrackingUniverseOrigin eOrigin, ref SpatialAnchorPose_t pPoseOut)
+        public EVRSpatialAnchorError GetSpatialAnchorPose(uint unHandle, ETrackingUniverseOrigin eOrigin, ref SpatialAnchorPose_t pPoseOut)
         {
             EVRSpatialAnchorError result = FnTable.GetSpatialAnchorPose(unHandle, eOrigin, ref pPoseOut);
             return result;
         }
-        internal EVRSpatialAnchorError GetSpatialAnchorDescriptor(uint unHandle, System.Text.StringBuilder pchDescriptorOut, ref uint punDescriptorBufferLenInOut)
+        public EVRSpatialAnchorError GetSpatialAnchorDescriptor(uint unHandle, System.Text.StringBuilder pchDescriptorOut, ref uint punDescriptorBufferLenInOut)
         {
             punDescriptorBufferLenInOut = 0;
             EVRSpatialAnchorError result = FnTable.GetSpatialAnchorDescriptor(unHandle, pchDescriptorOut, ref punDescriptorBufferLenInOut);
@@ -3635,7 +3825,38 @@ namespace Valve.VR
     }
 
 
-    internal class OpenVRInterop
+    public class CVRDebug
+    {
+        IVRDebug FnTable;
+        internal CVRDebug(IntPtr pInterface)
+        {
+            FnTable = (IVRDebug)Marshal.PtrToStructure(pInterface, typeof(IVRDebug));
+        }
+        public EVRDebugError EmitVrProfilerEvent(string pchMessage)
+        {
+            EVRDebugError result = FnTable.EmitVrProfilerEvent(pchMessage);
+            return result;
+        }
+        public EVRDebugError BeginVrProfilerEvent(ref ulong pHandleOut)
+        {
+            pHandleOut = 0;
+            EVRDebugError result = FnTable.BeginVrProfilerEvent(ref pHandleOut);
+            return result;
+        }
+        public EVRDebugError FinishVrProfilerEvent(ulong hHandle, string pchMessage)
+        {
+            EVRDebugError result = FnTable.FinishVrProfilerEvent(hHandle, pchMessage);
+            return result;
+        }
+        public uint DriverDebugRequest(uint unDeviceIndex, string pchRequest, System.Text.StringBuilder pchResponseBuffer, uint unResponseBufferSize)
+        {
+            uint result = FnTable.DriverDebugRequest(unDeviceIndex, pchRequest, pchResponseBuffer, unResponseBufferSize);
+            return result;
+        }
+    }
+
+
+    public class OpenVRInterop
     {
         [DllImportAttribute("openvr_api", EntryPoint = "VR_InitInternal", CallingConvention = CallingConvention.Cdecl)]
         internal static extern uint InitInternal(ref EVRInitError peError, EVRApplicationType eApplicationType);
@@ -3649,6 +3870,8 @@ namespace Valve.VR
         internal static extern bool IsRuntimeInstalled();
         [DllImportAttribute("openvr_api", EntryPoint = "VR_RuntimePath", CallingConvention = CallingConvention.Cdecl)]
         internal static extern string RuntimePath();
+        [DllImportAttribute("openvr_api", EntryPoint = "VR_GetRuntimePath", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern bool GetRuntimePath(System.Text.StringBuilder pchPathBuffer, uint unBufferSize, ref uint punRequiredBufferSize);
         [DllImportAttribute("openvr_api", EntryPoint = "VR_GetStringForHmdError", CallingConvention = CallingConvention.Cdecl)]
         internal static extern IntPtr GetStringForHmdError(EVRInitError error);
         [DllImportAttribute("openvr_api", EntryPoint = "VR_GetGenericInterface", CallingConvention = CallingConvention.Cdecl)]
@@ -3660,12 +3883,12 @@ namespace Valve.VR
     }
 
 
-    internal enum EVREye
+    public enum EVREye
     {
         Eye_Left = 0,
         Eye_Right = 1,
     }
-    internal enum ETextureType
+    public enum ETextureType
     {
         Invalid = -1,
         DirectX = 0,
@@ -3676,13 +3899,13 @@ namespace Valve.VR
         DXGISharedHandle = 5,
         Metal = 6,
     }
-    internal enum EColorSpace
+    public enum EColorSpace
     {
         Auto = 0,
         Gamma = 1,
         Linear = 2,
     }
-    internal enum ETrackingResult
+    public enum ETrackingResult
     {
         Uninitialized = 1,
         Calibrating_InProgress = 100,
@@ -3691,7 +3914,7 @@ namespace Valve.VR
         Running_OutOfRange = 201,
         Fallback_RotationOnly = 300,
     }
-    internal enum ETrackedDeviceClass
+    public enum ETrackedDeviceClass
     {
         Invalid = 0,
         HMD = 1,
@@ -3701,21 +3924,30 @@ namespace Valve.VR
         DisplayRedirect = 5,
         Max = 6,
     }
-    internal enum ETrackedControllerRole
+    public enum ETrackedControllerRole
     {
         Invalid = 0,
         LeftHand = 1,
         RightHand = 2,
         OptOut = 3,
-        Max = 4,
+        Treadmill = 4,
+        Stylus = 5,
+        Max = 5,
     }
-    internal enum ETrackingUniverseOrigin
+    public enum ETrackingUniverseOrigin
     {
         TrackingUniverseSeated = 0,
         TrackingUniverseStanding = 1,
         TrackingUniverseRawAndUncalibrated = 2,
     }
-    internal enum ETrackedDeviceProperty
+    public enum EAdditionalRadioFeatures
+    {
+        None = 0,
+        HTCLinkBox = 1,
+        InternalDongle = 2,
+        ExternalDongle = 4,
+    }
+    public enum ETrackedDeviceProperty
     {
         Prop_Invalid = 0,
         Prop_TrackingSystemName_String = 1000,
@@ -3760,6 +3992,16 @@ namespace Valve.VR
         Prop_NumCameras_Int32 = 1039,
         Prop_CameraFrameLayout_Int32 = 1040,
         Prop_CameraStreamFormat_Int32 = 1041,
+        Prop_AdditionalDeviceSettingsPath_String = 1042,
+        Prop_Identifiable_Bool = 1043,
+        Prop_BootloaderVersion_Uint64 = 1044,
+        Prop_AdditionalSystemReportData_String = 1045,
+        Prop_CompositeFirmwareVersion_String = 1046,
+        Prop_Firmware_RemindUpdate_Bool = 1047,
+        Prop_PeripheralApplicationVersion_Uint64 = 1048,
+        Prop_ManufacturerSerialNumber_String = 1049,
+        Prop_ComputedSerialNumber_String = 1050,
+        Prop_EstimatedDeviceFirstUseTime_Int32 = 1051,
         Prop_ReportsTimeSinceVSync_Bool = 2000,
         Prop_SecondsFromVsyncToPhotons_Float = 2001,
         Prop_DisplayFrequency_Float = 2002,
@@ -3827,6 +4069,27 @@ namespace Valve.VR
         Prop_ImuFactoryAccelerometerBias_Vector3 = 2066,
         Prop_ImuFactoryAccelerometerScale_Vector3 = 2067,
         Prop_ConfigurationIncludesLighthouse20Features_Bool = 2069,
+        Prop_AdditionalRadioFeatures_Uint64 = 2070,
+        Prop_CameraWhiteBalance_Vector4_Array = 2071,
+        Prop_CameraDistortionFunction_Int32_Array = 2072,
+        Prop_CameraDistortionCoefficients_Float_Array = 2073,
+        Prop_ExpectedControllerType_String = 2074,
+        Prop_HmdTrackingStyle_Int32 = 2075,
+        Prop_DriverProvidedChaperoneVisibility_Bool = 2076,
+        Prop_HmdColumnCorrectionSettingPrefix_String = 2077,
+        Prop_CameraSupportsCompatibilityModes_Bool = 2078,
+        Prop_DisplayAvailableFrameRates_Float_Array = 2080,
+        Prop_DisplaySupportsMultipleFramerates_Bool = 2081,
+        Prop_DisplayColorMultLeft_Vector3 = 2082,
+        Prop_DisplayColorMultRight_Vector3 = 2083,
+        Prop_DisplaySupportsRuntimeFramerateChange_Bool = 2084,
+        Prop_DisplaySupportsAnalogGain_Bool = 2085,
+        Prop_DisplayMinAnalogGain_Float = 2086,
+        Prop_DisplayMaxAnalogGain_Float = 2087,
+        Prop_DashboardLayoutPathName_String = 2090,
+        Prop_DashboardScale_Float = 2091,
+        Prop_IpdUIRangeMinMeters_Float = 2100,
+        Prop_IpdUIRangeMaxMeters_Float = 2101,
         Prop_DriverRequestedMuraCorrectionMode_Int32 = 2200,
         Prop_DriverRequestedMuraFeather_InnerLeft_Int32 = 2201,
         Prop_DriverRequestedMuraFeather_InnerRight_Int32 = 2202,
@@ -3836,6 +4099,9 @@ namespace Valve.VR
         Prop_DriverRequestedMuraFeather_OuterRight_Int32 = 2206,
         Prop_DriverRequestedMuraFeather_OuterTop_Int32 = 2207,
         Prop_DriverRequestedMuraFeather_OuterBottom_Int32 = 2208,
+        Prop_Audio_DefaultPlaybackDeviceId_String = 2300,
+        Prop_Audio_DefaultRecordingDeviceId_String = 2301,
+        Prop_Audio_DefaultPlaybackDeviceVolume_Float = 2302,
         Prop_AttachedDeviceId_String = 3000,
         Prop_SupportedButtons_Uint64 = 3001,
         Prop_Axis0Type_Int32 = 3002,
@@ -3851,6 +4117,8 @@ namespace Valve.VR
         Prop_TrackingRangeMinimumMeters_Float = 4004,
         Prop_TrackingRangeMaximumMeters_Float = 4005,
         Prop_ModeLabel_String = 4006,
+        Prop_CanWirelessIdentify_Bool = 4007,
+        Prop_Nonce_Int32 = 4008,
         Prop_IconPathName_String = 5000,
         Prop_NamedIconPathDeviceOff_String = 5001,
         Prop_NamedIconPathDeviceSearching_String = 5002,
@@ -3860,9 +4128,11 @@ namespace Valve.VR
         Prop_NamedIconPathDeviceNotReady_String = 5006,
         Prop_NamedIconPathDeviceStandby_String = 5007,
         Prop_NamedIconPathDeviceAlertLow_String = 5008,
+        Prop_NamedIconPathDeviceStandbyAlert_String = 5009,
         Prop_DisplayHiddenArea_Binary_Start = 5100,
         Prop_DisplayHiddenArea_Binary_End = 5150,
         Prop_ParentContainer = 5151,
+        Prop_OverrideContainer_Uint64 = 5152,
         Prop_UserConfigPath_String = 6000,
         Prop_InstallPath_String = 6001,
         Prop_HasDisplayComponent_Bool = 6002,
@@ -3872,13 +4142,12 @@ namespace Valve.VR
         Prop_HasVirtualDisplayComponent_Bool = 6006,
         Prop_HasSpatialAnchorsSupport_Bool = 6007,
         Prop_ControllerType_String = 7000,
-        Prop_LegacyInputProfile_String = 7001,
         Prop_ControllerHandSelectionPriority_Int32 = 7002,
         Prop_VendorSpecific_Reserved_Start = 10000,
         Prop_VendorSpecific_Reserved_End = 10999,
         Prop_TrackedDeviceProperty_Max = 1000000,
     }
-    internal enum ETrackedPropertyError
+    public enum ETrackedPropertyError
     {
         TrackedProp_Success = 0,
         TrackedProp_WrongDataType = 1,
@@ -3894,8 +4163,17 @@ namespace Valve.VR
         TrackedProp_InvalidOperation = 11,
         TrackedProp_CannotWriteToWildcards = 12,
         TrackedProp_IPCReadFailure = 13,
+        TrackedProp_OutOfMemory = 14,
+        TrackedProp_InvalidContainer = 15,
     }
-    internal enum EVRSubmitFlags
+    public enum EHmdTrackingStyle
+    {
+        Unknown = 0,
+        Lighthouse = 1,
+        OutsideInCameras = 2,
+        InsideOutCameras = 3,
+    }
+    public enum EVRSubmitFlags
     {
         Submit_Default = 0,
         Submit_LensDistortionAlreadyApplied = 1,
@@ -3904,7 +4182,7 @@ namespace Valve.VR
         Submit_TextureWithPose = 8,
         Submit_TextureWithDepth = 16,
     }
-    internal enum EVRState
+    public enum EVRState
     {
         Undefined = -1,
         Off = 0,
@@ -3916,7 +4194,7 @@ namespace Valve.VR
         Standby = 6,
         Ready_Alert_Low = 7,
     }
-    internal enum EVREventType
+    public enum EVREventType
     {
         VREvent_None = 0,
         VREvent_TrackedDeviceActivated = 100,
@@ -3950,28 +4228,27 @@ namespace Valve.VR
         VREvent_MouseButtonUp = 302,
         VREvent_FocusEnter = 303,
         VREvent_FocusLeave = 304,
-        VREvent_Scroll = 305,
+        VREvent_ScrollDiscrete = 305,
         VREvent_TouchPadMove = 306,
         VREvent_OverlayFocusChanged = 307,
+        VREvent_ReloadOverlays = 308,
+        VREvent_ScrollSmooth = 309,
         VREvent_InputFocusCaptured = 400,
         VREvent_InputFocusReleased = 401,
-        VREvent_SceneFocusLost = 402,
-        VREvent_SceneFocusGained = 403,
         VREvent_SceneApplicationChanged = 404,
         VREvent_SceneFocusChanged = 405,
         VREvent_InputFocusChanged = 406,
-        VREvent_SceneApplicationSecondaryRenderingStarted = 407,
         VREvent_SceneApplicationUsingWrongGraphicsAdapter = 408,
         VREvent_ActionBindingReloaded = 409,
         VREvent_HideRenderModels = 410,
         VREvent_ShowRenderModels = 411,
+        VREvent_SceneApplicationStateChanged = 412,
         VREvent_ConsoleOpened = 420,
         VREvent_ConsoleClosed = 421,
         VREvent_OverlayShown = 500,
         VREvent_OverlayHidden = 501,
         VREvent_DashboardActivated = 502,
         VREvent_DashboardDeactivated = 503,
-        VREvent_DashboardThumbSelected = 504,
         VREvent_DashboardRequested = 505,
         VREvent_ResetDashboard = 506,
         VREvent_RenderToast = 507,
@@ -3993,20 +4270,25 @@ namespace Valve.VR
         VREvent_PrimaryDashboardDeviceChanged = 525,
         VREvent_RoomViewShown = 526,
         VREvent_RoomViewHidden = 527,
+        VREvent_ShowUI = 528,
+        VREvent_ShowDevTools = 529,
         VREvent_Notification_Shown = 600,
         VREvent_Notification_Hidden = 601,
         VREvent_Notification_BeginInteraction = 602,
         VREvent_Notification_Destroyed = 603,
         VREvent_Quit = 700,
         VREvent_ProcessQuit = 701,
-        VREvent_QuitAborted_UserPrompt = 702,
         VREvent_QuitAcknowledged = 703,
         VREvent_DriverRequestedQuit = 704,
+        VREvent_RestartRequested = 705,
         VREvent_ChaperoneDataHasChanged = 800,
         VREvent_ChaperoneUniverseHasChanged = 801,
         VREvent_ChaperoneTempDataHasChanged = 802,
         VREvent_ChaperoneSettingsHaveChanged = 803,
         VREvent_SeatedZeroPoseReset = 804,
+        VREvent_ChaperoneFlushCache = 805,
+        VREvent_ChaperoneRoomSetupStarting = 806,
+        VREvent_ChaperoneRoomSetupFinished = 807,
         VREvent_AudioSettingsHaveChanged = 820,
         VREvent_BackgroundSettingHasChanged = 850,
         VREvent_CameraSettingsHaveChanged = 851,
@@ -4025,6 +4307,9 @@ namespace Valve.VR
         VREvent_DashboardSectionSettingChanged = 864,
         VREvent_WebInterfaceSectionSettingChanged = 865,
         VREvent_TrackersSectionSettingChanged = 866,
+        VREvent_LastKnownSectionSettingChanged = 867,
+        VREvent_DismissedWarningsSectionSettingChanged = 868,
+        VREvent_GpuSpeedSectionSettingChanged = 869,
         VREvent_StatusUpdate = 900,
         VREvent_WebInterface_InstallDriverCompleted = 950,
         VREvent_MCImageUpdated = 1000,
@@ -4033,18 +4318,20 @@ namespace Valve.VR
         VREvent_KeyboardClosed = 1200,
         VREvent_KeyboardCharInput = 1201,
         VREvent_KeyboardDone = 1202,
-        VREvent_ApplicationTransitionStarted = 1300,
-        VREvent_ApplicationTransitionAborted = 1301,
-        VREvent_ApplicationTransitionNewAppStarted = 1302,
         VREvent_ApplicationListUpdated = 1303,
         VREvent_ApplicationMimeTypeLoad = 1304,
-        VREvent_ApplicationTransitionNewAppLaunchComplete = 1305,
         VREvent_ProcessConnected = 1306,
         VREvent_ProcessDisconnected = 1307,
-        VREvent_Compositor_MirrorWindowShown = 1400,
-        VREvent_Compositor_MirrorWindowHidden = 1401,
         VREvent_Compositor_ChaperoneBoundsShown = 1410,
         VREvent_Compositor_ChaperoneBoundsHidden = 1411,
+        VREvent_Compositor_DisplayDisconnected = 1412,
+        VREvent_Compositor_DisplayReconnected = 1413,
+        VREvent_Compositor_HDCPError = 1414,
+        VREvent_Compositor_ApplicationNotResponding = 1415,
+        VREvent_Compositor_ApplicationResumed = 1416,
+        VREvent_Compositor_OutOfVideoMemory = 1417,
+        VREvent_Compositor_DisplayModeNotSupported = 1418,
+        VREvent_Compositor_StageOverrideReady = 1419,
         VREvent_TrackedCamera_StartVideoStream = 1500,
         VREvent_TrackedCamera_StopVideoStream = 1501,
         VREvent_TrackedCamera_PauseVideoStream = 1502,
@@ -4060,23 +4347,30 @@ namespace Valve.VR
         VREvent_Input_BindingLoadSuccessful = 1702,
         VREvent_Input_ActionManifestReloaded = 1703,
         VREvent_Input_ActionManifestLoadFailed = 1704,
+        VREvent_Input_ProgressUpdate = 1705,
         VREvent_Input_TrackerActivated = 1706,
+        VREvent_Input_BindingsUpdated = 1707,
+        VREvent_Input_BindingSubscriptionChanged = 1708,
         VREvent_SpatialAnchors_PoseUpdated = 1800,
         VREvent_SpatialAnchors_DescriptorUpdated = 1801,
         VREvent_SpatialAnchors_RequestPoseUpdate = 1802,
         VREvent_SpatialAnchors_RequestDescriptorUpdate = 1803,
+        VREvent_SystemReport_Started = 1900,
+        VREvent_Monitor_ShowHeadsetView = 2000,
+        VREvent_Monitor_HideHeadsetView = 2001,
         VREvent_VendorSpecific_Reserved_Start = 10000,
         VREvent_VendorSpecific_Reserved_End = 19999,
     }
-    internal enum EDeviceActivityLevel
+    public enum EDeviceActivityLevel
     {
         k_EDeviceActivityLevel_Unknown = -1,
         k_EDeviceActivityLevel_Idle = 0,
         k_EDeviceActivityLevel_UserInteraction = 1,
         k_EDeviceActivityLevel_UserInteraction_Timeout = 2,
         k_EDeviceActivityLevel_Standby = 3,
+        k_EDeviceActivityLevel_Idle_Timeout = 4,
     }
-    internal enum EVRButtonId
+    public enum EVRButtonId
     {
         k_EButton_System = 0,
         k_EButton_ApplicationMenu = 1,
@@ -4095,23 +4389,40 @@ namespace Valve.VR
         k_EButton_SteamVR_Touchpad = 32,
         k_EButton_SteamVR_Trigger = 33,
         k_EButton_Dashboard_Back = 2,
-        k_EButton_Knuckles_A = 2,
-        k_EButton_Knuckles_B = 1,
-        k_EButton_Knuckles_JoyStick = 35,
+        k_EButton_IndexController_A = 2,
+        k_EButton_IndexController_B = 1,
+        k_EButton_IndexController_JoyStick = 35,
         k_EButton_Max = 64,
     }
-    internal enum EVRMouseButton
+    public enum EVRMouseButton
     {
         Left = 1,
         Right = 2,
         Middle = 4,
     }
-    internal enum EDualAnalogWhich
+    public enum EDualAnalogWhich
     {
         k_EDualAnalog_Left = 0,
         k_EDualAnalog_Right = 1,
     }
-    internal enum EVRInputError
+    public enum EShowUIType
+    {
+        ShowUI_ControllerBinding = 0,
+        ShowUI_ManageTrackers = 1,
+        ShowUI_Pairing = 3,
+        ShowUI_Settings = 4,
+        ShowUI_DebugCommands = 5,
+        ShowUI_FullControllerBinding = 6,
+    }
+    public enum EHDCPError
+    {
+        None = 0,
+        LinkLost = 1,
+        Tampered = 2,
+        DeviceRevoked = 3,
+        Unknown = 4,
+    }
+    public enum EVRInputError
     {
         None = 0,
         NameNotFound = 1,
@@ -4130,8 +4441,9 @@ namespace Valve.VR
         BufferTooSmall = 14,
         MismatchedActionManifest = 15,
         MissingSkeletonData = 16,
+        InvalidBoneIndex = 17,
     }
-    internal enum EVRSpatialAnchorError
+    public enum EVRSpatialAnchorError
     {
         Success = 0,
         Internal = 1,
@@ -4148,26 +4460,26 @@ namespace Valve.VR
         InvalidArgument = 12,
         UnknownDriver = 13,
     }
-    internal enum EHiddenAreaMeshType
+    public enum EHiddenAreaMeshType
     {
         k_eHiddenAreaMesh_Standard = 0,
         k_eHiddenAreaMesh_Inverse = 1,
         k_eHiddenAreaMesh_LineLoop = 2,
         k_eHiddenAreaMesh_Max = 3,
     }
-    internal enum EVRControllerAxisType
+    public enum EVRControllerAxisType
     {
         k_eControllerAxis_None = 0,
         k_eControllerAxis_TrackPad = 1,
         k_eControllerAxis_Joystick = 2,
         k_eControllerAxis_Trigger = 3,
     }
-    internal enum EVRControllerEventOutputType
+    public enum EVRControllerEventOutputType
     {
         ControllerEventOutput_OSEvents = 0,
         ControllerEventOutput_VREvents = 1,
     }
-    internal enum ECollisionBoundsStyle
+    public enum ECollisionBoundsStyle
     {
         COLLISION_BOUNDS_STYLE_BEGINNER = 0,
         COLLISION_BOUNDS_STYLE_INTERMEDIATE = 1,
@@ -4176,7 +4488,7 @@ namespace Valve.VR
         COLLISION_BOUNDS_STYLE_NONE = 4,
         COLLISION_BOUNDS_STYLE_COUNT = 5,
     }
-    internal enum EVROverlayError
+    public enum EVROverlayError
     {
         None = 0,
         UnknownOverlay = 10,
@@ -4203,7 +4515,7 @@ namespace Valve.VR
         TextureLockCapacityReached = 32,
         TextureNotLocked = 33,
     }
-    internal enum EVRApplicationType
+    public enum EVRApplicationType
     {
         VRApplication_Other = 0,
         VRApplication_Scene = 1,
@@ -4213,15 +4525,16 @@ namespace Valve.VR
         VRApplication_VRMonitor = 5,
         VRApplication_SteamWatchdog = 6,
         VRApplication_Bootstrapper = 7,
-        VRApplication_Max = 8,
+        VRApplication_WebHelper = 8,
+        VRApplication_Max = 9,
     }
-    internal enum EVRFirmwareError
+    public enum EVRFirmwareError
     {
         None = 0,
         Success = 1,
         Fail = 2,
     }
-    internal enum EVRNotificationError
+    public enum EVRNotificationError
     {
         OK = 0,
         InvalidNotificationId = 100,
@@ -4229,12 +4542,20 @@ namespace Valve.VR
         InvalidOverlayHandle = 102,
         SystemWithUserValueAlreadyExists = 103,
     }
-    internal enum EVRSkeletalMotionRange
+    public enum EVRSkeletalMotionRange
     {
         WithController = 0,
         WithoutController = 1,
     }
-    internal enum EVRInitError
+    public enum EVRSkeletalTrackingLevel
+    {
+        VRSkeletalTracking_Estimated = 0,
+        VRSkeletalTracking_Partial = 1,
+        VRSkeletalTracking_Full = 2,
+        Count = 3,
+        Max = 2,
+    }
+    public enum EVRInitError
     {
         None = 0,
         Unknown = 1,
@@ -4281,6 +4602,10 @@ namespace Valve.VR
         Init_USBServiceBusy = 140,
         Init_VRWebHelperStartupFailed = 141,
         Init_TrackerManagerInitFailed = 142,
+        Init_AlreadyRunning = 143,
+        Init_FailedForVrMonitor = 144,
+        Init_PropertyManagerInitFailed = 145,
+        Init_WebServerFailed = 146,
         Driver_Failed = 200,
         Driver_Unknown = 201,
         Driver_HmdUnknown = 202,
@@ -4293,6 +4618,7 @@ namespace Valve.VR
         Driver_TrackedDeviceInterfaceUnknown = 209,
         Driver_HmdDriverIdOutOfBounds = 211,
         Driver_HmdDisplayMirrored = 212,
+        Driver_HmdDisplayNotFoundLaptop = 213,
         IPC_ServerInitFailed = 300,
         IPC_ConnectFailed = 301,
         IPC_SharedStateInitFailed = 302,
@@ -4302,12 +4628,96 @@ namespace Valve.VR
         IPC_CompositorConnectFailed = 306,
         IPC_CompositorInvalidConnectResponse = 307,
         IPC_ConnectFailedAfterMultipleAttempts = 308,
+        IPC_ConnectFailedAfterTargetExited = 309,
+        IPC_NamespaceUnavailable = 310,
         Compositor_Failed = 400,
         Compositor_D3D11HardwareRequired = 401,
         Compositor_FirmwareRequiresUpdate = 402,
         Compositor_OverlayInitFailed = 403,
         Compositor_ScreenshotsInitFailed = 404,
         Compositor_UnableToCreateDevice = 405,
+        Compositor_SharedStateIsNull = 406,
+        Compositor_NotificationManagerIsNull = 407,
+        Compositor_ResourceManagerClientIsNull = 408,
+        Compositor_MessageOverlaySharedStateInitFailure = 409,
+        Compositor_PropertiesInterfaceIsNull = 410,
+        Compositor_CreateFullscreenWindowFailed = 411,
+        Compositor_SettingsInterfaceIsNull = 412,
+        Compositor_FailedToShowWindow = 413,
+        Compositor_DistortInterfaceIsNull = 414,
+        Compositor_DisplayFrequencyFailure = 415,
+        Compositor_RendererInitializationFailed = 416,
+        Compositor_DXGIFactoryInterfaceIsNull = 417,
+        Compositor_DXGIFactoryCreateFailed = 418,
+        Compositor_DXGIFactoryQueryFailed = 419,
+        Compositor_InvalidAdapterDesktop = 420,
+        Compositor_InvalidHmdAttachment = 421,
+        Compositor_InvalidOutputDesktop = 422,
+        Compositor_InvalidDeviceProvided = 423,
+        Compositor_D3D11RendererInitializationFailed = 424,
+        Compositor_FailedToFindDisplayMode = 425,
+        Compositor_FailedToCreateSwapChain = 426,
+        Compositor_FailedToGetBackBuffer = 427,
+        Compositor_FailedToCreateRenderTarget = 428,
+        Compositor_FailedToCreateDXGI2SwapChain = 429,
+        Compositor_FailedtoGetDXGI2BackBuffer = 430,
+        Compositor_FailedToCreateDXGI2RenderTarget = 431,
+        Compositor_FailedToGetDXGIDeviceInterface = 432,
+        Compositor_SelectDisplayMode = 433,
+        Compositor_FailedToCreateNvAPIRenderTargets = 434,
+        Compositor_NvAPISetDisplayMode = 435,
+        Compositor_FailedToCreateDirectModeDisplay = 436,
+        Compositor_InvalidHmdPropertyContainer = 437,
+        Compositor_UpdateDisplayFrequency = 438,
+        Compositor_CreateRasterizerState = 439,
+        Compositor_CreateWireframeRasterizerState = 440,
+        Compositor_CreateSamplerState = 441,
+        Compositor_CreateClampToBorderSamplerState = 442,
+        Compositor_CreateAnisoSamplerState = 443,
+        Compositor_CreateOverlaySamplerState = 444,
+        Compositor_CreatePanoramaSamplerState = 445,
+        Compositor_CreateFontSamplerState = 446,
+        Compositor_CreateNoBlendState = 447,
+        Compositor_CreateBlendState = 448,
+        Compositor_CreateAlphaBlendState = 449,
+        Compositor_CreateBlendStateMaskR = 450,
+        Compositor_CreateBlendStateMaskG = 451,
+        Compositor_CreateBlendStateMaskB = 452,
+        Compositor_CreateDepthStencilState = 453,
+        Compositor_CreateDepthStencilStateNoWrite = 454,
+        Compositor_CreateDepthStencilStateNoDepth = 455,
+        Compositor_CreateFlushTexture = 456,
+        Compositor_CreateDistortionSurfaces = 457,
+        Compositor_CreateConstantBuffer = 458,
+        Compositor_CreateHmdPoseConstantBuffer = 459,
+        Compositor_CreateHmdPoseStagingConstantBuffer = 460,
+        Compositor_CreateSharedFrameInfoConstantBuffer = 461,
+        Compositor_CreateOverlayConstantBuffer = 462,
+        Compositor_CreateSceneTextureIndexConstantBuffer = 463,
+        Compositor_CreateReadableSceneTextureIndexConstantBuffer = 464,
+        Compositor_CreateLayerGraphicsTextureIndexConstantBuffer = 465,
+        Compositor_CreateLayerComputeTextureIndexConstantBuffer = 466,
+        Compositor_CreateLayerComputeSceneTextureIndexConstantBuffer = 467,
+        Compositor_CreateComputeHmdPoseConstantBuffer = 468,
+        Compositor_CreateGeomConstantBuffer = 469,
+        Compositor_CreatePanelMaskConstantBuffer = 470,
+        Compositor_CreatePixelSimUBO = 471,
+        Compositor_CreateMSAARenderTextures = 472,
+        Compositor_CreateResolveRenderTextures = 473,
+        Compositor_CreateComputeResolveRenderTextures = 474,
+        Compositor_CreateDriverDirectModeResolveTextures = 475,
+        Compositor_OpenDriverDirectModeResolveTextures = 476,
+        Compositor_CreateFallbackSyncTexture = 477,
+        Compositor_ShareFallbackSyncTexture = 478,
+        Compositor_CreateOverlayIndexBuffer = 479,
+        Compositor_CreateOverlayVertextBuffer = 480,
+        Compositor_CreateTextVertexBuffer = 481,
+        Compositor_CreateTextIndexBuffer = 482,
+        Compositor_CreateMirrorTextures = 483,
+        Compositor_CreateLastFrameRenderTexture = 484,
+        Compositor_CreateMirrorOverlay = 485,
+        Compositor_FailedToCreateVirtualDisplayBackbuffer = 486,
+        Compositor_DisplayModeNotSupported = 487,
         VendorSpecific_UnableToConnectToOculusRuntime = 1000,
         VendorSpecific_WindowsNotInDevMode = 1001,
         VendorSpecific_HmdFound_CantOpenDevice = 1101,
@@ -4323,9 +4733,11 @@ namespace Valve.VR
         VendorSpecific_HmdFound_UserDataAddressRange = 1111,
         VendorSpecific_HmdFound_UserDataError = 1112,
         VendorSpecific_HmdFound_ConfigFailedSanityCheck = 1113,
+        VendorSpecific_OculusRuntimeBadInstall = 1114,
         Steam_SteamInstallationNotFound = 2000,
+        LastError = 2001,
     }
-    internal enum EVRScreenshotType
+    public enum EVRScreenshotType
     {
         None = 0,
         Mono = 1,
@@ -4334,12 +4746,12 @@ namespace Valve.VR
         MonoPanorama = 4,
         StereoPanorama = 5,
     }
-    internal enum EVRScreenshotPropertyFilenames
+    public enum EVRScreenshotPropertyFilenames
     {
         Preview = 0,
         VR = 1,
     }
-    internal enum EVRTrackedCameraError
+    public enum EVRTrackedCameraError
     {
         None = 0,
         OperationFailed = 100,
@@ -4359,32 +4771,39 @@ namespace Valve.VR
         InvalidArgument = 114,
         InvalidFrameBufferSize = 115,
     }
-    internal enum EVRTrackedCameraFrameLayout
+    public enum EVRTrackedCameraFrameLayout
     {
         Mono = 1,
         Stereo = 2,
         VerticalLayout = 16,
         HorizontalLayout = 32,
     }
-    internal enum EVRTrackedCameraFrameType
+    public enum EVRTrackedCameraFrameType
     {
         Distorted = 0,
         Undistorted = 1,
         MaximumUndistorted = 2,
         MAX_CAMERA_FRAME_TYPES = 3,
     }
-    internal enum EVSync
+    public enum EVRDistortionFunctionType
+    {
+        None = 0,
+        FTheta = 1,
+        Extended_FTheta = 2,
+        MAX_DISTORTION_FUNCTION_TYPES = 3,
+    }
+    public enum EVSync
     {
         None = 0,
         WaitRender = 1,
         NoWaitRender = 2,
     }
-    internal enum EVRMuraCorrectionMode
+    public enum EVRMuraCorrectionMode
     {
         Default = 0,
         NoCorrection = 1,
     }
-    internal enum Imu_OffScaleFlags
+    public enum Imu_OffScaleFlags
     {
         OffScale_AccelX = 1,
         OffScale_AccelY = 2,
@@ -4393,7 +4812,7 @@ namespace Valve.VR
         OffScale_GyroY = 16,
         OffScale_GyroZ = 32,
     }
-    internal enum EVRApplicationError
+    public enum EVRApplicationError
     {
         None = 0,
         AppKeyAlreadyExists = 100,
@@ -4417,7 +4836,7 @@ namespace Valve.VR
         UnknownProperty = 202,
         InvalidParameter = 203,
     }
-    internal enum EVRApplicationProperty
+    public enum EVRApplicationProperty
     {
         Name_String = 0,
         LaunchType_String = 11,
@@ -4435,16 +4854,18 @@ namespace Valve.VR
         IsInstanced_Bool = 62,
         IsInternal_Bool = 63,
         WantsCompositorPauseInStandby_Bool = 64,
+        IsHidden_Bool = 65,
         LastLaunchTime_Uint64 = 70,
     }
-    internal enum EVRApplicationTransitionState
+    public enum EVRSceneApplicationState
     {
-        VRApplicationTransition_None = 0,
-        VRApplicationTransition_OldAppQuitSent = 10,
-        VRApplicationTransition_WaitingForExternalLaunch = 11,
-        VRApplicationTransition_NewAppLaunched = 20,
+        None = 0,
+        Starting = 1,
+        Quitting = 2,
+        Running = 3,
+        Waiting = 4,
     }
-    internal enum ChaperoneCalibrationState
+    public enum ChaperoneCalibrationState
     {
         OK = 1,
         Warning = 100,
@@ -4457,16 +4878,16 @@ namespace Valve.VR
         Error_PlayAreaInvalid = 203,
         Error_CollisionBoundsInvalid = 204,
     }
-    internal enum EChaperoneConfigFile
+    public enum EChaperoneConfigFile
     {
         Live = 1,
         Temp = 2,
     }
-    internal enum EChaperoneImportFlags
+    public enum EChaperoneImportFlags
     {
         EChaperoneImport_BoundsOnly = 1,
     }
-    internal enum EVRCompositorError
+    public enum EVRCompositorError
     {
         None = 0,
         RequestFailed = 1,
@@ -4480,46 +4901,50 @@ namespace Valve.VR
         IndexOutOfRange = 107,
         AlreadySubmitted = 108,
         InvalidBounds = 109,
+        AlreadySet = 110,
     }
-    internal enum EVRCompositorTimingMode
+    public enum EVRCompositorTimingMode
     {
         Implicit = 0,
         Explicit_RuntimePerformsPostPresentHandoff = 1,
         Explicit_ApplicationPerformsPostPresentHandoff = 2,
     }
-    internal enum VROverlayInputMethod
+    public enum VROverlayInputMethod
     {
         None = 0,
         Mouse = 1,
         DualAnalog = 2,
     }
-    internal enum VROverlayTransformType
+    public enum VROverlayTransformType
     {
+        VROverlayTransform_Invalid = -1,
         VROverlayTransform_Absolute = 0,
         VROverlayTransform_TrackedDeviceRelative = 1,
         VROverlayTransform_SystemOverlay = 2,
         VROverlayTransform_TrackedComponent = 3,
+        VROverlayTransform_Cursor = 4,
+        VROverlayTransform_DashboardTab = 5,
+        VROverlayTransform_DashboardThumb = 6,
     }
-    internal enum VROverlayFlags
+    public enum VROverlayFlags
     {
-        None = 0,
-        Curved = 1,
-        RGSS4X = 2,
-        NoDashboardTab = 3,
-        AcceptsGamepadEvents = 4,
-        ShowGamepadFocus = 5,
-        SendVRScrollEvents = 6,
-        SendVRTouchpadEvents = 7,
-        ShowTouchPadScrollWheel = 8,
-        TransferOwnershipToInternalProcess = 9,
-        SideBySide_Parallel = 10,
-        SideBySide_Crossed = 11,
-        Panorama = 12,
-        StereoPanorama = 13,
-        SortWithNonSceneOverlays = 14,
-        VisibleInDashboard = 15,
+        NoDashboardTab = 8,
+        SendVRDiscreteScrollEvents = 64,
+        SendVRTouchpadEvents = 128,
+        ShowTouchPadScrollWheel = 256,
+        TransferOwnershipToInternalProcess = 512,
+        SideBySide_Parallel = 1024,
+        SideBySide_Crossed = 2048,
+        Panorama = 4096,
+        StereoPanorama = 8192,
+        SortWithNonSceneOverlays = 16384,
+        VisibleInDashboard = 32768,
+        MakeOverlaysInteractiveIfVisible = 65536,
+        SendVRSmoothScrollEvents = 131072,
+        ProtectedContent = 262144,
+        HideLaserIntersection = 524288,
     }
-    internal enum VRMessageOverlayResponse
+    public enum VRMessageOverlayResponse
     {
         ButtonPress_0 = 0,
         ButtonPress_1 = 1,
@@ -4529,31 +4954,23 @@ namespace Valve.VR
         CouldntFindOrCreateClientOverlay = 5,
         ApplicationQuit = 6,
     }
-    internal enum EGamepadTextInputMode
+    public enum EGamepadTextInputMode
     {
         k_EGamepadTextInputModeNormal = 0,
         k_EGamepadTextInputModePassword = 1,
         k_EGamepadTextInputModeSubmit = 2,
     }
-    internal enum EGamepadTextInputLineMode
+    public enum EGamepadTextInputLineMode
     {
         k_EGamepadTextInputLineModeSingleLine = 0,
         k_EGamepadTextInputLineModeMultipleLines = 1,
     }
-    internal enum EOverlayDirection
-    {
-        Up = 0,
-        Down = 1,
-        Left = 2,
-        Right = 3,
-        Count = 4,
-    }
-    internal enum EVROverlayIntersectionMaskPrimitiveType
+    public enum EVROverlayIntersectionMaskPrimitiveType
     {
         OverlayIntersectionPrimitiveType_Rectangle = 0,
         OverlayIntersectionPrimitiveType_Circle = 1,
     }
-    internal enum EVRRenderModelError
+    public enum EVRRenderModelError
     {
         None = 0,
         Loading = 100,
@@ -4569,7 +4986,7 @@ namespace Valve.VR
         NotEnoughTexCoords = 308,
         InvalidTexture = 400,
     }
-    internal enum EVRComponentProperty
+    public enum EVRComponentProperty
     {
         IsStatic = 1,
         IsVisible = 2,
@@ -4577,13 +4994,13 @@ namespace Valve.VR
         IsPressed = 8,
         IsScrolled = 16,
     }
-    internal enum EVRNotificationType
+    public enum EVRNotificationType
     {
         Transient = 0,
         Persistent = 1,
         Transient_SystemWithUserValue = 2,
     }
-    internal enum EVRNotificationStyle
+    public enum EVRNotificationStyle
     {
         None = 0,
         Application = 100,
@@ -4591,7 +5008,7 @@ namespace Valve.VR
         Contact_Enabled = 201,
         Contact_Active = 202,
     }
-    internal enum EVRSettingsError
+    public enum EVRSettingsError
     {
         None = 0,
         IPCFailed = 1,
@@ -4600,7 +5017,7 @@ namespace Valve.VR
         JsonParseFailed = 4,
         UnsetSettingHasNoDefault = 5,
     }
-    internal enum EVRScreenshotError
+    public enum EVRScreenshotError
     {
         None = 0,
         RequestFailed = 1,
@@ -4609,18 +5026,53 @@ namespace Valve.VR
         BufferTooSmall = 102,
         ScreenshotAlreadyInProgress = 108,
     }
-    internal enum EVRSkeletalTransformSpace
+    public enum EVRSkeletalTransformSpace
     {
         Model = 0,
         Parent = 1,
-        Additive = 2,
     }
-    internal enum EVRInputFilterCancelType
+    public enum EVRSkeletalReferencePose
+    {
+        BindPose = 0,
+        OpenHand = 1,
+        Fist = 2,
+        GripLimit = 3,
+    }
+    public enum EVRFinger
+    {
+        Thumb = 0,
+        Index = 1,
+        Middle = 2,
+        Ring = 3,
+        Pinky = 4,
+        Count = 5,
+    }
+    public enum EVRFingerSplay
+    {
+        Thumb_Index = 0,
+        Index_Middle = 1,
+        Middle_Ring = 2,
+        Ring_Pinky = 3,
+        Count = 4,
+    }
+    public enum EVRSummaryType
+    {
+        FromAnimation = 0,
+        FromDevice = 1,
+    }
+    public enum EVRInputFilterCancelType
     {
         VRInputFilterCancel_Timers = 0,
         VRInputFilterCancel_Momentum = 1,
     }
-    internal enum EIOBufferError
+    public enum EVRInputStringBits
+    {
+        VRInputString_Hand = 1,
+        VRInputString_ControllerType = 2,
+        VRInputString_InputSource = 4,
+        VRInputString_All = -1,
+    }
+    public enum EIOBufferError
     {
         IOBuffer_Success = 0,
         IOBuffer_OperationFailed = 100,
@@ -4630,307 +5082,355 @@ namespace Valve.VR
         IOBuffer_PathDoesNotExist = 104,
         IOBuffer_Permission = 105,
     }
-    internal enum EIOBufferMode
+    public enum EIOBufferMode
     {
         Read = 1,
         Write = 2,
         Create = 512,
     }
+    public enum EVRDebugError
+    {
+        Success = 0,
+        BadParameter = 1,
+    }
 
     [StructLayout(LayoutKind.Explicit)]
-    internal struct VREvent_Data_t
+    public struct VREvent_Data_t
     {
-        [FieldOffset(0)] internal VREvent_Reserved_t reserved;
-        [FieldOffset(0)] internal VREvent_Controller_t controller;
-        [FieldOffset(0)] internal VREvent_Mouse_t mouse;
-        [FieldOffset(0)] internal VREvent_Scroll_t scroll;
-        [FieldOffset(0)] internal VREvent_Process_t process;
-        [FieldOffset(0)] internal VREvent_Notification_t notification;
-        [FieldOffset(0)] internal VREvent_Overlay_t overlay;
-        [FieldOffset(0)] internal VREvent_Status_t status;
-        [FieldOffset(0)] internal VREvent_Ipd_t ipd;
-        [FieldOffset(0)] internal VREvent_Chaperone_t chaperone;
-        [FieldOffset(0)] internal VREvent_PerformanceTest_t performanceTest;
-        [FieldOffset(0)] internal VREvent_TouchPadMove_t touchPadMove;
-        [FieldOffset(0)] internal VREvent_SeatedZeroPoseReset_t seatedZeroPoseReset;
-        [FieldOffset(0)] internal VREvent_Screenshot_t screenshot;
-        [FieldOffset(0)] internal VREvent_ScreenshotProgress_t screenshotProgress;
-        [FieldOffset(0)] internal VREvent_ApplicationLaunch_t applicationLaunch;
-        [FieldOffset(0)] internal VREvent_EditingCameraSurface_t cameraSurface;
-        [FieldOffset(0)] internal VREvent_MessageOverlay_t messageOverlay;
-        [FieldOffset(0)] internal VREvent_Property_t property;
-        [FieldOffset(0)] internal VREvent_DualAnalog_t dualAnalog;
-        [FieldOffset(0)] internal VREvent_HapticVibration_t hapticVibration;
-        [FieldOffset(0)] internal VREvent_WebConsole_t webConsole;
-        [FieldOffset(0)] internal VREvent_InputBindingLoad_t inputBinding;
-        [FieldOffset(0)] internal VREvent_SpatialAnchor_t spatialAnchor;
-        [FieldOffset(0)] internal VREvent_InputActionManifestLoad_t actionManifest;
-        [FieldOffset(0)] internal VREvent_Keyboard_t keyboard; // This has to be at the end due to a mono bug
+        [FieldOffset(0)] public VREvent_Reserved_t reserved;
+        [FieldOffset(0)] public VREvent_Controller_t controller;
+        [FieldOffset(0)] public VREvent_Mouse_t mouse;
+        [FieldOffset(0)] public VREvent_Scroll_t scroll;
+        [FieldOffset(0)] public VREvent_Process_t process;
+        [FieldOffset(0)] public VREvent_Notification_t notification;
+        [FieldOffset(0)] public VREvent_Overlay_t overlay;
+        [FieldOffset(0)] public VREvent_Status_t status;
+        [FieldOffset(0)] public VREvent_Ipd_t ipd;
+        [FieldOffset(0)] public VREvent_Chaperone_t chaperone;
+        [FieldOffset(0)] public VREvent_PerformanceTest_t performanceTest;
+        [FieldOffset(0)] public VREvent_TouchPadMove_t touchPadMove;
+        [FieldOffset(0)] public VREvent_SeatedZeroPoseReset_t seatedZeroPoseReset;
+        [FieldOffset(0)] public VREvent_Screenshot_t screenshot;
+        [FieldOffset(0)] public VREvent_ScreenshotProgress_t screenshotProgress;
+        [FieldOffset(0)] public VREvent_ApplicationLaunch_t applicationLaunch;
+        [FieldOffset(0)] public VREvent_EditingCameraSurface_t cameraSurface;
+        [FieldOffset(0)] public VREvent_MessageOverlay_t messageOverlay;
+        [FieldOffset(0)] public VREvent_Property_t property;
+        [FieldOffset(0)] public VREvent_DualAnalog_t dualAnalog;
+        [FieldOffset(0)] public VREvent_HapticVibration_t hapticVibration;
+        [FieldOffset(0)] public VREvent_WebConsole_t webConsole;
+        [FieldOffset(0)] public VREvent_InputBindingLoad_t inputBinding;
+        [FieldOffset(0)] public VREvent_SpatialAnchor_t spatialAnchor;
+        [FieldOffset(0)] public VREvent_InputActionManifestLoad_t actionManifest;
+        [FieldOffset(0)] public VREvent_ProgressUpdate_t progressUpdate;
+        [FieldOffset(0)] public VREvent_ShowUI_t showUi;
+        [FieldOffset(0)] public VREvent_ShowDevTools_t showDevTools;
+        [FieldOffset(0)] public VREvent_HDCPError_t hdcpError;
+        [FieldOffset(0)] public VREvent_Keyboard_t keyboard; // This has to be at the end due to a mono bug
     }
 
 
     [StructLayout(LayoutKind.Explicit)]
-    internal struct VROverlayIntersectionMaskPrimitive_Data_t
+    public struct VROverlayIntersectionMaskPrimitive_Data_t
     {
-        [FieldOffset(0)] internal IntersectionMaskRectangle_t m_Rectangle;
-        [FieldOffset(0)] internal IntersectionMaskCircle_t m_Circle;
+        [FieldOffset(0)] public IntersectionMaskRectangle_t m_Rectangle;
+        [FieldOffset(0)] public IntersectionMaskCircle_t m_Circle;
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct HmdMatrix34_t
+    public struct HmdMatrix34_t
     {
-        internal float m0; //float[3][4]
-        internal float m1;
-        internal float m2;
-        internal float m3;
-        internal float m4;
-        internal float m5;
-        internal float m6;
-        internal float m7;
-        internal float m8;
-        internal float m9;
-        internal float m10;
-        internal float m11;
+        public float m0; //float[3][4]
+        public float m1;
+        public float m2;
+        public float m3;
+        public float m4;
+        public float m5;
+        public float m6;
+        public float m7;
+        public float m8;
+        public float m9;
+        public float m10;
+        public float m11;
+#if UNITY_5_3_OR_NEWER
+
+    public Vector3 GetPosition()
+    {
+        return new Vector3(m3, m7, -m11);
+    }
+
+    public bool IsRotationValid()
+    {
+        return ((m2 != 0 || m6 != 0 || m10 != 0) && (m1 != 0 || m5 != 0 || m9 != 0));
+    }
+
+    public Quaternion GetRotation()
+    {
+        if (IsRotationValid())
+        {
+            float w = Mathf.Sqrt(Mathf.Max(0, 1 + m0 + m5 + m10)) / 2;
+            float x = Mathf.Sqrt(Mathf.Max(0, 1 + m0 - m5 - m10)) / 2;
+            float y = Mathf.Sqrt(Mathf.Max(0, 1 - m0 + m5 - m10)) / 2;
+            float z = Mathf.Sqrt(Mathf.Max(0, 1 - m0 - m5 + m10)) / 2;
+
+            _copysign(ref x, -m9 - -m6);
+            _copysign(ref y, -m2 - -m8);
+            _copysign(ref z, m4 - m1);
+
+            return new Quaternion(x, y, z, w);
+        }
+        return Quaternion.identity;
+    }
+
+    private static void _copysign(ref float sizeval, float signval)
+    {
+        if (signval > 0 != sizeval > 0)
+            sizeval = -sizeval;
+    }
+#endif
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct HmdMatrix33_t
+    public struct HmdMatrix33_t
     {
-        internal float m0; //float[3][3]
-        internal float m1;
-        internal float m2;
-        internal float m3;
-        internal float m4;
-        internal float m5;
-        internal float m6;
-        internal float m7;
-        internal float m8;
+        public float m0; //float[3][3]
+        public float m1;
+        public float m2;
+        public float m3;
+        public float m4;
+        public float m5;
+        public float m6;
+        public float m7;
+        public float m8;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct HmdMatrix44_t
+    public struct HmdMatrix44_t
     {
-        internal float m0; //float[4][4]
-        internal float m1;
-        internal float m2;
-        internal float m3;
-        internal float m4;
-        internal float m5;
-        internal float m6;
-        internal float m7;
-        internal float m8;
-        internal float m9;
-        internal float m10;
-        internal float m11;
-        internal float m12;
-        internal float m13;
-        internal float m14;
-        internal float m15;
+        public float m0; //float[4][4]
+        public float m1;
+        public float m2;
+        public float m3;
+        public float m4;
+        public float m5;
+        public float m6;
+        public float m7;
+        public float m8;
+        public float m9;
+        public float m10;
+        public float m11;
+        public float m12;
+        public float m13;
+        public float m14;
+        public float m15;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct HmdVector3_t
+    public struct HmdVector3_t
     {
-        internal float v0; //float[3]
-        internal float v1;
-        internal float v2;
+        public float v0; //float[3]
+        public float v1;
+        public float v2;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct HmdVector4_t
+    public struct HmdVector4_t
     {
-        internal float v0; //float[4]
-        internal float v1;
-        internal float v2;
-        internal float v3;
+        public float v0; //float[4]
+        public float v1;
+        public float v2;
+        public float v3;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct HmdVector3d_t
+    public struct HmdVector3d_t
     {
-        internal double v0; //double[3]
-        internal double v1;
-        internal double v2;
+        public double v0; //double[3]
+        public double v1;
+        public double v2;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct HmdVector2_t
+    public struct HmdVector2_t
     {
-        internal float v0; //float[2]
-        internal float v1;
+        public float v0; //float[2]
+        public float v1;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct HmdQuaternion_t
+    public struct HmdQuaternion_t
     {
-        internal double w;
-        internal double x;
-        internal double y;
-        internal double z;
+        public double w;
+        public double x;
+        public double y;
+        public double z;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct HmdQuaternionf_t
+    public struct HmdQuaternionf_t
     {
-        internal float w;
-        internal float x;
-        internal float y;
-        internal float z;
+        public float w;
+        public float x;
+        public float y;
+        public float z;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct HmdColor_t
+    public struct HmdColor_t
     {
-        internal float r;
-        internal float g;
-        internal float b;
-        internal float a;
+        public float r;
+        public float g;
+        public float b;
+        public float a;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct HmdQuad_t
+    public struct HmdQuad_t
     {
-        internal HmdVector3_t vCorners0; //HmdVector3_t[4]
-        internal HmdVector3_t vCorners1;
-        internal HmdVector3_t vCorners2;
-        internal HmdVector3_t vCorners3;
+        public HmdVector3_t vCorners0; //HmdVector3_t[4]
+        public HmdVector3_t vCorners1;
+        public HmdVector3_t vCorners2;
+        public HmdVector3_t vCorners3;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct HmdRect2_t
+    public struct HmdRect2_t
     {
-        internal HmdVector2_t vTopLeft;
-        internal HmdVector2_t vBottomRight;
+        public HmdVector2_t vTopLeft;
+        public HmdVector2_t vBottomRight;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct DistortionCoordinates_t
+    public struct DistortionCoordinates_t
     {
-        internal float rfRed0; //float[2]
-        internal float rfRed1;
-        internal float rfGreen0; //float[2]
-        internal float rfGreen1;
-        internal float rfBlue0; //float[2]
-        internal float rfBlue1;
+        public float rfRed0; //float[2]
+        public float rfRed1;
+        public float rfGreen0; //float[2]
+        public float rfGreen1;
+        public float rfBlue0; //float[2]
+        public float rfBlue1;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct Texture_t
+    public struct Texture_t
     {
-        internal IntPtr handle; // void *
-        internal ETextureType eType;
-        internal EColorSpace eColorSpace;
+        public IntPtr handle; // void *
+        public ETextureType eType;
+        public EColorSpace eColorSpace;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct TrackedDevicePose_t
+    public struct TrackedDevicePose_t
     {
-        internal HmdMatrix34_t mDeviceToAbsoluteTracking;
-        internal HmdVector3_t vVelocity;
-        internal HmdVector3_t vAngularVelocity;
-        internal ETrackingResult eTrackingResult;
+        public HmdMatrix34_t mDeviceToAbsoluteTracking;
+        public HmdVector3_t vVelocity;
+        public HmdVector3_t vAngularVelocity;
+        public ETrackingResult eTrackingResult;
         [MarshalAs(UnmanagedType.I1)]
-        internal bool bPoseIsValid;
+        public bool bPoseIsValid;
         [MarshalAs(UnmanagedType.I1)]
-        internal bool bDeviceIsConnected;
+        public bool bDeviceIsConnected;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VRTextureBounds_t
+    public struct VRTextureBounds_t
     {
-        internal float uMin;
-        internal float vMin;
-        internal float uMax;
-        internal float vMax;
+        public float uMin;
+        public float vMin;
+        public float uMax;
+        public float vMax;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VRTextureWithPose_t
+    public struct VRTextureWithPose_t
     {
-        internal HmdMatrix34_t mDeviceToAbsoluteTracking;
+        public HmdMatrix34_t mDeviceToAbsoluteTracking;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VRTextureDepthInfo_t
+    public struct VRTextureDepthInfo_t
     {
-        internal IntPtr handle; // void *
-        internal HmdMatrix44_t mProjection;
-        internal HmdVector2_t vRange;
+        public IntPtr handle; // void *
+        public HmdMatrix44_t mProjection;
+        public HmdVector2_t vRange;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VRTextureWithDepth_t
+    public struct VRTextureWithDepth_t
     {
-        internal VRTextureDepthInfo_t depth;
+        public VRTextureDepthInfo_t depth;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VRTextureWithPoseAndDepth_t
+    public struct VRTextureWithPoseAndDepth_t
     {
-        internal VRTextureDepthInfo_t depth;
+        public VRTextureDepthInfo_t depth;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VRVulkanTextureData_t
+    public struct VRVulkanTextureData_t
     {
-        internal ulong m_nImage;
-        internal IntPtr m_pDevice; // struct VkDevice_T *
-        internal IntPtr m_pPhysicalDevice; // struct VkPhysicalDevice_T *
-        internal IntPtr m_pInstance; // struct VkInstance_T *
-        internal IntPtr m_pQueue; // struct VkQueue_T *
-        internal uint m_nQueueFamilyIndex;
-        internal uint m_nWidth;
-        internal uint m_nHeight;
-        internal uint m_nFormat;
-        internal uint m_nSampleCount;
+        public ulong m_nImage;
+        public IntPtr m_pDevice; // struct VkDevice_T *
+        public IntPtr m_pPhysicalDevice; // struct VkPhysicalDevice_T *
+        public IntPtr m_pInstance; // struct VkInstance_T *
+        public IntPtr m_pQueue; // struct VkQueue_T *
+        public uint m_nQueueFamilyIndex;
+        public uint m_nWidth;
+        public uint m_nHeight;
+        public uint m_nFormat;
+        public uint m_nSampleCount;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct D3D12TextureData_t
+    public struct D3D12TextureData_t
     {
-        internal IntPtr m_pResource; // struct ID3D12Resource *
-        internal IntPtr m_pCommandQueue; // struct ID3D12CommandQueue *
-        internal uint m_nNodeMask;
+        public IntPtr m_pResource; // struct ID3D12Resource *
+        public IntPtr m_pCommandQueue; // struct ID3D12CommandQueue *
+        public uint m_nNodeMask;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_Controller_t
+    public struct VREvent_Controller_t
     {
-        internal uint button;
+        public uint button;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_Mouse_t
+    public struct VREvent_Mouse_t
     {
-        internal float x;
-        internal float y;
-        internal uint button;
+        public float x;
+        public float y;
+        public uint button;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_Scroll_t
+    public struct VREvent_Scroll_t
     {
-        internal float xdelta;
-        internal float ydelta;
-        internal uint repeatCount;
+        public float xdelta;
+        public float ydelta;
+        public uint unused;
+        public float viewportscale;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_TouchPadMove_t
+    public struct VREvent_TouchPadMove_t
     {
         [MarshalAs(UnmanagedType.I1)]
-        internal bool bFingerDown;
-        internal float flSecondsFingerDown;
-        internal float fValueXFirst;
-        internal float fValueYFirst;
-        internal float fValueXRaw;
-        internal float fValueYRaw;
+        public bool bFingerDown;
+        public float flSecondsFingerDown;
+        public float fValueXFirst;
+        public float fValueYFirst;
+        public float fValueXRaw;
+        public float fValueYRaw;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_Notification_t
+    public struct VREvent_Notification_t
     {
-        internal ulong ulUserValue;
-        internal uint notificationId;
+        public ulong ulUserValue;
+        public uint notificationId;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_Process_t
+    public struct VREvent_Process_t
     {
-        internal uint pid;
-        internal uint oldPid;
+        public uint pid;
+        public uint oldPid;
         [MarshalAs(UnmanagedType.I1)]
-        internal bool bForced;
+        public bool bForced;
+        [MarshalAs(UnmanagedType.I1)]
+        public bool bConnectionLost;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_Overlay_t
+    public struct VREvent_Overlay_t
     {
-        internal ulong overlayHandle;
-        internal ulong devicePath;
+        public ulong overlayHandle;
+        public ulong devicePath;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_Status_t
+    public struct VREvent_Status_t
     {
-        internal uint statusState;
+        public uint statusState;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_Keyboard_t
+    public struct VREvent_Keyboard_t
     {
-        internal byte cNewInput0, cNewInput1, cNewInput2, cNewInput3, cNewInput4, cNewInput5, cNewInput6, cNewInput7;
-        internal string cNewInput
+        public byte cNewInput0, cNewInput1, cNewInput2, cNewInput3, cNewInput4, cNewInput5, cNewInput6, cNewInput7;
+        public string cNewInput
         {
             get
             {
@@ -4946,140 +5446,167 @@ namespace Valve.VR
             }).TrimEnd('\0');
             }
         }
-        internal ulong uUserValue;
+        public ulong uUserValue;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_Ipd_t
+    public struct VREvent_Ipd_t
     {
-        internal float ipdMeters;
+        public float ipdMeters;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_Chaperone_t
+    public struct VREvent_Chaperone_t
     {
-        internal ulong m_nPreviousUniverse;
-        internal ulong m_nCurrentUniverse;
+        public ulong m_nPreviousUniverse;
+        public ulong m_nCurrentUniverse;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_Reserved_t
+    public struct VREvent_Reserved_t
     {
-        internal ulong reserved0;
-        internal ulong reserved1;
-        internal ulong reserved2;
-        internal ulong reserved3;
+        public ulong reserved0;
+        public ulong reserved1;
+        public ulong reserved2;
+        public ulong reserved3;
+        public ulong reserved4;
+        public ulong reserved5;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_PerformanceTest_t
+    public struct VREvent_PerformanceTest_t
     {
-        internal uint m_nFidelityLevel;
+        public uint m_nFidelityLevel;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_SeatedZeroPoseReset_t
+    public struct VREvent_SeatedZeroPoseReset_t
     {
         [MarshalAs(UnmanagedType.I1)]
-        internal bool bResetBySystemMenu;
+        public bool bResetBySystemMenu;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_Screenshot_t
+    public struct VREvent_Screenshot_t
     {
-        internal uint handle;
-        internal uint type;
+        public uint handle;
+        public uint type;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_ScreenshotProgress_t
+    public struct VREvent_ScreenshotProgress_t
     {
-        internal float progress;
+        public float progress;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_ApplicationLaunch_t
+    public struct VREvent_ApplicationLaunch_t
     {
-        internal uint pid;
-        internal uint unArgsHandle;
+        public uint pid;
+        public uint unArgsHandle;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_EditingCameraSurface_t
+    public struct VREvent_EditingCameraSurface_t
     {
-        internal ulong overlayHandle;
-        internal uint nVisualMode;
+        public ulong overlayHandle;
+        public uint nVisualMode;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_MessageOverlay_t
+    public struct VREvent_MessageOverlay_t
     {
-        internal uint unVRMessageOverlayResponse;
+        public uint unVRMessageOverlayResponse;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_Property_t
+    public struct VREvent_Property_t
     {
-        internal ulong container;
-        internal ETrackedDeviceProperty prop;
+        public ulong container;
+        public ETrackedDeviceProperty prop;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_DualAnalog_t
+    public struct VREvent_DualAnalog_t
     {
-        internal float x;
-        internal float y;
-        internal float transformedX;
-        internal float transformedY;
-        internal EDualAnalogWhich which;
+        public float x;
+        public float y;
+        public float transformedX;
+        public float transformedY;
+        public EDualAnalogWhich which;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_HapticVibration_t
+    public struct VREvent_HapticVibration_t
     {
-        internal ulong containerHandle;
-        internal ulong componentHandle;
-        internal float fDurationSeconds;
-        internal float fFrequency;
-        internal float fAmplitude;
+        public ulong containerHandle;
+        public ulong componentHandle;
+        public float fDurationSeconds;
+        public float fFrequency;
+        public float fAmplitude;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_WebConsole_t
+    public struct VREvent_WebConsole_t
     {
-        internal ulong webConsoleHandle;
+        public ulong webConsoleHandle;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_InputBindingLoad_t
+    public struct VREvent_InputBindingLoad_t
     {
-        internal ulong ulAppContainer;
-        internal ulong pathMessage;
-        internal ulong pathUrl;
-        internal ulong pathControllerType;
+        public ulong ulAppContainer;
+        public ulong pathMessage;
+        public ulong pathUrl;
+        public ulong pathControllerType;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_InputActionManifestLoad_t
+    public struct VREvent_InputActionManifestLoad_t
     {
-        internal ulong pathAppKey;
-        internal ulong pathMessage;
-        internal ulong pathMessageParam;
-        internal ulong pathManifestPath;
+        public ulong pathAppKey;
+        public ulong pathMessage;
+        public ulong pathMessageParam;
+        public ulong pathManifestPath;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_SpatialAnchor_t
+    public struct VREvent_SpatialAnchor_t
     {
-        internal uint unHandle;
+        public uint unHandle;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VREvent_t
+    public struct VREvent_ProgressUpdate_t
     {
-        internal uint eventType;
-        internal uint trackedDeviceIndex;
-        internal float eventAgeSeconds;
-        internal VREvent_Data_t data;
+        public ulong ulApplicationPropertyContainer;
+        public ulong pathDevice;
+        public ulong pathInputSource;
+        public ulong pathProgressAction;
+        public ulong pathIcon;
+        public float fProgress;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct VREvent_ShowUI_t
+    {
+        public EShowUIType eType;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct VREvent_ShowDevTools_t
+    {
+        public int nBrowserIdentifier;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct VREvent_HDCPError_t
+    {
+        public EHDCPError eCode;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct VREvent_t
+    {
+        public uint eventType;
+        public uint trackedDeviceIndex;
+        public float eventAgeSeconds;
+        public VREvent_Data_t data;
     }
     // This structure is for backwards binary compatibility on Linux and OSX only
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    internal struct VREvent_t_Packed
+    public struct VREvent_t_Packed
     {
-        internal uint eventType;
-        internal uint trackedDeviceIndex;
-        internal float eventAgeSeconds;
-        internal VREvent_Data_t data;
-        internal VREvent_t_Packed(VREvent_t unpacked)
+        public uint eventType;
+        public uint trackedDeviceIndex;
+        public float eventAgeSeconds;
+        public VREvent_Data_t data;
+        public VREvent_t_Packed(VREvent_t unpacked)
         {
             this.eventType = unpacked.eventType;
             this.trackedDeviceIndex = unpacked.trackedDeviceIndex;
             this.eventAgeSeconds = unpacked.eventAgeSeconds;
             this.data = unpacked.data;
         }
-        internal void Unpack(ref VREvent_t unpacked)
+        public void Unpack(ref VREvent_t unpacked)
         {
             unpacked.eventType = this.eventType;
             unpacked.trackedDeviceIndex = this.trackedDeviceIndex;
@@ -5088,42 +5615,42 @@ namespace Valve.VR
         }
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct HiddenAreaMesh_t
+    public struct HiddenAreaMesh_t
     {
-        internal IntPtr pVertexData; // const struct vr::HmdVector2_t *
-        internal uint unTriangleCount;
+        public IntPtr pVertexData; // const struct vr::HmdVector2_t *
+        public uint unTriangleCount;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VRControllerAxis_t
+    public struct VRControllerAxis_t
     {
-        internal float x;
-        internal float y;
+        public float x;
+        public float y;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VRControllerState_t
+    public struct VRControllerState_t
     {
-        internal uint unPacketNum;
-        internal ulong ulButtonPressed;
-        internal ulong ulButtonTouched;
-        internal VRControllerAxis_t rAxis0; //VRControllerAxis_t[5]
-        internal VRControllerAxis_t rAxis1;
-        internal VRControllerAxis_t rAxis2;
-        internal VRControllerAxis_t rAxis3;
-        internal VRControllerAxis_t rAxis4;
+        public uint unPacketNum;
+        public ulong ulButtonPressed;
+        public ulong ulButtonTouched;
+        public VRControllerAxis_t rAxis0; //VRControllerAxis_t[5]
+        public VRControllerAxis_t rAxis1;
+        public VRControllerAxis_t rAxis2;
+        public VRControllerAxis_t rAxis3;
+        public VRControllerAxis_t rAxis4;
     }
     // This structure is for backwards binary compatibility on Linux and OSX only
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    internal struct VRControllerState_t_Packed
+    public struct VRControllerState_t_Packed
     {
-        internal uint unPacketNum;
-        internal ulong ulButtonPressed;
-        internal ulong ulButtonTouched;
-        internal VRControllerAxis_t rAxis0; //VRControllerAxis_t[5]
-        internal VRControllerAxis_t rAxis1;
-        internal VRControllerAxis_t rAxis2;
-        internal VRControllerAxis_t rAxis3;
-        internal VRControllerAxis_t rAxis4;
-        internal VRControllerState_t_Packed(VRControllerState_t unpacked)
+        public uint unPacketNum;
+        public ulong ulButtonPressed;
+        public ulong ulButtonTouched;
+        public VRControllerAxis_t rAxis0; //VRControllerAxis_t[5]
+        public VRControllerAxis_t rAxis1;
+        public VRControllerAxis_t rAxis2;
+        public VRControllerAxis_t rAxis3;
+        public VRControllerAxis_t rAxis4;
+        public VRControllerState_t_Packed(VRControllerState_t unpacked)
         {
             this.unPacketNum = unpacked.unPacketNum;
             this.ulButtonPressed = unpacked.ulButtonPressed;
@@ -5134,7 +5661,7 @@ namespace Valve.VR
             this.rAxis3 = unpacked.rAxis3;
             this.rAxis4 = unpacked.rAxis4;
         }
-        internal void Unpack(ref VRControllerState_t unpacked)
+        public void Unpack(ref VRControllerState_t unpacked)
         {
             unpacked.unPacketNum = this.unPacketNum;
             unpacked.ulButtonPressed = this.ulButtonPressed;
@@ -5147,186 +5674,201 @@ namespace Valve.VR
         }
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct Compositor_OverlaySettings
+    public struct Compositor_OverlaySettings
     {
-        internal uint size;
+        public uint size;
         [MarshalAs(UnmanagedType.I1)]
-        internal bool curved;
+        public bool curved;
         [MarshalAs(UnmanagedType.I1)]
-        internal bool antialias;
-        internal float scale;
-        internal float distance;
-        internal float alpha;
-        internal float uOffset;
-        internal float vOffset;
-        internal float uScale;
-        internal float vScale;
-        internal float gridDivs;
-        internal float gridWidth;
-        internal float gridScale;
-        internal HmdMatrix44_t transform;
+        public bool antialias;
+        public float scale;
+        public float distance;
+        public float alpha;
+        public float uOffset;
+        public float vOffset;
+        public float uScale;
+        public float vScale;
+        public float gridDivs;
+        public float gridWidth;
+        public float gridScale;
+        public HmdMatrix44_t transform;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VRBoneTransform_t
+    public struct VRBoneTransform_t
     {
-        internal HmdVector4_t position;
-        internal HmdQuaternionf_t orientation;
+        public HmdVector4_t position;
+        public HmdQuaternionf_t orientation;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct CameraVideoStreamFrameHeader_t
+    public struct CameraVideoStreamFrameHeader_t
     {
-        internal EVRTrackedCameraFrameType eFrameType;
-        internal uint nWidth;
-        internal uint nHeight;
-        internal uint nBytesPerPixel;
-        internal uint nFrameSequence;
-        internal TrackedDevicePose_t standingTrackedDevicePose;
-        internal ulong ulFrameExposureTime;
+        public EVRTrackedCameraFrameType eFrameType;
+        public uint nWidth;
+        public uint nHeight;
+        public uint nBytesPerPixel;
+        public uint nFrameSequence;
+        public TrackedDevicePose_t trackedDevicePose;
+        public ulong ulFrameExposureTime;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct DriverDirectMode_FrameTiming
+    public struct Compositor_FrameTiming
     {
-        internal uint m_nSize;
-        internal uint m_nNumFramePresents;
-        internal uint m_nNumMisPresented;
-        internal uint m_nNumDroppedFrames;
-        internal uint m_nReprojectionFlags;
+        public uint m_nSize;
+        public uint m_nFrameIndex;
+        public uint m_nNumFramePresents;
+        public uint m_nNumMisPresented;
+        public uint m_nNumDroppedFrames;
+        public uint m_nReprojectionFlags;
+        public double m_flSystemTimeInSeconds;
+        public float m_flPreSubmitGpuMs;
+        public float m_flPostSubmitGpuMs;
+        public float m_flTotalRenderGpuMs;
+        public float m_flCompositorRenderGpuMs;
+        public float m_flCompositorRenderCpuMs;
+        public float m_flCompositorIdleCpuMs;
+        public float m_flClientFrameIntervalMs;
+        public float m_flPresentCallCpuMs;
+        public float m_flWaitForPresentCpuMs;
+        public float m_flSubmitFrameMs;
+        public float m_flWaitGetPosesCalledMs;
+        public float m_flNewPosesReadyMs;
+        public float m_flNewFrameReadyMs;
+        public float m_flCompositorUpdateStartMs;
+        public float m_flCompositorUpdateEndMs;
+        public float m_flCompositorRenderStartMs;
+        public TrackedDevicePose_t m_HmdPose;
+        public uint m_nNumVSyncsReadyForUse;
+        public uint m_nNumVSyncsToFirstView;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct ImuSample_t
+    public struct DriverDirectMode_FrameTiming
     {
-        internal double fSampleTime;
-        internal HmdVector3d_t vAccel;
-        internal HmdVector3d_t vGyro;
-        internal uint unOffScaleFlags;
+        public uint m_nSize;
+        public uint m_nNumFramePresents;
+        public uint m_nNumMisPresented;
+        public uint m_nNumDroppedFrames;
+        public uint m_nReprojectionFlags;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct AppOverrideKeys_t
+    public struct ImuSample_t
     {
-        internal IntPtr pchKey; // const char *
-        internal IntPtr pchValue; // const char *
+        public double fSampleTime;
+        public HmdVector3d_t vAccel;
+        public HmdVector3d_t vGyro;
+        public uint unOffScaleFlags;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct Compositor_FrameTiming
+    public struct AppOverrideKeys_t
     {
-        internal uint m_nSize;
-        internal uint m_nFrameIndex;
-        internal uint m_nNumFramePresents;
-        internal uint m_nNumMisPresented;
-        internal uint m_nNumDroppedFrames;
-        internal uint m_nReprojectionFlags;
-        internal double m_flSystemTimeInSeconds;
-        internal float m_flPreSubmitGpuMs;
-        internal float m_flPostSubmitGpuMs;
-        internal float m_flTotalRenderGpuMs;
-        internal float m_flCompositorRenderGpuMs;
-        internal float m_flCompositorRenderCpuMs;
-        internal float m_flCompositorIdleCpuMs;
-        internal float m_flClientFrameIntervalMs;
-        internal float m_flPresentCallCpuMs;
-        internal float m_flWaitForPresentCpuMs;
-        internal float m_flSubmitFrameMs;
-        internal float m_flWaitGetPosesCalledMs;
-        internal float m_flNewPosesReadyMs;
-        internal float m_flNewFrameReadyMs;
-        internal float m_flCompositorUpdateStartMs;
-        internal float m_flCompositorUpdateEndMs;
-        internal float m_flCompositorRenderStartMs;
-        internal TrackedDevicePose_t m_HmdPose;
-        internal uint m_nNumVSyncsReadyForUse;
-        internal uint m_nNumVSyncsToFirstView;
+        public IntPtr pchKey; // const char *
+        public IntPtr pchValue; // const char *
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct Compositor_CumulativeStats
+    public struct Compositor_CumulativeStats
     {
-        internal uint m_nPid;
-        internal uint m_nNumFramePresents;
-        internal uint m_nNumDroppedFrames;
-        internal uint m_nNumReprojectedFrames;
-        internal uint m_nNumFramePresentsOnStartup;
-        internal uint m_nNumDroppedFramesOnStartup;
-        internal uint m_nNumReprojectedFramesOnStartup;
-        internal uint m_nNumLoading;
-        internal uint m_nNumFramePresentsLoading;
-        internal uint m_nNumDroppedFramesLoading;
-        internal uint m_nNumReprojectedFramesLoading;
-        internal uint m_nNumTimedOut;
-        internal uint m_nNumFramePresentsTimedOut;
-        internal uint m_nNumDroppedFramesTimedOut;
-        internal uint m_nNumReprojectedFramesTimedOut;
+        public uint m_nPid;
+        public uint m_nNumFramePresents;
+        public uint m_nNumDroppedFrames;
+        public uint m_nNumReprojectedFrames;
+        public uint m_nNumFramePresentsOnStartup;
+        public uint m_nNumDroppedFramesOnStartup;
+        public uint m_nNumReprojectedFramesOnStartup;
+        public uint m_nNumLoading;
+        public uint m_nNumFramePresentsLoading;
+        public uint m_nNumDroppedFramesLoading;
+        public uint m_nNumReprojectedFramesLoading;
+        public uint m_nNumTimedOut;
+        public uint m_nNumFramePresentsTimedOut;
+        public uint m_nNumDroppedFramesTimedOut;
+        public uint m_nNumReprojectedFramesTimedOut;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VROverlayIntersectionParams_t
+    public struct Compositor_StageRenderSettings
     {
-        internal HmdVector3_t vSource;
-        internal HmdVector3_t vDirection;
-        internal ETrackingUniverseOrigin eOrigin;
+        public HmdColor_t m_PrimaryColor;
+        public HmdColor_t m_SecondaryColor;
+        public float m_flVignetteInnerRadius;
+        public float m_flVignetteOuterRadius;
+        public float m_flFresnelStrength;
+        [MarshalAs(UnmanagedType.I1)]
+        public bool m_bBackfaceCulling;
+        [MarshalAs(UnmanagedType.I1)]
+        public bool m_bGreyscale;
+        [MarshalAs(UnmanagedType.I1)]
+        public bool m_bWireframe;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VROverlayIntersectionResults_t
+    public struct VROverlayIntersectionParams_t
     {
-        internal HmdVector3_t vPoint;
-        internal HmdVector3_t vNormal;
-        internal HmdVector2_t vUVs;
-        internal float fDistance;
+        public HmdVector3_t vSource;
+        public HmdVector3_t vDirection;
+        public ETrackingUniverseOrigin eOrigin;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct IntersectionMaskRectangle_t
+    public struct VROverlayIntersectionResults_t
     {
-        internal float m_flTopLeftX;
-        internal float m_flTopLeftY;
-        internal float m_flWidth;
-        internal float m_flHeight;
+        public HmdVector3_t vPoint;
+        public HmdVector3_t vNormal;
+        public HmdVector2_t vUVs;
+        public float fDistance;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct IntersectionMaskCircle_t
+    public struct IntersectionMaskRectangle_t
     {
-        internal float m_flCenterX;
-        internal float m_flCenterY;
-        internal float m_flRadius;
+        public float m_flTopLeftX;
+        public float m_flTopLeftY;
+        public float m_flWidth;
+        public float m_flHeight;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VROverlayIntersectionMaskPrimitive_t
+    public struct IntersectionMaskCircle_t
     {
-        internal EVROverlayIntersectionMaskPrimitiveType m_nPrimitiveType;
-        internal VROverlayIntersectionMaskPrimitive_Data_t m_Primitive;
+        public float m_flCenterX;
+        public float m_flCenterY;
+        public float m_flRadius;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct RenderModel_ComponentState_t
+    public struct VROverlayIntersectionMaskPrimitive_t
     {
-        internal HmdMatrix34_t mTrackingToComponentRenderModel;
-        internal HmdMatrix34_t mTrackingToComponentLocal;
-        internal uint uProperties;
+        public EVROverlayIntersectionMaskPrimitiveType m_nPrimitiveType;
+        public VROverlayIntersectionMaskPrimitive_Data_t m_Primitive;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct RenderModel_Vertex_t
+    public struct RenderModel_ComponentState_t
     {
-        internal HmdVector3_t vPosition;
-        internal HmdVector3_t vNormal;
-        internal float rfTextureCoord0; //float[2]
-        internal float rfTextureCoord1;
+        public HmdMatrix34_t mTrackingToComponentRenderModel;
+        public HmdMatrix34_t mTrackingToComponentLocal;
+        public uint uProperties;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct RenderModel_TextureMap_t
+    public struct RenderModel_Vertex_t
     {
-        internal ushort unWidth;
-        internal ushort unHeight;
-        internal IntPtr rubTextureMapData; // const uint8_t *
+        public HmdVector3_t vPosition;
+        public HmdVector3_t vNormal;
+        public float rfTextureCoord0; //float[2]
+        public float rfTextureCoord1;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct RenderModel_TextureMap_t
+    {
+        public ushort unWidth;
+        public ushort unHeight;
+        public IntPtr rubTextureMapData; // const uint8_t *
     }
     // This structure is for backwards binary compatibility on Linux and OSX only
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    internal struct RenderModel_TextureMap_t_Packed
+    public struct RenderModel_TextureMap_t_Packed
     {
-        internal ushort unWidth;
-        internal ushort unHeight;
-        internal IntPtr rubTextureMapData; // const uint8_t *
-        internal RenderModel_TextureMap_t_Packed(RenderModel_TextureMap_t unpacked)
+        public ushort unWidth;
+        public ushort unHeight;
+        public IntPtr rubTextureMapData; // const uint8_t *
+        public RenderModel_TextureMap_t_Packed(RenderModel_TextureMap_t unpacked)
         {
             this.unWidth = unpacked.unWidth;
             this.unHeight = unpacked.unHeight;
             this.rubTextureMapData = unpacked.rubTextureMapData;
         }
-        internal void Unpack(ref RenderModel_TextureMap_t unpacked)
+        public void Unpack(ref RenderModel_TextureMap_t unpacked)
         {
             unpacked.unWidth = this.unWidth;
             unpacked.unHeight = this.unHeight;
@@ -5334,24 +5876,24 @@ namespace Valve.VR
         }
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct RenderModel_t
+    public struct RenderModel_t
     {
-        internal IntPtr rVertexData; // const struct vr::RenderModel_Vertex_t *
-        internal uint unVertexCount;
-        internal IntPtr rIndexData; // const uint16_t *
-        internal uint unTriangleCount;
-        internal int diffuseTextureId;
+        public IntPtr rVertexData; // const struct vr::RenderModel_Vertex_t *
+        public uint unVertexCount;
+        public IntPtr rIndexData; // const uint16_t *
+        public uint unTriangleCount;
+        public int diffuseTextureId;
     }
     // This structure is for backwards binary compatibility on Linux and OSX only
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    internal struct RenderModel_t_Packed
+    public struct RenderModel_t_Packed
     {
-        internal IntPtr rVertexData; // const struct vr::RenderModel_Vertex_t *
-        internal uint unVertexCount;
-        internal IntPtr rIndexData; // const uint16_t *
-        internal uint unTriangleCount;
-        internal int diffuseTextureId;
-        internal RenderModel_t_Packed(RenderModel_t unpacked)
+        public IntPtr rVertexData; // const struct vr::RenderModel_Vertex_t *
+        public uint unVertexCount;
+        public IntPtr rIndexData; // const uint16_t *
+        public uint unTriangleCount;
+        public int diffuseTextureId;
+        public RenderModel_t_Packed(RenderModel_t unpacked)
         {
             this.rVertexData = unpacked.rVertexData;
             this.unVertexCount = unpacked.unVertexCount;
@@ -5359,7 +5901,7 @@ namespace Valve.VR
             this.unTriangleCount = unpacked.unTriangleCount;
             this.diffuseTextureId = unpacked.diffuseTextureId;
         }
-        internal void Unpack(ref RenderModel_t unpacked)
+        public void Unpack(ref RenderModel_t unpacked)
         {
             unpacked.rVertexData = this.rVertexData;
             unpacked.unVertexCount = this.unVertexCount;
@@ -5369,73 +5911,72 @@ namespace Valve.VR
         }
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct RenderModel_ControllerMode_State_t
+    public struct RenderModel_ControllerMode_State_t
     {
         [MarshalAs(UnmanagedType.I1)]
-        internal bool bScrollWheelVisible;
+        public bool bScrollWheelVisible;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct NotificationBitmap_t
+    public struct NotificationBitmap_t
     {
-        internal IntPtr m_pImageData; // void *
-        internal int m_nWidth;
-        internal int m_nHeight;
-        internal int m_nBytesPerPixel;
+        public IntPtr m_pImageData; // void *
+        public int m_nWidth;
+        public int m_nHeight;
+        public int m_nBytesPerPixel;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct CVRSettingHelper
+    public struct CVRSettingHelper
     {
-        internal IntPtr m_pSettings; // class vr::IVRSettings *
+        public IntPtr m_pSettings; // class vr::IVRSettings *
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct InputAnalogActionData_t
-    {
-        [MarshalAs(UnmanagedType.I1)]
-        internal bool bActive;
-        internal ulong activeOrigin;
-        internal float x;
-        internal float y;
-        internal float z;
-        internal float deltaX;
-        internal float deltaY;
-        internal float deltaZ;
-        internal float fUpdateTime;
-    }
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct InputDigitalActionData_t
+    public struct InputAnalogActionData_t
     {
         [MarshalAs(UnmanagedType.I1)]
-        internal bool bActive;
-        internal ulong activeOrigin;
-        [MarshalAs(UnmanagedType.I1)]
-        internal bool bState;
-        [MarshalAs(UnmanagedType.I1)]
-        internal bool bChanged;
-        internal float fUpdateTime;
+        public bool bActive;
+        public ulong activeOrigin;
+        public float x;
+        public float y;
+        public float z;
+        public float deltaX;
+        public float deltaY;
+        public float deltaZ;
+        public float fUpdateTime;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct InputPoseActionData_t
+    public struct InputDigitalActionData_t
     {
         [MarshalAs(UnmanagedType.I1)]
-        internal bool bActive;
-        internal ulong activeOrigin;
-        internal TrackedDevicePose_t pose;
+        public bool bActive;
+        public ulong activeOrigin;
+        [MarshalAs(UnmanagedType.I1)]
+        public bool bState;
+        [MarshalAs(UnmanagedType.I1)]
+        public bool bChanged;
+        public float fUpdateTime;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct InputSkeletalActionData_t
+    public struct InputPoseActionData_t
     {
         [MarshalAs(UnmanagedType.I1)]
-        internal bool bActive;
-        internal ulong activeOrigin;
-        internal uint boneCount;
+        public bool bActive;
+        public ulong activeOrigin;
+        public TrackedDevicePose_t pose;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct InputOriginInfo_t
+    public struct InputSkeletalActionData_t
     {
-        internal ulong devicePath;
-        internal uint trackedDeviceIndex;
-        internal byte rchRenderModelComponentName0, rchRenderModelComponentName1, rchRenderModelComponentName2, rchRenderModelComponentName3, rchRenderModelComponentName4, rchRenderModelComponentName5, rchRenderModelComponentName6, rchRenderModelComponentName7, rchRenderModelComponentName8, rchRenderModelComponentName9, rchRenderModelComponentName10, rchRenderModelComponentName11, rchRenderModelComponentName12, rchRenderModelComponentName13, rchRenderModelComponentName14, rchRenderModelComponentName15, rchRenderModelComponentName16, rchRenderModelComponentName17, rchRenderModelComponentName18, rchRenderModelComponentName19, rchRenderModelComponentName20, rchRenderModelComponentName21, rchRenderModelComponentName22, rchRenderModelComponentName23, rchRenderModelComponentName24, rchRenderModelComponentName25, rchRenderModelComponentName26, rchRenderModelComponentName27, rchRenderModelComponentName28, rchRenderModelComponentName29, rchRenderModelComponentName30, rchRenderModelComponentName31, rchRenderModelComponentName32, rchRenderModelComponentName33, rchRenderModelComponentName34, rchRenderModelComponentName35, rchRenderModelComponentName36, rchRenderModelComponentName37, rchRenderModelComponentName38, rchRenderModelComponentName39, rchRenderModelComponentName40, rchRenderModelComponentName41, rchRenderModelComponentName42, rchRenderModelComponentName43, rchRenderModelComponentName44, rchRenderModelComponentName45, rchRenderModelComponentName46, rchRenderModelComponentName47, rchRenderModelComponentName48, rchRenderModelComponentName49, rchRenderModelComponentName50, rchRenderModelComponentName51, rchRenderModelComponentName52, rchRenderModelComponentName53, rchRenderModelComponentName54, rchRenderModelComponentName55, rchRenderModelComponentName56, rchRenderModelComponentName57, rchRenderModelComponentName58, rchRenderModelComponentName59, rchRenderModelComponentName60, rchRenderModelComponentName61, rchRenderModelComponentName62, rchRenderModelComponentName63, rchRenderModelComponentName64, rchRenderModelComponentName65, rchRenderModelComponentName66, rchRenderModelComponentName67, rchRenderModelComponentName68, rchRenderModelComponentName69, rchRenderModelComponentName70, rchRenderModelComponentName71, rchRenderModelComponentName72, rchRenderModelComponentName73, rchRenderModelComponentName74, rchRenderModelComponentName75, rchRenderModelComponentName76, rchRenderModelComponentName77, rchRenderModelComponentName78, rchRenderModelComponentName79, rchRenderModelComponentName80, rchRenderModelComponentName81, rchRenderModelComponentName82, rchRenderModelComponentName83, rchRenderModelComponentName84, rchRenderModelComponentName85, rchRenderModelComponentName86, rchRenderModelComponentName87, rchRenderModelComponentName88, rchRenderModelComponentName89, rchRenderModelComponentName90, rchRenderModelComponentName91, rchRenderModelComponentName92, rchRenderModelComponentName93, rchRenderModelComponentName94, rchRenderModelComponentName95, rchRenderModelComponentName96, rchRenderModelComponentName97, rchRenderModelComponentName98, rchRenderModelComponentName99, rchRenderModelComponentName100, rchRenderModelComponentName101, rchRenderModelComponentName102, rchRenderModelComponentName103, rchRenderModelComponentName104, rchRenderModelComponentName105, rchRenderModelComponentName106, rchRenderModelComponentName107, rchRenderModelComponentName108, rchRenderModelComponentName109, rchRenderModelComponentName110, rchRenderModelComponentName111, rchRenderModelComponentName112, rchRenderModelComponentName113, rchRenderModelComponentName114, rchRenderModelComponentName115, rchRenderModelComponentName116, rchRenderModelComponentName117, rchRenderModelComponentName118, rchRenderModelComponentName119, rchRenderModelComponentName120, rchRenderModelComponentName121, rchRenderModelComponentName122, rchRenderModelComponentName123, rchRenderModelComponentName124, rchRenderModelComponentName125, rchRenderModelComponentName126, rchRenderModelComponentName127;
-        internal string rchRenderModelComponentName
+        [MarshalAs(UnmanagedType.I1)]
+        public bool bActive;
+        public ulong activeOrigin;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct InputOriginInfo_t
+    {
+        public ulong devicePath;
+        public uint trackedDeviceIndex;
+        public byte rchRenderModelComponentName0, rchRenderModelComponentName1, rchRenderModelComponentName2, rchRenderModelComponentName3, rchRenderModelComponentName4, rchRenderModelComponentName5, rchRenderModelComponentName6, rchRenderModelComponentName7, rchRenderModelComponentName8, rchRenderModelComponentName9, rchRenderModelComponentName10, rchRenderModelComponentName11, rchRenderModelComponentName12, rchRenderModelComponentName13, rchRenderModelComponentName14, rchRenderModelComponentName15, rchRenderModelComponentName16, rchRenderModelComponentName17, rchRenderModelComponentName18, rchRenderModelComponentName19, rchRenderModelComponentName20, rchRenderModelComponentName21, rchRenderModelComponentName22, rchRenderModelComponentName23, rchRenderModelComponentName24, rchRenderModelComponentName25, rchRenderModelComponentName26, rchRenderModelComponentName27, rchRenderModelComponentName28, rchRenderModelComponentName29, rchRenderModelComponentName30, rchRenderModelComponentName31, rchRenderModelComponentName32, rchRenderModelComponentName33, rchRenderModelComponentName34, rchRenderModelComponentName35, rchRenderModelComponentName36, rchRenderModelComponentName37, rchRenderModelComponentName38, rchRenderModelComponentName39, rchRenderModelComponentName40, rchRenderModelComponentName41, rchRenderModelComponentName42, rchRenderModelComponentName43, rchRenderModelComponentName44, rchRenderModelComponentName45, rchRenderModelComponentName46, rchRenderModelComponentName47, rchRenderModelComponentName48, rchRenderModelComponentName49, rchRenderModelComponentName50, rchRenderModelComponentName51, rchRenderModelComponentName52, rchRenderModelComponentName53, rchRenderModelComponentName54, rchRenderModelComponentName55, rchRenderModelComponentName56, rchRenderModelComponentName57, rchRenderModelComponentName58, rchRenderModelComponentName59, rchRenderModelComponentName60, rchRenderModelComponentName61, rchRenderModelComponentName62, rchRenderModelComponentName63, rchRenderModelComponentName64, rchRenderModelComponentName65, rchRenderModelComponentName66, rchRenderModelComponentName67, rchRenderModelComponentName68, rchRenderModelComponentName69, rchRenderModelComponentName70, rchRenderModelComponentName71, rchRenderModelComponentName72, rchRenderModelComponentName73, rchRenderModelComponentName74, rchRenderModelComponentName75, rchRenderModelComponentName76, rchRenderModelComponentName77, rchRenderModelComponentName78, rchRenderModelComponentName79, rchRenderModelComponentName80, rchRenderModelComponentName81, rchRenderModelComponentName82, rchRenderModelComponentName83, rchRenderModelComponentName84, rchRenderModelComponentName85, rchRenderModelComponentName86, rchRenderModelComponentName87, rchRenderModelComponentName88, rchRenderModelComponentName89, rchRenderModelComponentName90, rchRenderModelComponentName91, rchRenderModelComponentName92, rchRenderModelComponentName93, rchRenderModelComponentName94, rchRenderModelComponentName95, rchRenderModelComponentName96, rchRenderModelComponentName97, rchRenderModelComponentName98, rchRenderModelComponentName99, rchRenderModelComponentName100, rchRenderModelComponentName101, rchRenderModelComponentName102, rchRenderModelComponentName103, rchRenderModelComponentName104, rchRenderModelComponentName105, rchRenderModelComponentName106, rchRenderModelComponentName107, rchRenderModelComponentName108, rchRenderModelComponentName109, rchRenderModelComponentName110, rchRenderModelComponentName111, rchRenderModelComponentName112, rchRenderModelComponentName113, rchRenderModelComponentName114, rchRenderModelComponentName115, rchRenderModelComponentName116, rchRenderModelComponentName117, rchRenderModelComponentName118, rchRenderModelComponentName119, rchRenderModelComponentName120, rchRenderModelComponentName121, rchRenderModelComponentName122, rchRenderModelComponentName123, rchRenderModelComponentName124, rchRenderModelComponentName125, rchRenderModelComponentName126, rchRenderModelComponentName127;
+        public string rchRenderModelComponentName
         {
             get
             {
@@ -5573,318 +6114,947 @@ namespace Valve.VR
         }
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VRActiveActionSet_t
+    public struct InputBindingInfo_t
     {
-        internal ulong ulActionSet;
-        internal ulong ulRestrictedToDevice;
-        internal ulong ulSecondaryActionSet;
-        internal uint unPadding;
-        internal int nPriority;
+        public byte rchDevicePathName0, rchDevicePathName1, rchDevicePathName2, rchDevicePathName3, rchDevicePathName4, rchDevicePathName5, rchDevicePathName6, rchDevicePathName7, rchDevicePathName8, rchDevicePathName9, rchDevicePathName10, rchDevicePathName11, rchDevicePathName12, rchDevicePathName13, rchDevicePathName14, rchDevicePathName15, rchDevicePathName16, rchDevicePathName17, rchDevicePathName18, rchDevicePathName19, rchDevicePathName20, rchDevicePathName21, rchDevicePathName22, rchDevicePathName23, rchDevicePathName24, rchDevicePathName25, rchDevicePathName26, rchDevicePathName27, rchDevicePathName28, rchDevicePathName29, rchDevicePathName30, rchDevicePathName31, rchDevicePathName32, rchDevicePathName33, rchDevicePathName34, rchDevicePathName35, rchDevicePathName36, rchDevicePathName37, rchDevicePathName38, rchDevicePathName39, rchDevicePathName40, rchDevicePathName41, rchDevicePathName42, rchDevicePathName43, rchDevicePathName44, rchDevicePathName45, rchDevicePathName46, rchDevicePathName47, rchDevicePathName48, rchDevicePathName49, rchDevicePathName50, rchDevicePathName51, rchDevicePathName52, rchDevicePathName53, rchDevicePathName54, rchDevicePathName55, rchDevicePathName56, rchDevicePathName57, rchDevicePathName58, rchDevicePathName59, rchDevicePathName60, rchDevicePathName61, rchDevicePathName62, rchDevicePathName63, rchDevicePathName64, rchDevicePathName65, rchDevicePathName66, rchDevicePathName67, rchDevicePathName68, rchDevicePathName69, rchDevicePathName70, rchDevicePathName71, rchDevicePathName72, rchDevicePathName73, rchDevicePathName74, rchDevicePathName75, rchDevicePathName76, rchDevicePathName77, rchDevicePathName78, rchDevicePathName79, rchDevicePathName80, rchDevicePathName81, rchDevicePathName82, rchDevicePathName83, rchDevicePathName84, rchDevicePathName85, rchDevicePathName86, rchDevicePathName87, rchDevicePathName88, rchDevicePathName89, rchDevicePathName90, rchDevicePathName91, rchDevicePathName92, rchDevicePathName93, rchDevicePathName94, rchDevicePathName95, rchDevicePathName96, rchDevicePathName97, rchDevicePathName98, rchDevicePathName99, rchDevicePathName100, rchDevicePathName101, rchDevicePathName102, rchDevicePathName103, rchDevicePathName104, rchDevicePathName105, rchDevicePathName106, rchDevicePathName107, rchDevicePathName108, rchDevicePathName109, rchDevicePathName110, rchDevicePathName111, rchDevicePathName112, rchDevicePathName113, rchDevicePathName114, rchDevicePathName115, rchDevicePathName116, rchDevicePathName117, rchDevicePathName118, rchDevicePathName119, rchDevicePathName120, rchDevicePathName121, rchDevicePathName122, rchDevicePathName123, rchDevicePathName124, rchDevicePathName125, rchDevicePathName126, rchDevicePathName127;
+        public string rchDevicePathName
+        {
+            get
+            {
+                return new string(new char[] {
+                (char)rchDevicePathName0,
+                (char)rchDevicePathName1,
+                (char)rchDevicePathName2,
+                (char)rchDevicePathName3,
+                (char)rchDevicePathName4,
+                (char)rchDevicePathName5,
+                (char)rchDevicePathName6,
+                (char)rchDevicePathName7,
+                (char)rchDevicePathName8,
+                (char)rchDevicePathName9,
+                (char)rchDevicePathName10,
+                (char)rchDevicePathName11,
+                (char)rchDevicePathName12,
+                (char)rchDevicePathName13,
+                (char)rchDevicePathName14,
+                (char)rchDevicePathName15,
+                (char)rchDevicePathName16,
+                (char)rchDevicePathName17,
+                (char)rchDevicePathName18,
+                (char)rchDevicePathName19,
+                (char)rchDevicePathName20,
+                (char)rchDevicePathName21,
+                (char)rchDevicePathName22,
+                (char)rchDevicePathName23,
+                (char)rchDevicePathName24,
+                (char)rchDevicePathName25,
+                (char)rchDevicePathName26,
+                (char)rchDevicePathName27,
+                (char)rchDevicePathName28,
+                (char)rchDevicePathName29,
+                (char)rchDevicePathName30,
+                (char)rchDevicePathName31,
+                (char)rchDevicePathName32,
+                (char)rchDevicePathName33,
+                (char)rchDevicePathName34,
+                (char)rchDevicePathName35,
+                (char)rchDevicePathName36,
+                (char)rchDevicePathName37,
+                (char)rchDevicePathName38,
+                (char)rchDevicePathName39,
+                (char)rchDevicePathName40,
+                (char)rchDevicePathName41,
+                (char)rchDevicePathName42,
+                (char)rchDevicePathName43,
+                (char)rchDevicePathName44,
+                (char)rchDevicePathName45,
+                (char)rchDevicePathName46,
+                (char)rchDevicePathName47,
+                (char)rchDevicePathName48,
+                (char)rchDevicePathName49,
+                (char)rchDevicePathName50,
+                (char)rchDevicePathName51,
+                (char)rchDevicePathName52,
+                (char)rchDevicePathName53,
+                (char)rchDevicePathName54,
+                (char)rchDevicePathName55,
+                (char)rchDevicePathName56,
+                (char)rchDevicePathName57,
+                (char)rchDevicePathName58,
+                (char)rchDevicePathName59,
+                (char)rchDevicePathName60,
+                (char)rchDevicePathName61,
+                (char)rchDevicePathName62,
+                (char)rchDevicePathName63,
+                (char)rchDevicePathName64,
+                (char)rchDevicePathName65,
+                (char)rchDevicePathName66,
+                (char)rchDevicePathName67,
+                (char)rchDevicePathName68,
+                (char)rchDevicePathName69,
+                (char)rchDevicePathName70,
+                (char)rchDevicePathName71,
+                (char)rchDevicePathName72,
+                (char)rchDevicePathName73,
+                (char)rchDevicePathName74,
+                (char)rchDevicePathName75,
+                (char)rchDevicePathName76,
+                (char)rchDevicePathName77,
+                (char)rchDevicePathName78,
+                (char)rchDevicePathName79,
+                (char)rchDevicePathName80,
+                (char)rchDevicePathName81,
+                (char)rchDevicePathName82,
+                (char)rchDevicePathName83,
+                (char)rchDevicePathName84,
+                (char)rchDevicePathName85,
+                (char)rchDevicePathName86,
+                (char)rchDevicePathName87,
+                (char)rchDevicePathName88,
+                (char)rchDevicePathName89,
+                (char)rchDevicePathName90,
+                (char)rchDevicePathName91,
+                (char)rchDevicePathName92,
+                (char)rchDevicePathName93,
+                (char)rchDevicePathName94,
+                (char)rchDevicePathName95,
+                (char)rchDevicePathName96,
+                (char)rchDevicePathName97,
+                (char)rchDevicePathName98,
+                (char)rchDevicePathName99,
+                (char)rchDevicePathName100,
+                (char)rchDevicePathName101,
+                (char)rchDevicePathName102,
+                (char)rchDevicePathName103,
+                (char)rchDevicePathName104,
+                (char)rchDevicePathName105,
+                (char)rchDevicePathName106,
+                (char)rchDevicePathName107,
+                (char)rchDevicePathName108,
+                (char)rchDevicePathName109,
+                (char)rchDevicePathName110,
+                (char)rchDevicePathName111,
+                (char)rchDevicePathName112,
+                (char)rchDevicePathName113,
+                (char)rchDevicePathName114,
+                (char)rchDevicePathName115,
+                (char)rchDevicePathName116,
+                (char)rchDevicePathName117,
+                (char)rchDevicePathName118,
+                (char)rchDevicePathName119,
+                (char)rchDevicePathName120,
+                (char)rchDevicePathName121,
+                (char)rchDevicePathName122,
+                (char)rchDevicePathName123,
+                (char)rchDevicePathName124,
+                (char)rchDevicePathName125,
+                (char)rchDevicePathName126,
+                (char)rchDevicePathName127
+            }).TrimEnd('\0');
+            }
+        }
+        public byte rchInputPathName0, rchInputPathName1, rchInputPathName2, rchInputPathName3, rchInputPathName4, rchInputPathName5, rchInputPathName6, rchInputPathName7, rchInputPathName8, rchInputPathName9, rchInputPathName10, rchInputPathName11, rchInputPathName12, rchInputPathName13, rchInputPathName14, rchInputPathName15, rchInputPathName16, rchInputPathName17, rchInputPathName18, rchInputPathName19, rchInputPathName20, rchInputPathName21, rchInputPathName22, rchInputPathName23, rchInputPathName24, rchInputPathName25, rchInputPathName26, rchInputPathName27, rchInputPathName28, rchInputPathName29, rchInputPathName30, rchInputPathName31, rchInputPathName32, rchInputPathName33, rchInputPathName34, rchInputPathName35, rchInputPathName36, rchInputPathName37, rchInputPathName38, rchInputPathName39, rchInputPathName40, rchInputPathName41, rchInputPathName42, rchInputPathName43, rchInputPathName44, rchInputPathName45, rchInputPathName46, rchInputPathName47, rchInputPathName48, rchInputPathName49, rchInputPathName50, rchInputPathName51, rchInputPathName52, rchInputPathName53, rchInputPathName54, rchInputPathName55, rchInputPathName56, rchInputPathName57, rchInputPathName58, rchInputPathName59, rchInputPathName60, rchInputPathName61, rchInputPathName62, rchInputPathName63, rchInputPathName64, rchInputPathName65, rchInputPathName66, rchInputPathName67, rchInputPathName68, rchInputPathName69, rchInputPathName70, rchInputPathName71, rchInputPathName72, rchInputPathName73, rchInputPathName74, rchInputPathName75, rchInputPathName76, rchInputPathName77, rchInputPathName78, rchInputPathName79, rchInputPathName80, rchInputPathName81, rchInputPathName82, rchInputPathName83, rchInputPathName84, rchInputPathName85, rchInputPathName86, rchInputPathName87, rchInputPathName88, rchInputPathName89, rchInputPathName90, rchInputPathName91, rchInputPathName92, rchInputPathName93, rchInputPathName94, rchInputPathName95, rchInputPathName96, rchInputPathName97, rchInputPathName98, rchInputPathName99, rchInputPathName100, rchInputPathName101, rchInputPathName102, rchInputPathName103, rchInputPathName104, rchInputPathName105, rchInputPathName106, rchInputPathName107, rchInputPathName108, rchInputPathName109, rchInputPathName110, rchInputPathName111, rchInputPathName112, rchInputPathName113, rchInputPathName114, rchInputPathName115, rchInputPathName116, rchInputPathName117, rchInputPathName118, rchInputPathName119, rchInputPathName120, rchInputPathName121, rchInputPathName122, rchInputPathName123, rchInputPathName124, rchInputPathName125, rchInputPathName126, rchInputPathName127;
+        public string rchInputPathName
+        {
+            get
+            {
+                return new string(new char[] {
+                (char)rchInputPathName0,
+                (char)rchInputPathName1,
+                (char)rchInputPathName2,
+                (char)rchInputPathName3,
+                (char)rchInputPathName4,
+                (char)rchInputPathName5,
+                (char)rchInputPathName6,
+                (char)rchInputPathName7,
+                (char)rchInputPathName8,
+                (char)rchInputPathName9,
+                (char)rchInputPathName10,
+                (char)rchInputPathName11,
+                (char)rchInputPathName12,
+                (char)rchInputPathName13,
+                (char)rchInputPathName14,
+                (char)rchInputPathName15,
+                (char)rchInputPathName16,
+                (char)rchInputPathName17,
+                (char)rchInputPathName18,
+                (char)rchInputPathName19,
+                (char)rchInputPathName20,
+                (char)rchInputPathName21,
+                (char)rchInputPathName22,
+                (char)rchInputPathName23,
+                (char)rchInputPathName24,
+                (char)rchInputPathName25,
+                (char)rchInputPathName26,
+                (char)rchInputPathName27,
+                (char)rchInputPathName28,
+                (char)rchInputPathName29,
+                (char)rchInputPathName30,
+                (char)rchInputPathName31,
+                (char)rchInputPathName32,
+                (char)rchInputPathName33,
+                (char)rchInputPathName34,
+                (char)rchInputPathName35,
+                (char)rchInputPathName36,
+                (char)rchInputPathName37,
+                (char)rchInputPathName38,
+                (char)rchInputPathName39,
+                (char)rchInputPathName40,
+                (char)rchInputPathName41,
+                (char)rchInputPathName42,
+                (char)rchInputPathName43,
+                (char)rchInputPathName44,
+                (char)rchInputPathName45,
+                (char)rchInputPathName46,
+                (char)rchInputPathName47,
+                (char)rchInputPathName48,
+                (char)rchInputPathName49,
+                (char)rchInputPathName50,
+                (char)rchInputPathName51,
+                (char)rchInputPathName52,
+                (char)rchInputPathName53,
+                (char)rchInputPathName54,
+                (char)rchInputPathName55,
+                (char)rchInputPathName56,
+                (char)rchInputPathName57,
+                (char)rchInputPathName58,
+                (char)rchInputPathName59,
+                (char)rchInputPathName60,
+                (char)rchInputPathName61,
+                (char)rchInputPathName62,
+                (char)rchInputPathName63,
+                (char)rchInputPathName64,
+                (char)rchInputPathName65,
+                (char)rchInputPathName66,
+                (char)rchInputPathName67,
+                (char)rchInputPathName68,
+                (char)rchInputPathName69,
+                (char)rchInputPathName70,
+                (char)rchInputPathName71,
+                (char)rchInputPathName72,
+                (char)rchInputPathName73,
+                (char)rchInputPathName74,
+                (char)rchInputPathName75,
+                (char)rchInputPathName76,
+                (char)rchInputPathName77,
+                (char)rchInputPathName78,
+                (char)rchInputPathName79,
+                (char)rchInputPathName80,
+                (char)rchInputPathName81,
+                (char)rchInputPathName82,
+                (char)rchInputPathName83,
+                (char)rchInputPathName84,
+                (char)rchInputPathName85,
+                (char)rchInputPathName86,
+                (char)rchInputPathName87,
+                (char)rchInputPathName88,
+                (char)rchInputPathName89,
+                (char)rchInputPathName90,
+                (char)rchInputPathName91,
+                (char)rchInputPathName92,
+                (char)rchInputPathName93,
+                (char)rchInputPathName94,
+                (char)rchInputPathName95,
+                (char)rchInputPathName96,
+                (char)rchInputPathName97,
+                (char)rchInputPathName98,
+                (char)rchInputPathName99,
+                (char)rchInputPathName100,
+                (char)rchInputPathName101,
+                (char)rchInputPathName102,
+                (char)rchInputPathName103,
+                (char)rchInputPathName104,
+                (char)rchInputPathName105,
+                (char)rchInputPathName106,
+                (char)rchInputPathName107,
+                (char)rchInputPathName108,
+                (char)rchInputPathName109,
+                (char)rchInputPathName110,
+                (char)rchInputPathName111,
+                (char)rchInputPathName112,
+                (char)rchInputPathName113,
+                (char)rchInputPathName114,
+                (char)rchInputPathName115,
+                (char)rchInputPathName116,
+                (char)rchInputPathName117,
+                (char)rchInputPathName118,
+                (char)rchInputPathName119,
+                (char)rchInputPathName120,
+                (char)rchInputPathName121,
+                (char)rchInputPathName122,
+                (char)rchInputPathName123,
+                (char)rchInputPathName124,
+                (char)rchInputPathName125,
+                (char)rchInputPathName126,
+                (char)rchInputPathName127
+            }).TrimEnd('\0');
+            }
+        }
+        public byte rchModeName0, rchModeName1, rchModeName2, rchModeName3, rchModeName4, rchModeName5, rchModeName6, rchModeName7, rchModeName8, rchModeName9, rchModeName10, rchModeName11, rchModeName12, rchModeName13, rchModeName14, rchModeName15, rchModeName16, rchModeName17, rchModeName18, rchModeName19, rchModeName20, rchModeName21, rchModeName22, rchModeName23, rchModeName24, rchModeName25, rchModeName26, rchModeName27, rchModeName28, rchModeName29, rchModeName30, rchModeName31, rchModeName32, rchModeName33, rchModeName34, rchModeName35, rchModeName36, rchModeName37, rchModeName38, rchModeName39, rchModeName40, rchModeName41, rchModeName42, rchModeName43, rchModeName44, rchModeName45, rchModeName46, rchModeName47, rchModeName48, rchModeName49, rchModeName50, rchModeName51, rchModeName52, rchModeName53, rchModeName54, rchModeName55, rchModeName56, rchModeName57, rchModeName58, rchModeName59, rchModeName60, rchModeName61, rchModeName62, rchModeName63, rchModeName64, rchModeName65, rchModeName66, rchModeName67, rchModeName68, rchModeName69, rchModeName70, rchModeName71, rchModeName72, rchModeName73, rchModeName74, rchModeName75, rchModeName76, rchModeName77, rchModeName78, rchModeName79, rchModeName80, rchModeName81, rchModeName82, rchModeName83, rchModeName84, rchModeName85, rchModeName86, rchModeName87, rchModeName88, rchModeName89, rchModeName90, rchModeName91, rchModeName92, rchModeName93, rchModeName94, rchModeName95, rchModeName96, rchModeName97, rchModeName98, rchModeName99, rchModeName100, rchModeName101, rchModeName102, rchModeName103, rchModeName104, rchModeName105, rchModeName106, rchModeName107, rchModeName108, rchModeName109, rchModeName110, rchModeName111, rchModeName112, rchModeName113, rchModeName114, rchModeName115, rchModeName116, rchModeName117, rchModeName118, rchModeName119, rchModeName120, rchModeName121, rchModeName122, rchModeName123, rchModeName124, rchModeName125, rchModeName126, rchModeName127;
+        public string rchModeName
+        {
+            get
+            {
+                return new string(new char[] {
+                (char)rchModeName0,
+                (char)rchModeName1,
+                (char)rchModeName2,
+                (char)rchModeName3,
+                (char)rchModeName4,
+                (char)rchModeName5,
+                (char)rchModeName6,
+                (char)rchModeName7,
+                (char)rchModeName8,
+                (char)rchModeName9,
+                (char)rchModeName10,
+                (char)rchModeName11,
+                (char)rchModeName12,
+                (char)rchModeName13,
+                (char)rchModeName14,
+                (char)rchModeName15,
+                (char)rchModeName16,
+                (char)rchModeName17,
+                (char)rchModeName18,
+                (char)rchModeName19,
+                (char)rchModeName20,
+                (char)rchModeName21,
+                (char)rchModeName22,
+                (char)rchModeName23,
+                (char)rchModeName24,
+                (char)rchModeName25,
+                (char)rchModeName26,
+                (char)rchModeName27,
+                (char)rchModeName28,
+                (char)rchModeName29,
+                (char)rchModeName30,
+                (char)rchModeName31,
+                (char)rchModeName32,
+                (char)rchModeName33,
+                (char)rchModeName34,
+                (char)rchModeName35,
+                (char)rchModeName36,
+                (char)rchModeName37,
+                (char)rchModeName38,
+                (char)rchModeName39,
+                (char)rchModeName40,
+                (char)rchModeName41,
+                (char)rchModeName42,
+                (char)rchModeName43,
+                (char)rchModeName44,
+                (char)rchModeName45,
+                (char)rchModeName46,
+                (char)rchModeName47,
+                (char)rchModeName48,
+                (char)rchModeName49,
+                (char)rchModeName50,
+                (char)rchModeName51,
+                (char)rchModeName52,
+                (char)rchModeName53,
+                (char)rchModeName54,
+                (char)rchModeName55,
+                (char)rchModeName56,
+                (char)rchModeName57,
+                (char)rchModeName58,
+                (char)rchModeName59,
+                (char)rchModeName60,
+                (char)rchModeName61,
+                (char)rchModeName62,
+                (char)rchModeName63,
+                (char)rchModeName64,
+                (char)rchModeName65,
+                (char)rchModeName66,
+                (char)rchModeName67,
+                (char)rchModeName68,
+                (char)rchModeName69,
+                (char)rchModeName70,
+                (char)rchModeName71,
+                (char)rchModeName72,
+                (char)rchModeName73,
+                (char)rchModeName74,
+                (char)rchModeName75,
+                (char)rchModeName76,
+                (char)rchModeName77,
+                (char)rchModeName78,
+                (char)rchModeName79,
+                (char)rchModeName80,
+                (char)rchModeName81,
+                (char)rchModeName82,
+                (char)rchModeName83,
+                (char)rchModeName84,
+                (char)rchModeName85,
+                (char)rchModeName86,
+                (char)rchModeName87,
+                (char)rchModeName88,
+                (char)rchModeName89,
+                (char)rchModeName90,
+                (char)rchModeName91,
+                (char)rchModeName92,
+                (char)rchModeName93,
+                (char)rchModeName94,
+                (char)rchModeName95,
+                (char)rchModeName96,
+                (char)rchModeName97,
+                (char)rchModeName98,
+                (char)rchModeName99,
+                (char)rchModeName100,
+                (char)rchModeName101,
+                (char)rchModeName102,
+                (char)rchModeName103,
+                (char)rchModeName104,
+                (char)rchModeName105,
+                (char)rchModeName106,
+                (char)rchModeName107,
+                (char)rchModeName108,
+                (char)rchModeName109,
+                (char)rchModeName110,
+                (char)rchModeName111,
+                (char)rchModeName112,
+                (char)rchModeName113,
+                (char)rchModeName114,
+                (char)rchModeName115,
+                (char)rchModeName116,
+                (char)rchModeName117,
+                (char)rchModeName118,
+                (char)rchModeName119,
+                (char)rchModeName120,
+                (char)rchModeName121,
+                (char)rchModeName122,
+                (char)rchModeName123,
+                (char)rchModeName124,
+                (char)rchModeName125,
+                (char)rchModeName126,
+                (char)rchModeName127
+            }).TrimEnd('\0');
+            }
+        }
+        public byte rchSlotName0, rchSlotName1, rchSlotName2, rchSlotName3, rchSlotName4, rchSlotName5, rchSlotName6, rchSlotName7, rchSlotName8, rchSlotName9, rchSlotName10, rchSlotName11, rchSlotName12, rchSlotName13, rchSlotName14, rchSlotName15, rchSlotName16, rchSlotName17, rchSlotName18, rchSlotName19, rchSlotName20, rchSlotName21, rchSlotName22, rchSlotName23, rchSlotName24, rchSlotName25, rchSlotName26, rchSlotName27, rchSlotName28, rchSlotName29, rchSlotName30, rchSlotName31, rchSlotName32, rchSlotName33, rchSlotName34, rchSlotName35, rchSlotName36, rchSlotName37, rchSlotName38, rchSlotName39, rchSlotName40, rchSlotName41, rchSlotName42, rchSlotName43, rchSlotName44, rchSlotName45, rchSlotName46, rchSlotName47, rchSlotName48, rchSlotName49, rchSlotName50, rchSlotName51, rchSlotName52, rchSlotName53, rchSlotName54, rchSlotName55, rchSlotName56, rchSlotName57, rchSlotName58, rchSlotName59, rchSlotName60, rchSlotName61, rchSlotName62, rchSlotName63, rchSlotName64, rchSlotName65, rchSlotName66, rchSlotName67, rchSlotName68, rchSlotName69, rchSlotName70, rchSlotName71, rchSlotName72, rchSlotName73, rchSlotName74, rchSlotName75, rchSlotName76, rchSlotName77, rchSlotName78, rchSlotName79, rchSlotName80, rchSlotName81, rchSlotName82, rchSlotName83, rchSlotName84, rchSlotName85, rchSlotName86, rchSlotName87, rchSlotName88, rchSlotName89, rchSlotName90, rchSlotName91, rchSlotName92, rchSlotName93, rchSlotName94, rchSlotName95, rchSlotName96, rchSlotName97, rchSlotName98, rchSlotName99, rchSlotName100, rchSlotName101, rchSlotName102, rchSlotName103, rchSlotName104, rchSlotName105, rchSlotName106, rchSlotName107, rchSlotName108, rchSlotName109, rchSlotName110, rchSlotName111, rchSlotName112, rchSlotName113, rchSlotName114, rchSlotName115, rchSlotName116, rchSlotName117, rchSlotName118, rchSlotName119, rchSlotName120, rchSlotName121, rchSlotName122, rchSlotName123, rchSlotName124, rchSlotName125, rchSlotName126, rchSlotName127;
+        public string rchSlotName
+        {
+            get
+            {
+                return new string(new char[] {
+                (char)rchSlotName0,
+                (char)rchSlotName1,
+                (char)rchSlotName2,
+                (char)rchSlotName3,
+                (char)rchSlotName4,
+                (char)rchSlotName5,
+                (char)rchSlotName6,
+                (char)rchSlotName7,
+                (char)rchSlotName8,
+                (char)rchSlotName9,
+                (char)rchSlotName10,
+                (char)rchSlotName11,
+                (char)rchSlotName12,
+                (char)rchSlotName13,
+                (char)rchSlotName14,
+                (char)rchSlotName15,
+                (char)rchSlotName16,
+                (char)rchSlotName17,
+                (char)rchSlotName18,
+                (char)rchSlotName19,
+                (char)rchSlotName20,
+                (char)rchSlotName21,
+                (char)rchSlotName22,
+                (char)rchSlotName23,
+                (char)rchSlotName24,
+                (char)rchSlotName25,
+                (char)rchSlotName26,
+                (char)rchSlotName27,
+                (char)rchSlotName28,
+                (char)rchSlotName29,
+                (char)rchSlotName30,
+                (char)rchSlotName31,
+                (char)rchSlotName32,
+                (char)rchSlotName33,
+                (char)rchSlotName34,
+                (char)rchSlotName35,
+                (char)rchSlotName36,
+                (char)rchSlotName37,
+                (char)rchSlotName38,
+                (char)rchSlotName39,
+                (char)rchSlotName40,
+                (char)rchSlotName41,
+                (char)rchSlotName42,
+                (char)rchSlotName43,
+                (char)rchSlotName44,
+                (char)rchSlotName45,
+                (char)rchSlotName46,
+                (char)rchSlotName47,
+                (char)rchSlotName48,
+                (char)rchSlotName49,
+                (char)rchSlotName50,
+                (char)rchSlotName51,
+                (char)rchSlotName52,
+                (char)rchSlotName53,
+                (char)rchSlotName54,
+                (char)rchSlotName55,
+                (char)rchSlotName56,
+                (char)rchSlotName57,
+                (char)rchSlotName58,
+                (char)rchSlotName59,
+                (char)rchSlotName60,
+                (char)rchSlotName61,
+                (char)rchSlotName62,
+                (char)rchSlotName63,
+                (char)rchSlotName64,
+                (char)rchSlotName65,
+                (char)rchSlotName66,
+                (char)rchSlotName67,
+                (char)rchSlotName68,
+                (char)rchSlotName69,
+                (char)rchSlotName70,
+                (char)rchSlotName71,
+                (char)rchSlotName72,
+                (char)rchSlotName73,
+                (char)rchSlotName74,
+                (char)rchSlotName75,
+                (char)rchSlotName76,
+                (char)rchSlotName77,
+                (char)rchSlotName78,
+                (char)rchSlotName79,
+                (char)rchSlotName80,
+                (char)rchSlotName81,
+                (char)rchSlotName82,
+                (char)rchSlotName83,
+                (char)rchSlotName84,
+                (char)rchSlotName85,
+                (char)rchSlotName86,
+                (char)rchSlotName87,
+                (char)rchSlotName88,
+                (char)rchSlotName89,
+                (char)rchSlotName90,
+                (char)rchSlotName91,
+                (char)rchSlotName92,
+                (char)rchSlotName93,
+                (char)rchSlotName94,
+                (char)rchSlotName95,
+                (char)rchSlotName96,
+                (char)rchSlotName97,
+                (char)rchSlotName98,
+                (char)rchSlotName99,
+                (char)rchSlotName100,
+                (char)rchSlotName101,
+                (char)rchSlotName102,
+                (char)rchSlotName103,
+                (char)rchSlotName104,
+                (char)rchSlotName105,
+                (char)rchSlotName106,
+                (char)rchSlotName107,
+                (char)rchSlotName108,
+                (char)rchSlotName109,
+                (char)rchSlotName110,
+                (char)rchSlotName111,
+                (char)rchSlotName112,
+                (char)rchSlotName113,
+                (char)rchSlotName114,
+                (char)rchSlotName115,
+                (char)rchSlotName116,
+                (char)rchSlotName117,
+                (char)rchSlotName118,
+                (char)rchSlotName119,
+                (char)rchSlotName120,
+                (char)rchSlotName121,
+                (char)rchSlotName122,
+                (char)rchSlotName123,
+                (char)rchSlotName124,
+                (char)rchSlotName125,
+                (char)rchSlotName126,
+                (char)rchSlotName127
+            }).TrimEnd('\0');
+            }
+        }
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct SpatialAnchorPose_t
+    public struct VRActiveActionSet_t
     {
-        internal HmdMatrix34_t mAnchorToAbsoluteTracking;
+        public ulong ulActionSet;
+        public ulong ulRestrictedToDevice;
+        public ulong ulSecondaryActionSet;
+        public uint unPadding;
+        public int nPriority;
     }
     [StructLayout(LayoutKind.Sequential)]
-    internal struct COpenVRContext
+    public struct VRSkeletalSummaryData_t
     {
-        internal IntPtr m_pVRSystem; // class vr::IVRSystem *
-        internal IntPtr m_pVRChaperone; // class vr::IVRChaperone *
-        internal IntPtr m_pVRChaperoneSetup; // class vr::IVRChaperoneSetup *
-        internal IntPtr m_pVRCompositor; // class vr::IVRCompositor *
-        internal IntPtr m_pVROverlay; // class vr::IVROverlay *
-        internal IntPtr m_pVRResources; // class vr::IVRResources *
-        internal IntPtr m_pVRRenderModels; // class vr::IVRRenderModels *
-        internal IntPtr m_pVRExtendedDisplay; // class vr::IVRExtendedDisplay *
-        internal IntPtr m_pVRSettings; // class vr::IVRSettings *
-        internal IntPtr m_pVRApplications; // class vr::IVRApplications *
-        internal IntPtr m_pVRTrackedCamera; // class vr::IVRTrackedCamera *
-        internal IntPtr m_pVRScreenshots; // class vr::IVRScreenshots *
-        internal IntPtr m_pVRDriverManager; // class vr::IVRDriverManager *
-        internal IntPtr m_pVRInput; // class vr::IVRInput *
-        internal IntPtr m_pVRIOBuffer; // class vr::IVRIOBuffer *
-        internal IntPtr m_pVRSpatialAnchors; // class vr::IVRSpatialAnchors *
+        public float flFingerCurl0; //float[5]
+        public float flFingerCurl1;
+        public float flFingerCurl2;
+        public float flFingerCurl3;
+        public float flFingerCurl4;
+        public float flFingerSplay0; //float[4]
+        public float flFingerSplay1;
+        public float flFingerSplay2;
+        public float flFingerSplay3;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct SpatialAnchorPose_t
+    {
+        public HmdMatrix34_t mAnchorToAbsoluteTracking;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct COpenVRContext
+    {
+        public IntPtr m_pVRSystem; // class vr::IVRSystem *
+        public IntPtr m_pVRChaperone; // class vr::IVRChaperone *
+        public IntPtr m_pVRChaperoneSetup; // class vr::IVRChaperoneSetup *
+        public IntPtr m_pVRCompositor; // class vr::IVRCompositor *
+        public IntPtr m_pVROverlay; // class vr::IVROverlay *
+        public IntPtr m_pVRResources; // class vr::IVRResources *
+        public IntPtr m_pVRRenderModels; // class vr::IVRRenderModels *
+        public IntPtr m_pVRExtendedDisplay; // class vr::IVRExtendedDisplay *
+        public IntPtr m_pVRSettings; // class vr::IVRSettings *
+        public IntPtr m_pVRApplications; // class vr::IVRApplications *
+        public IntPtr m_pVRTrackedCamera; // class vr::IVRTrackedCamera *
+        public IntPtr m_pVRScreenshots; // class vr::IVRScreenshots *
+        public IntPtr m_pVRDriverManager; // class vr::IVRDriverManager *
+        public IntPtr m_pVRInput; // class vr::IVRInput *
+        public IntPtr m_pVRIOBuffer; // class vr::IVRIOBuffer *
+        public IntPtr m_pVRSpatialAnchors; // class vr::IVRSpatialAnchors *
+        public IntPtr m_pVRDebug; // class vr::IVRDebug *
+        public IntPtr m_pVRNotifications; // class vr::IVRNotifications *
     }
 
-    internal class OpenVR
+    public class OpenVR
     {
 
-        internal static uint InitInternal(ref EVRInitError peError, EVRApplicationType eApplicationType)
+        public static uint InitInternal(ref EVRInitError peError, EVRApplicationType eApplicationType)
         {
             return OpenVRInterop.InitInternal(ref peError, eApplicationType);
         }
 
-        internal static uint InitInternal2(ref EVRInitError peError, EVRApplicationType eApplicationType, string pchStartupInfo)
+        public static uint InitInternal2(ref EVRInitError peError, EVRApplicationType eApplicationType, string pchStartupInfo)
         {
             return OpenVRInterop.InitInternal2(ref peError, eApplicationType, pchStartupInfo);
         }
 
-        internal static void ShutdownInternal()
+        public static void ShutdownInternal()
         {
             OpenVRInterop.ShutdownInternal();
         }
 
-        internal static bool IsHmdPresent()
+        public static bool IsHmdPresent()
         {
             return OpenVRInterop.IsHmdPresent();
         }
 
-        internal static bool IsRuntimeInstalled()
+        public static bool IsRuntimeInstalled()
         {
             return OpenVRInterop.IsRuntimeInstalled();
         }
 
-        internal static string RuntimePath()
+        public static string RuntimePath()
         {
-            return OpenVRInterop.RuntimePath();
+            try
+            {
+                uint pathSize = 512;
+                uint requiredPathSize = 512;
+                System.Text.StringBuilder path = new System.Text.StringBuilder((int)pathSize);
+                bool success = OpenVRInterop.GetRuntimePath(path, pathSize, ref requiredPathSize);
+                if (success == false)
+                {
+                    return null;
+                }
+
+                return path.ToString();
+            }
+            catch
+            {
+                return OpenVRInterop.RuntimePath(); //this api is deprecated but here to support older unity versions
+            }
         }
 
-        internal static string GetStringForHmdError(EVRInitError error)
+        public static string GetStringForHmdError(EVRInitError error)
         {
             return Marshal.PtrToStringAnsi(OpenVRInterop.GetStringForHmdError(error));
         }
 
-        internal static IntPtr GetGenericInterface(string pchInterfaceVersion, ref EVRInitError peError)
+        public static IntPtr GetGenericInterface(string pchInterfaceVersion, ref EVRInitError peError)
         {
             return OpenVRInterop.GetGenericInterface(pchInterfaceVersion, ref peError);
         }
 
-        internal static bool IsInterfaceVersionValid(string pchInterfaceVersion)
+        public static bool IsInterfaceVersionValid(string pchInterfaceVersion)
         {
             return OpenVRInterop.IsInterfaceVersionValid(pchInterfaceVersion);
         }
 
-        internal static uint GetInitToken()
+        public static uint GetInitToken()
         {
             return OpenVRInterop.GetInitToken();
         }
 
-        internal const uint k_nDriverNone = 4294967295;
-        internal const uint k_unMaxDriverDebugResponseSize = 32768;
-        internal const uint k_unTrackedDeviceIndex_Hmd = 0;
-        internal const uint k_unMaxTrackedDeviceCount = 64;
-        internal const uint k_unTrackedDeviceIndexOther = 4294967294;
-        internal const uint k_unTrackedDeviceIndexInvalid = 4294967295;
-        internal const ulong k_ulInvalidPropertyContainer = 0;
-        internal const uint k_unInvalidPropertyTag = 0;
-        internal const ulong k_ulInvalidDriverHandle = 0;
-        internal const uint k_unFloatPropertyTag = 1;
-        internal const uint k_unInt32PropertyTag = 2;
-        internal const uint k_unUint64PropertyTag = 3;
-        internal const uint k_unBoolPropertyTag = 4;
-        internal const uint k_unStringPropertyTag = 5;
-        internal const uint k_unHmdMatrix34PropertyTag = 20;
-        internal const uint k_unHmdMatrix44PropertyTag = 21;
-        internal const uint k_unHmdVector3PropertyTag = 22;
-        internal const uint k_unHmdVector4PropertyTag = 23;
-        internal const uint k_unHiddenAreaPropertyTag = 30;
-        internal const uint k_unPathHandleInfoTag = 31;
-        internal const uint k_unActionPropertyTag = 32;
-        internal const uint k_unInputValuePropertyTag = 33;
-        internal const uint k_unWildcardPropertyTag = 34;
-        internal const uint k_unHapticVibrationPropertyTag = 35;
-        internal const uint k_unSkeletonPropertyTag = 36;
-        internal const uint k_unSpatialAnchorPosePropertyTag = 40;
-        internal const uint k_unJsonPropertyTag = 41;
-        internal const uint k_unOpenVRInternalReserved_Start = 1000;
-        internal const uint k_unOpenVRInternalReserved_End = 10000;
-        internal const uint k_unMaxPropertyStringSize = 32768;
-        internal const ulong k_ulInvalidActionHandle = 0;
-        internal const ulong k_ulInvalidActionSetHandle = 0;
-        internal const ulong k_ulInvalidInputValueHandle = 0;
-        internal const uint k_unControllerStateAxisCount = 5;
-        internal const ulong k_ulOverlayHandleInvalid = 0;
-        internal const uint k_unScreenshotHandleInvalid = 0;
-        internal const string IVRSystem_Version = "IVRSystem_019";
-        internal const string IVRExtendedDisplay_Version = "IVRExtendedDisplay_001";
-        internal const string IVRTrackedCamera_Version = "IVRTrackedCamera_004";
-        internal const uint k_unMaxApplicationKeyLength = 128;
-        internal const string k_pch_MimeType_HomeApp = "vr/home";
-        internal const string k_pch_MimeType_GameTheater = "vr/game_theater";
-        internal const string IVRApplications_Version = "IVRApplications_006";
-        internal const string IVRChaperone_Version = "IVRChaperone_003";
-        internal const string IVRChaperoneSetup_Version = "IVRChaperoneSetup_005";
-        internal const string IVRCompositor_Version = "IVRCompositor_022";
-        internal const uint k_unVROverlayMaxKeyLength = 128;
-        internal const uint k_unVROverlayMaxNameLength = 128;
-        internal const uint k_unMaxOverlayCount = 64;
-        internal const uint k_unMaxOverlayIntersectionMaskPrimitivesCount = 32;
-        internal const string IVROverlay_Version = "IVROverlay_018";
-        internal const string k_pch_Controller_Component_GDC2015 = "gdc2015";
-        internal const string k_pch_Controller_Component_Base = "base";
-        internal const string k_pch_Controller_Component_Tip = "tip";
-        internal const string k_pch_Controller_Component_HandGrip = "handgrip";
-        internal const string k_pch_Controller_Component_Status = "status";
-        internal const string IVRRenderModels_Version = "IVRRenderModels_006";
-        internal const uint k_unNotificationTextMaxSize = 256;
-        internal const string IVRNotifications_Version = "IVRNotifications_002";
-        internal const uint k_unMaxSettingsKeyLength = 128;
-        internal const string IVRSettings_Version = "IVRSettings_002";
-        internal const string k_pch_SteamVR_Section = "steamvr";
-        internal const string k_pch_SteamVR_RequireHmd_String = "requireHmd";
-        internal const string k_pch_SteamVR_ForcedDriverKey_String = "forcedDriver";
-        internal const string k_pch_SteamVR_ForcedHmdKey_String = "forcedHmd";
-        internal const string k_pch_SteamVR_DisplayDebug_Bool = "displayDebug";
-        internal const string k_pch_SteamVR_DebugProcessPipe_String = "debugProcessPipe";
-        internal const string k_pch_SteamVR_DisplayDebugX_Int32 = "displayDebugX";
-        internal const string k_pch_SteamVR_DisplayDebugY_Int32 = "displayDebugY";
-        internal const string k_pch_SteamVR_SendSystemButtonToAllApps_Bool = "sendSystemButtonToAllApps";
-        internal const string k_pch_SteamVR_LogLevel_Int32 = "loglevel";
-        internal const string k_pch_SteamVR_IPD_Float = "ipd";
-        internal const string k_pch_SteamVR_Background_String = "background";
-        internal const string k_pch_SteamVR_BackgroundUseDomeProjection_Bool = "backgroundUseDomeProjection";
-        internal const string k_pch_SteamVR_BackgroundCameraHeight_Float = "backgroundCameraHeight";
-        internal const string k_pch_SteamVR_BackgroundDomeRadius_Float = "backgroundDomeRadius";
-        internal const string k_pch_SteamVR_GridColor_String = "gridColor";
-        internal const string k_pch_SteamVR_PlayAreaColor_String = "playAreaColor";
-        internal const string k_pch_SteamVR_ShowStage_Bool = "showStage";
-        internal const string k_pch_SteamVR_ActivateMultipleDrivers_Bool = "activateMultipleDrivers";
-        internal const string k_pch_SteamVR_DirectMode_Bool = "directMode";
-        internal const string k_pch_SteamVR_DirectModeEdidVid_Int32 = "directModeEdidVid";
-        internal const string k_pch_SteamVR_DirectModeEdidPid_Int32 = "directModeEdidPid";
-        internal const string k_pch_SteamVR_UsingSpeakers_Bool = "usingSpeakers";
-        internal const string k_pch_SteamVR_SpeakersForwardYawOffsetDegrees_Float = "speakersForwardYawOffsetDegrees";
-        internal const string k_pch_SteamVR_BaseStationPowerManagement_Bool = "basestationPowerManagement";
-        internal const string k_pch_SteamVR_NeverKillProcesses_Bool = "neverKillProcesses";
-        internal const string k_pch_SteamVR_SupersampleScale_Float = "supersampleScale";
-        internal const string k_pch_SteamVR_MaxRecommendedResolution_Int32 = "maxRecommendedResolution";
-        internal const string k_pch_SteamVR_AllowAsyncReprojection_Bool = "allowAsyncReprojection";
-        internal const string k_pch_SteamVR_AllowReprojection_Bool = "allowInterleavedReprojection";
-        internal const string k_pch_SteamVR_ForceReprojection_Bool = "forceReprojection";
-        internal const string k_pch_SteamVR_ForceFadeOnBadTracking_Bool = "forceFadeOnBadTracking";
-        internal const string k_pch_SteamVR_DefaultMirrorView_Int32 = "mirrorView";
-        internal const string k_pch_SteamVR_ShowMirrorView_Bool = "showMirrorView";
-        internal const string k_pch_SteamVR_MirrorViewGeometry_String = "mirrorViewGeometry";
-        internal const string k_pch_SteamVR_MirrorViewGeometryMaximized_String = "mirrorViewGeometryMaximized";
-        internal const string k_pch_SteamVR_StartMonitorFromAppLaunch = "startMonitorFromAppLaunch";
-        internal const string k_pch_SteamVR_StartCompositorFromAppLaunch_Bool = "startCompositorFromAppLaunch";
-        internal const string k_pch_SteamVR_StartDashboardFromAppLaunch_Bool = "startDashboardFromAppLaunch";
-        internal const string k_pch_SteamVR_StartOverlayAppsFromDashboard_Bool = "startOverlayAppsFromDashboard";
-        internal const string k_pch_SteamVR_EnableHomeApp = "enableHomeApp";
-        internal const string k_pch_SteamVR_CycleBackgroundImageTimeSec_Int32 = "CycleBackgroundImageTimeSec";
-        internal const string k_pch_SteamVR_RetailDemo_Bool = "retailDemo";
-        internal const string k_pch_SteamVR_IpdOffset_Float = "ipdOffset";
-        internal const string k_pch_SteamVR_AllowSupersampleFiltering_Bool = "allowSupersampleFiltering";
-        internal const string k_pch_SteamVR_SupersampleManualOverride_Bool = "supersampleManualOverride";
-        internal const string k_pch_SteamVR_EnableLinuxVulkanAsync_Bool = "enableLinuxVulkanAsync";
-        internal const string k_pch_SteamVR_AllowDisplayLockedMode_Bool = "allowDisplayLockedMode";
-        internal const string k_pch_SteamVR_HaveStartedTutorialForNativeChaperoneDriver_Bool = "haveStartedTutorialForNativeChaperoneDriver";
-        internal const string k_pch_SteamVR_ForceWindows32bitVRMonitor = "forceWindows32BitVRMonitor";
-        internal const string k_pch_SteamVR_DebugInput = "debugInput";
-        internal const string k_pch_SteamVR_LegacyInputRebinding = "legacyInputRebinding";
-        internal const string k_pch_SteamVR_DebugInputBinding = "debugInputBinding";
-        internal const string k_pch_SteamVR_InputBindingUIBlock = "inputBindingUI";
-        internal const string k_pch_SteamVR_RenderCameraMode = "renderCameraMode";
-        internal const string k_pch_Lighthouse_Section = "driver_lighthouse";
-        internal const string k_pch_Lighthouse_DisableIMU_Bool = "disableimu";
-        internal const string k_pch_Lighthouse_DisableIMUExceptHMD_Bool = "disableimuexcepthmd";
-        internal const string k_pch_Lighthouse_UseDisambiguation_String = "usedisambiguation";
-        internal const string k_pch_Lighthouse_DisambiguationDebug_Int32 = "disambiguationdebug";
-        internal const string k_pch_Lighthouse_PrimaryBasestation_Int32 = "primarybasestation";
-        internal const string k_pch_Lighthouse_DBHistory_Bool = "dbhistory";
-        internal const string k_pch_Lighthouse_EnableBluetooth_Bool = "enableBluetooth";
-        internal const string k_pch_Lighthouse_PowerManagedBaseStations_String = "PowerManagedBaseStations";
-        internal const string k_pch_Lighthouse_EnableImuFallback_Bool = "enableImuFallback";
-        internal const string k_pch_Null_Section = "driver_null";
-        internal const string k_pch_Null_SerialNumber_String = "serialNumber";
-        internal const string k_pch_Null_ModelNumber_String = "modelNumber";
-        internal const string k_pch_Null_WindowX_Int32 = "windowX";
-        internal const string k_pch_Null_WindowY_Int32 = "windowY";
-        internal const string k_pch_Null_WindowWidth_Int32 = "windowWidth";
-        internal const string k_pch_Null_WindowHeight_Int32 = "windowHeight";
-        internal const string k_pch_Null_RenderWidth_Int32 = "renderWidth";
-        internal const string k_pch_Null_RenderHeight_Int32 = "renderHeight";
-        internal const string k_pch_Null_SecondsFromVsyncToPhotons_Float = "secondsFromVsyncToPhotons";
-        internal const string k_pch_Null_DisplayFrequency_Float = "displayFrequency";
-        internal const string k_pch_UserInterface_Section = "userinterface";
-        internal const string k_pch_UserInterface_StatusAlwaysOnTop_Bool = "StatusAlwaysOnTop";
-        internal const string k_pch_UserInterface_MinimizeToTray_Bool = "MinimizeToTray";
-        internal const string k_pch_UserInterface_HidePopupsWhenStatusMinimized_Bool = "HidePopupsWhenStatusMinimized";
-        internal const string k_pch_UserInterface_Screenshots_Bool = "screenshots";
-        internal const string k_pch_UserInterface_ScreenshotType_Int = "screenshotType";
-        internal const string k_pch_Notifications_Section = "notifications";
-        internal const string k_pch_Notifications_DoNotDisturb_Bool = "DoNotDisturb";
-        internal const string k_pch_Keyboard_Section = "keyboard";
-        internal const string k_pch_Keyboard_TutorialCompletions = "TutorialCompletions";
-        internal const string k_pch_Keyboard_ScaleX = "ScaleX";
-        internal const string k_pch_Keyboard_ScaleY = "ScaleY";
-        internal const string k_pch_Keyboard_OffsetLeftX = "OffsetLeftX";
-        internal const string k_pch_Keyboard_OffsetRightX = "OffsetRightX";
-        internal const string k_pch_Keyboard_OffsetY = "OffsetY";
-        internal const string k_pch_Keyboard_Smoothing = "Smoothing";
-        internal const string k_pch_Perf_Section = "perfcheck";
-        internal const string k_pch_Perf_PerfGraphInHMD_Bool = "perfGraphInHMD";
-        internal const string k_pch_Perf_AllowTimingStore_Bool = "allowTimingStore";
-        internal const string k_pch_Perf_SaveTimingsOnExit_Bool = "saveTimingsOnExit";
-        internal const string k_pch_Perf_TestData_Float = "perfTestData";
-        internal const string k_pch_Perf_LinuxGPUProfiling_Bool = "linuxGPUProfiling";
-        internal const string k_pch_CollisionBounds_Section = "collisionBounds";
-        internal const string k_pch_CollisionBounds_Style_Int32 = "CollisionBoundsStyle";
-        internal const string k_pch_CollisionBounds_GroundPerimeterOn_Bool = "CollisionBoundsGroundPerimeterOn";
-        internal const string k_pch_CollisionBounds_CenterMarkerOn_Bool = "CollisionBoundsCenterMarkerOn";
-        internal const string k_pch_CollisionBounds_PlaySpaceOn_Bool = "CollisionBoundsPlaySpaceOn";
-        internal const string k_pch_CollisionBounds_FadeDistance_Float = "CollisionBoundsFadeDistance";
-        internal const string k_pch_CollisionBounds_ColorGammaR_Int32 = "CollisionBoundsColorGammaR";
-        internal const string k_pch_CollisionBounds_ColorGammaG_Int32 = "CollisionBoundsColorGammaG";
-        internal const string k_pch_CollisionBounds_ColorGammaB_Int32 = "CollisionBoundsColorGammaB";
-        internal const string k_pch_CollisionBounds_ColorGammaA_Int32 = "CollisionBoundsColorGammaA";
-        internal const string k_pch_Camera_Section = "camera";
-        internal const string k_pch_Camera_EnableCamera_Bool = "enableCamera";
-        internal const string k_pch_Camera_EnableCameraInDashboard_Bool = "enableCameraInDashboard";
-        internal const string k_pch_Camera_EnableCameraForCollisionBounds_Bool = "enableCameraForCollisionBounds";
-        internal const string k_pch_Camera_EnableCameraForRoomView_Bool = "enableCameraForRoomView";
-        internal const string k_pch_Camera_BoundsColorGammaR_Int32 = "cameraBoundsColorGammaR";
-        internal const string k_pch_Camera_BoundsColorGammaG_Int32 = "cameraBoundsColorGammaG";
-        internal const string k_pch_Camera_BoundsColorGammaB_Int32 = "cameraBoundsColorGammaB";
-        internal const string k_pch_Camera_BoundsColorGammaA_Int32 = "cameraBoundsColorGammaA";
-        internal const string k_pch_Camera_BoundsStrength_Int32 = "cameraBoundsStrength";
-        internal const string k_pch_Camera_RoomViewMode_Int32 = "cameraRoomViewMode";
-        internal const string k_pch_audio_Section = "audio";
-        internal const string k_pch_audio_OnPlaybackDevice_String = "onPlaybackDevice";
-        internal const string k_pch_audio_OnRecordDevice_String = "onRecordDevice";
-        internal const string k_pch_audio_OnPlaybackMirrorDevice_String = "onPlaybackMirrorDevice";
-        internal const string k_pch_audio_OffPlaybackDevice_String = "offPlaybackDevice";
-        internal const string k_pch_audio_OffRecordDevice_String = "offRecordDevice";
-        internal const string k_pch_audio_VIVEHDMIGain = "viveHDMIGain";
-        internal const string k_pch_Power_Section = "power";
-        internal const string k_pch_Power_PowerOffOnExit_Bool = "powerOffOnExit";
-        internal const string k_pch_Power_TurnOffScreensTimeout_Float = "turnOffScreensTimeout";
-        internal const string k_pch_Power_TurnOffControllersTimeout_Float = "turnOffControllersTimeout";
-        internal const string k_pch_Power_ReturnToWatchdogTimeout_Float = "returnToWatchdogTimeout";
-        internal const string k_pch_Power_AutoLaunchSteamVROnButtonPress = "autoLaunchSteamVROnButtonPress";
-        internal const string k_pch_Power_PauseCompositorOnStandby_Bool = "pauseCompositorOnStandby";
-        internal const string k_pch_Dashboard_Section = "dashboard";
-        internal const string k_pch_Dashboard_EnableDashboard_Bool = "enableDashboard";
-        internal const string k_pch_Dashboard_ArcadeMode_Bool = "arcadeMode";
-        internal const string k_pch_Dashboard_EnableWebUI = "webUI";
-        internal const string k_pch_Dashboard_EnableWebUIDevTools = "webUIDevTools";
-        internal const string k_pch_Dashboard_EnableWebUIDashboardReplacement = "webUIDashboard";
-        internal const string k_pch_modelskin_Section = "modelskins";
-        internal const string k_pch_Driver_Enable_Bool = "enable";
-        internal const string k_pch_WebInterface_Section = "WebInterface";
-        internal const string k_pch_WebInterface_WebEnable_Bool = "WebEnable";
-        internal const string k_pch_WebInterface_WebPort_String = "WebPort";
-        internal const string k_pch_VRWebHelper_Section = "VRWebHelper";
-        internal const string k_pch_VRWebHelper_DebuggerEnabled_Bool = "DebuggerEnabled";
-        internal const string k_pch_VRWebHelper_DebuggerPort_Int32 = "DebuggerPort";
-        internal const string k_pch_TrackingOverride_Section = "TrackingOverrides";
-        internal const string k_pch_App_BindingAutosaveURLSuffix_String = "AutosaveURL";
-        internal const string k_pch_App_BindingCurrentURLSuffix_String = "CurrentURL";
-        internal const string k_pch_App_NeedToUpdateAutosaveSuffix_Bool = "NeedToUpdateAutosave";
-        internal const string k_pch_App_ActionManifestURL_String = "ActionManifestURL";
-        internal const string k_pch_Trackers_Section = "trackers";
-        internal const string IVRScreenshots_Version = "IVRScreenshots_001";
-        internal const string IVRResources_Version = "IVRResources_001";
-        internal const string IVRDriverManager_Version = "IVRDriverManager_001";
-        internal const uint k_unMaxActionNameLength = 64;
-        internal const uint k_unMaxActionSetNameLength = 64;
-        internal const uint k_unMaxActionOriginCount = 16;
-        internal const string IVRInput_Version = "IVRInput_004";
-        internal const ulong k_ulInvalidIOBufferHandle = 0;
-        internal const string IVRIOBuffer_Version = "IVRIOBuffer_001";
-        internal const uint k_ulInvalidSpatialAnchorHandle = 0;
-        internal const string IVRSpatialAnchors_Version = "IVRSpatialAnchors_001";
+        public const uint k_nDriverNone = 4294967295;
+        public const uint k_unMaxDriverDebugResponseSize = 32768;
+        public const uint k_unTrackedDeviceIndex_Hmd = 0;
+        public const uint k_unMaxTrackedDeviceCount = 64;
+        public const uint k_unTrackedDeviceIndexOther = 4294967294;
+        public const uint k_unTrackedDeviceIndexInvalid = 4294967295;
+        public const ulong k_ulInvalidPropertyContainer = 0;
+        public const uint k_unInvalidPropertyTag = 0;
+        public const ulong k_ulInvalidDriverHandle = 0;
+        public const uint k_unFloatPropertyTag = 1;
+        public const uint k_unInt32PropertyTag = 2;
+        public const uint k_unUint64PropertyTag = 3;
+        public const uint k_unBoolPropertyTag = 4;
+        public const uint k_unStringPropertyTag = 5;
+        public const uint k_unErrorPropertyTag = 6;
+        public const uint k_unHmdMatrix34PropertyTag = 20;
+        public const uint k_unHmdMatrix44PropertyTag = 21;
+        public const uint k_unHmdVector3PropertyTag = 22;
+        public const uint k_unHmdVector4PropertyTag = 23;
+        public const uint k_unHmdVector2PropertyTag = 24;
+        public const uint k_unHmdQuadPropertyTag = 25;
+        public const uint k_unHiddenAreaPropertyTag = 30;
+        public const uint k_unPathHandleInfoTag = 31;
+        public const uint k_unActionPropertyTag = 32;
+        public const uint k_unInputValuePropertyTag = 33;
+        public const uint k_unWildcardPropertyTag = 34;
+        public const uint k_unHapticVibrationPropertyTag = 35;
+        public const uint k_unSkeletonPropertyTag = 36;
+        public const uint k_unSpatialAnchorPosePropertyTag = 40;
+        public const uint k_unJsonPropertyTag = 41;
+        public const uint k_unActiveActionSetPropertyTag = 42;
+        public const uint k_unOpenVRInternalReserved_Start = 1000;
+        public const uint k_unOpenVRInternalReserved_End = 10000;
+        public const uint k_unMaxPropertyStringSize = 32768;
+        public const ulong k_ulInvalidActionHandle = 0;
+        public const ulong k_ulInvalidActionSetHandle = 0;
+        public const ulong k_ulInvalidInputValueHandle = 0;
+        public const uint k_unControllerStateAxisCount = 5;
+        public const ulong k_ulOverlayHandleInvalid = 0;
+        public const uint k_unMaxDistortionFunctionParameters = 8;
+        public const uint k_unScreenshotHandleInvalid = 0;
+        public const string IVRSystem_Version = "IVRSystem_021";
+        public const string IVRExtendedDisplay_Version = "IVRExtendedDisplay_001";
+        public const string IVRTrackedCamera_Version = "IVRTrackedCamera_006";
+        public const uint k_unMaxApplicationKeyLength = 128;
+        public const string k_pch_MimeType_HomeApp = "vr/home";
+        public const string k_pch_MimeType_GameTheater = "vr/game_theater";
+        public const string IVRApplications_Version = "IVRApplications_007";
+        public const string IVRChaperone_Version = "IVRChaperone_003";
+        public const string IVRChaperoneSetup_Version = "IVRChaperoneSetup_006";
+        public const string IVRCompositor_Version = "IVRCompositor_024";
+        public const uint k_unVROverlayMaxKeyLength = 128;
+        public const uint k_unVROverlayMaxNameLength = 128;
+        public const uint k_unMaxOverlayCount = 128;
+        public const uint k_unMaxOverlayIntersectionMaskPrimitivesCount = 32;
+        public const string IVROverlay_Version = "IVROverlay_022";
+        public const string k_pch_Controller_Component_GDC2015 = "gdc2015";
+        public const string k_pch_Controller_Component_Base = "base";
+        public const string k_pch_Controller_Component_Tip = "tip";
+        public const string k_pch_Controller_Component_HandGrip = "handgrip";
+        public const string k_pch_Controller_Component_Status = "status";
+        public const string IVRRenderModels_Version = "IVRRenderModels_006";
+        public const uint k_unNotificationTextMaxSize = 256;
+        public const string IVRNotifications_Version = "IVRNotifications_002";
+        public const uint k_unMaxSettingsKeyLength = 128;
+        public const string IVRSettings_Version = "IVRSettings_003";
+        public const string k_pch_SteamVR_Section = "steamvr";
+        public const string k_pch_SteamVR_RequireHmd_String = "requireHmd";
+        public const string k_pch_SteamVR_ForcedDriverKey_String = "forcedDriver";
+        public const string k_pch_SteamVR_ForcedHmdKey_String = "forcedHmd";
+        public const string k_pch_SteamVR_DisplayDebug_Bool = "displayDebug";
+        public const string k_pch_SteamVR_DebugProcessPipe_String = "debugProcessPipe";
+        public const string k_pch_SteamVR_DisplayDebugX_Int32 = "displayDebugX";
+        public const string k_pch_SteamVR_DisplayDebugY_Int32 = "displayDebugY";
+        public const string k_pch_SteamVR_SendSystemButtonToAllApps_Bool = "sendSystemButtonToAllApps";
+        public const string k_pch_SteamVR_LogLevel_Int32 = "loglevel";
+        public const string k_pch_SteamVR_IPD_Float = "ipd";
+        public const string k_pch_SteamVR_Background_String = "background";
+        public const string k_pch_SteamVR_BackgroundUseDomeProjection_Bool = "backgroundUseDomeProjection";
+        public const string k_pch_SteamVR_BackgroundCameraHeight_Float = "backgroundCameraHeight";
+        public const string k_pch_SteamVR_BackgroundDomeRadius_Float = "backgroundDomeRadius";
+        public const string k_pch_SteamVR_GridColor_String = "gridColor";
+        public const string k_pch_SteamVR_PlayAreaColor_String = "playAreaColor";
+        public const string k_pch_SteamVR_TrackingLossColor_String = "trackingLossColor";
+        public const string k_pch_SteamVR_ShowStage_Bool = "showStage";
+        public const string k_pch_SteamVR_ActivateMultipleDrivers_Bool = "activateMultipleDrivers";
+        public const string k_pch_SteamVR_UsingSpeakers_Bool = "usingSpeakers";
+        public const string k_pch_SteamVR_SpeakersForwardYawOffsetDegrees_Float = "speakersForwardYawOffsetDegrees";
+        public const string k_pch_SteamVR_BaseStationPowerManagement_Int32 = "basestationPowerManagement";
+        public const string k_pch_SteamVR_ShowBaseStationPowerManagementTip_Int32 = "ShowBaseStationPowerManagementTip";
+        public const string k_pch_SteamVR_NeverKillProcesses_Bool = "neverKillProcesses";
+        public const string k_pch_SteamVR_SupersampleScale_Float = "supersampleScale";
+        public const string k_pch_SteamVR_MaxRecommendedResolution_Int32 = "maxRecommendedResolution";
+        public const string k_pch_SteamVR_MotionSmoothing_Bool = "motionSmoothing";
+        public const string k_pch_SteamVR_MotionSmoothingOverride_Int32 = "motionSmoothingOverride";
+        public const string k_pch_SteamVR_DisableAsyncReprojection_Bool = "disableAsync";
+        public const string k_pch_SteamVR_ForceFadeOnBadTracking_Bool = "forceFadeOnBadTracking";
+        public const string k_pch_SteamVR_DefaultMirrorView_Int32 = "mirrorView";
+        public const string k_pch_SteamVR_ShowLegacyMirrorView_Bool = "showLegacyMirrorView";
+        public const string k_pch_SteamVR_MirrorViewVisibility_Bool = "showMirrorView";
+        public const string k_pch_SteamVR_MirrorViewDisplayMode_Int32 = "mirrorViewDisplayMode";
+        public const string k_pch_SteamVR_MirrorViewEye_Int32 = "mirrorViewEye";
+        public const string k_pch_SteamVR_MirrorViewGeometry_String = "mirrorViewGeometry";
+        public const string k_pch_SteamVR_MirrorViewGeometryMaximized_String = "mirrorViewGeometryMaximized";
+        public const string k_pch_SteamVR_PerfGraphVisibility_Bool = "showPerfGraph";
+        public const string k_pch_SteamVR_StartMonitorFromAppLaunch = "startMonitorFromAppLaunch";
+        public const string k_pch_SteamVR_StartCompositorFromAppLaunch_Bool = "startCompositorFromAppLaunch";
+        public const string k_pch_SteamVR_StartDashboardFromAppLaunch_Bool = "startDashboardFromAppLaunch";
+        public const string k_pch_SteamVR_StartOverlayAppsFromDashboard_Bool = "startOverlayAppsFromDashboard";
+        public const string k_pch_SteamVR_EnableHomeApp = "enableHomeApp";
+        public const string k_pch_SteamVR_CycleBackgroundImageTimeSec_Int32 = "CycleBackgroundImageTimeSec";
+        public const string k_pch_SteamVR_RetailDemo_Bool = "retailDemo";
+        public const string k_pch_SteamVR_IpdOffset_Float = "ipdOffset";
+        public const string k_pch_SteamVR_AllowSupersampleFiltering_Bool = "allowSupersampleFiltering";
+        public const string k_pch_SteamVR_SupersampleManualOverride_Bool = "supersampleManualOverride";
+        public const string k_pch_SteamVR_EnableLinuxVulkanAsync_Bool = "enableLinuxVulkanAsync";
+        public const string k_pch_SteamVR_AllowDisplayLockedMode_Bool = "allowDisplayLockedMode";
+        public const string k_pch_SteamVR_HaveStartedTutorialForNativeChaperoneDriver_Bool = "haveStartedTutorialForNativeChaperoneDriver";
+        public const string k_pch_SteamVR_ForceWindows32bitVRMonitor = "forceWindows32BitVRMonitor";
+        public const string k_pch_SteamVR_DebugInputBinding = "debugInputBinding";
+        public const string k_pch_SteamVR_DoNotFadeToGrid = "doNotFadeToGrid";
+        public const string k_pch_SteamVR_RenderCameraMode = "renderCameraMode";
+        public const string k_pch_SteamVR_EnableSharedResourceJournaling = "enableSharedResourceJournaling";
+        public const string k_pch_SteamVR_EnableSafeMode = "enableSafeMode";
+        public const string k_pch_SteamVR_PreferredRefreshRate = "preferredRefreshRate";
+        public const string k_pch_SteamVR_LastVersionNotice = "lastVersionNotice";
+        public const string k_pch_SteamVR_LastVersionNoticeDate = "lastVersionNoticeDate";
+        public const string k_pch_SteamVR_HmdDisplayColorGainR_Float = "hmdDisplayColorGainR";
+        public const string k_pch_SteamVR_HmdDisplayColorGainG_Float = "hmdDisplayColorGainG";
+        public const string k_pch_SteamVR_HmdDisplayColorGainB_Float = "hmdDisplayColorGainB";
+        public const string k_pch_SteamVR_CustomIconStyle_String = "customIconStyle";
+        public const string k_pch_SteamVR_CustomOffIconStyle_String = "customOffIconStyle";
+        public const string k_pch_SteamVR_CustomIconForceUpdate_String = "customIconForceUpdate";
+        public const string k_pch_DirectMode_Section = "direct_mode";
+        public const string k_pch_DirectMode_Enable_Bool = "enable";
+        public const string k_pch_DirectMode_Count_Int32 = "count";
+        public const string k_pch_DirectMode_EdidVid_Int32 = "edidVid";
+        public const string k_pch_DirectMode_EdidPid_Int32 = "edidPid";
+        public const string k_pch_Lighthouse_Section = "driver_lighthouse";
+        public const string k_pch_Lighthouse_DisableIMU_Bool = "disableimu";
+        public const string k_pch_Lighthouse_DisableIMUExceptHMD_Bool = "disableimuexcepthmd";
+        public const string k_pch_Lighthouse_UseDisambiguation_String = "usedisambiguation";
+        public const string k_pch_Lighthouse_DisambiguationDebug_Int32 = "disambiguationdebug";
+        public const string k_pch_Lighthouse_PrimaryBasestation_Int32 = "primarybasestation";
+        public const string k_pch_Lighthouse_DBHistory_Bool = "dbhistory";
+        public const string k_pch_Lighthouse_EnableBluetooth_Bool = "enableBluetooth";
+        public const string k_pch_Lighthouse_PowerManagedBaseStations_String = "PowerManagedBaseStations";
+        public const string k_pch_Lighthouse_PowerManagedBaseStations2_String = "PowerManagedBaseStations2";
+        public const string k_pch_Lighthouse_InactivityTimeoutForBaseStations_Int32 = "InactivityTimeoutForBaseStations";
+        public const string k_pch_Lighthouse_EnableImuFallback_Bool = "enableImuFallback";
+        public const string k_pch_Null_Section = "driver_null";
+        public const string k_pch_Null_SerialNumber_String = "serialNumber";
+        public const string k_pch_Null_ModelNumber_String = "modelNumber";
+        public const string k_pch_Null_WindowX_Int32 = "windowX";
+        public const string k_pch_Null_WindowY_Int32 = "windowY";
+        public const string k_pch_Null_WindowWidth_Int32 = "windowWidth";
+        public const string k_pch_Null_WindowHeight_Int32 = "windowHeight";
+        public const string k_pch_Null_RenderWidth_Int32 = "renderWidth";
+        public const string k_pch_Null_RenderHeight_Int32 = "renderHeight";
+        public const string k_pch_Null_SecondsFromVsyncToPhotons_Float = "secondsFromVsyncToPhotons";
+        public const string k_pch_Null_DisplayFrequency_Float = "displayFrequency";
+        public const string k_pch_UserInterface_Section = "userinterface";
+        public const string k_pch_UserInterface_StatusAlwaysOnTop_Bool = "StatusAlwaysOnTop";
+        public const string k_pch_UserInterface_MinimizeToTray_Bool = "MinimizeToTray";
+        public const string k_pch_UserInterface_HidePopupsWhenStatusMinimized_Bool = "HidePopupsWhenStatusMinimized";
+        public const string k_pch_UserInterface_Screenshots_Bool = "screenshots";
+        public const string k_pch_UserInterface_ScreenshotType_Int = "screenshotType";
+        public const string k_pch_Notifications_Section = "notifications";
+        public const string k_pch_Notifications_DoNotDisturb_Bool = "DoNotDisturb";
+        public const string k_pch_Keyboard_Section = "keyboard";
+        public const string k_pch_Keyboard_TutorialCompletions = "TutorialCompletions";
+        public const string k_pch_Keyboard_ScaleX = "ScaleX";
+        public const string k_pch_Keyboard_ScaleY = "ScaleY";
+        public const string k_pch_Keyboard_OffsetLeftX = "OffsetLeftX";
+        public const string k_pch_Keyboard_OffsetRightX = "OffsetRightX";
+        public const string k_pch_Keyboard_OffsetY = "OffsetY";
+        public const string k_pch_Keyboard_Smoothing = "Smoothing";
+        public const string k_pch_Perf_Section = "perfcheck";
+        public const string k_pch_Perf_PerfGraphInHMD_Bool = "perfGraphInHMD";
+        public const string k_pch_Perf_AllowTimingStore_Bool = "allowTimingStore";
+        public const string k_pch_Perf_SaveTimingsOnExit_Bool = "saveTimingsOnExit";
+        public const string k_pch_Perf_TestData_Float = "perfTestData";
+        public const string k_pch_Perf_GPUProfiling_Bool = "GPUProfiling";
+        public const string k_pch_CollisionBounds_Section = "collisionBounds";
+        public const string k_pch_CollisionBounds_Style_Int32 = "CollisionBoundsStyle";
+        public const string k_pch_CollisionBounds_GroundPerimeterOn_Bool = "CollisionBoundsGroundPerimeterOn";
+        public const string k_pch_CollisionBounds_CenterMarkerOn_Bool = "CollisionBoundsCenterMarkerOn";
+        public const string k_pch_CollisionBounds_PlaySpaceOn_Bool = "CollisionBoundsPlaySpaceOn";
+        public const string k_pch_CollisionBounds_FadeDistance_Float = "CollisionBoundsFadeDistance";
+        public const string k_pch_CollisionBounds_ColorGammaR_Int32 = "CollisionBoundsColorGammaR";
+        public const string k_pch_CollisionBounds_ColorGammaG_Int32 = "CollisionBoundsColorGammaG";
+        public const string k_pch_CollisionBounds_ColorGammaB_Int32 = "CollisionBoundsColorGammaB";
+        public const string k_pch_CollisionBounds_ColorGammaA_Int32 = "CollisionBoundsColorGammaA";
+        public const string k_pch_CollisionBounds_EnableDriverImport = "enableDriverBoundsImport";
+        public const string k_pch_Camera_Section = "camera";
+        public const string k_pch_Camera_EnableCamera_Bool = "enableCamera";
+        public const string k_pch_Camera_EnableCameraInDashboard_Bool = "enableCameraInDashboard";
+        public const string k_pch_Camera_EnableCameraForCollisionBounds_Bool = "enableCameraForCollisionBounds";
+        public const string k_pch_Camera_EnableCameraForRoomView_Bool = "enableCameraForRoomView";
+        public const string k_pch_Camera_BoundsColorGammaR_Int32 = "cameraBoundsColorGammaR";
+        public const string k_pch_Camera_BoundsColorGammaG_Int32 = "cameraBoundsColorGammaG";
+        public const string k_pch_Camera_BoundsColorGammaB_Int32 = "cameraBoundsColorGammaB";
+        public const string k_pch_Camera_BoundsColorGammaA_Int32 = "cameraBoundsColorGammaA";
+        public const string k_pch_Camera_BoundsStrength_Int32 = "cameraBoundsStrength";
+        public const string k_pch_Camera_RoomViewMode_Int32 = "cameraRoomViewMode";
+        public const string k_pch_audio_Section = "audio";
+        public const string k_pch_audio_SetOsDefaultPlaybackDevice_Bool = "setOsDefaultPlaybackDevice";
+        public const string k_pch_audio_EnablePlaybackDeviceOverride_Bool = "enablePlaybackDeviceOverride";
+        public const string k_pch_audio_PlaybackDeviceOverride_String = "playbackDeviceOverride";
+        public const string k_pch_audio_PlaybackDeviceOverrideName_String = "playbackDeviceOverrideName";
+        public const string k_pch_audio_SetOsDefaultRecordingDevice_Bool = "setOsDefaultRecordingDevice";
+        public const string k_pch_audio_EnableRecordingDeviceOverride_Bool = "enableRecordingDeviceOverride";
+        public const string k_pch_audio_RecordingDeviceOverride_String = "recordingDeviceOverride";
+        public const string k_pch_audio_RecordingDeviceOverrideName_String = "recordingDeviceOverrideName";
+        public const string k_pch_audio_EnablePlaybackMirror_Bool = "enablePlaybackMirror";
+        public const string k_pch_audio_PlaybackMirrorDevice_String = "playbackMirrorDevice";
+        public const string k_pch_audio_PlaybackMirrorDeviceName_String = "playbackMirrorDeviceName";
+        public const string k_pch_audio_OldPlaybackMirrorDevice_String = "onPlaybackMirrorDevice";
+        public const string k_pch_audio_LastHmdPlaybackDeviceId_String = "lastHmdPlaybackDeviceId";
+        public const string k_pch_audio_VIVEHDMIGain = "viveHDMIGain";
+        public const string k_pch_Power_Section = "power";
+        public const string k_pch_Power_PowerOffOnExit_Bool = "powerOffOnExit";
+        public const string k_pch_Power_TurnOffScreensTimeout_Float = "turnOffScreensTimeout";
+        public const string k_pch_Power_TurnOffControllersTimeout_Float = "turnOffControllersTimeout";
+        public const string k_pch_Power_ReturnToWatchdogTimeout_Float = "returnToWatchdogTimeout";
+        public const string k_pch_Power_AutoLaunchSteamVROnButtonPress = "autoLaunchSteamVROnButtonPress";
+        public const string k_pch_Power_PauseCompositorOnStandby_Bool = "pauseCompositorOnStandby";
+        public const string k_pch_Dashboard_Section = "dashboard";
+        public const string k_pch_Dashboard_EnableDashboard_Bool = "enableDashboard";
+        public const string k_pch_Dashboard_ArcadeMode_Bool = "arcadeMode";
+        public const string k_pch_Dashboard_UseWebKeyboard = "useWebKeyboard";
+        public const string k_pch_Dashboard_UseWebSettings = "useWebSettings";
+        public const string k_pch_Dashboard_Position = "position";
+        public const string k_pch_Dashboard_DesktopScale = "desktopScale";
+        public const string k_pch_Dashboard_DashboardScale = "dashboardScale";
+        public const string k_pch_modelskin_Section = "modelskins";
+        public const string k_pch_Driver_Enable_Bool = "enable";
+        public const string k_pch_Driver_LoadPriority_Int32 = "loadPriority";
+        public const string k_pch_WebInterface_Section = "WebInterface";
+        public const string k_pch_VRWebHelper_Section = "VRWebHelper";
+        public const string k_pch_VRWebHelper_DebuggerEnabled_Bool = "DebuggerEnabled";
+        public const string k_pch_VRWebHelper_DebuggerPort_Int32 = "DebuggerPort";
+        public const string k_pch_TrackingOverride_Section = "TrackingOverrides";
+        public const string k_pch_App_BindingAutosaveURLSuffix_String = "AutosaveURL";
+        public const string k_pch_App_BindingCurrentURLSuffix_String = "CurrentURL";
+        public const string k_pch_App_BindingPreviousURLSuffix_String = "PreviousURL";
+        public const string k_pch_App_NeedToUpdateAutosaveSuffix_Bool = "NeedToUpdateAutosave";
+        public const string k_pch_Trackers_Section = "trackers";
+        public const string k_pch_DesktopUI_Section = "DesktopUI";
+        public const string k_pch_LastKnown_Section = "LastKnown";
+        public const string k_pch_LastKnown_HMDManufacturer_String = "HMDManufacturer";
+        public const string k_pch_LastKnown_HMDModel_String = "HMDModel";
+        public const string k_pch_DismissedWarnings_Section = "DismissedWarnings";
+        public const string k_pch_Input_Section = "input";
+        public const string k_pch_Input_LeftThumbstickRotation_Float = "leftThumbstickRotation";
+        public const string k_pch_Input_RightThumbstickRotation_Float = "rightThumbstickRotation";
+        public const string k_pch_Input_ThumbstickDeadzone_Float = "thumbstickDeadzone";
+        public const string k_pch_GpuSpeed_Section = "GpuSpeed";
+        public const string IVRScreenshots_Version = "IVRScreenshots_001";
+        public const string IVRResources_Version = "IVRResources_001";
+        public const string IVRDriverManager_Version = "IVRDriverManager_001";
+        public const uint k_unMaxActionNameLength = 64;
+        public const uint k_unMaxActionSetNameLength = 64;
+        public const uint k_unMaxActionOriginCount = 16;
+        public const uint k_unMaxBoneNameLength = 32;
+        public const string IVRInput_Version = "IVRInput_007";
+        public const ulong k_ulInvalidIOBufferHandle = 0;
+        public const string IVRIOBuffer_Version = "IVRIOBuffer_002";
+        public const uint k_ulInvalidSpatialAnchorHandle = 0;
+        public const string IVRSpatialAnchors_Version = "IVRSpatialAnchors_001";
+        public const string IVRDebug_Version = "IVRDebug_001";
 
         static uint VRToken { get; set; }
 
@@ -5892,9 +7062,9 @@ namespace Valve.VR
 
         class COpenVRContext
         {
-            internal COpenVRContext() { Clear(); }
+            public COpenVRContext() { Clear(); }
 
-            internal void Clear()
+            public void Clear()
             {
                 m_pVRSystem = null;
                 m_pVRChaperone = null;
@@ -5908,7 +7078,10 @@ namespace Valve.VR
                 m_pVRScreenshots = null;
                 m_pVRTrackedCamera = null;
                 m_pVRInput = null;
+                m_pVRIOBuffer = null;
                 m_pVRSpatialAnchors = null;
+                m_pVRNotifications = null;
+                m_pVRDebug = null;
             }
 
             void CheckClear()
@@ -5920,7 +7093,7 @@ namespace Valve.VR
                 }
             }
 
-            internal CVRSystem VRSystem()
+            public CVRSystem VRSystem()
             {
                 CheckClear();
                 if (m_pVRSystem == null)
@@ -5933,7 +7106,7 @@ namespace Valve.VR
                 return m_pVRSystem;
             }
 
-            internal CVRChaperone VRChaperone()
+            public CVRChaperone VRChaperone()
             {
                 CheckClear();
                 if (m_pVRChaperone == null)
@@ -5946,7 +7119,7 @@ namespace Valve.VR
                 return m_pVRChaperone;
             }
 
-            internal CVRChaperoneSetup VRChaperoneSetup()
+            public CVRChaperoneSetup VRChaperoneSetup()
             {
                 CheckClear();
                 if (m_pVRChaperoneSetup == null)
@@ -5959,7 +7132,7 @@ namespace Valve.VR
                 return m_pVRChaperoneSetup;
             }
 
-            internal CVRCompositor VRCompositor()
+            public CVRCompositor VRCompositor()
             {
                 CheckClear();
                 if (m_pVRCompositor == null)
@@ -5972,7 +7145,7 @@ namespace Valve.VR
                 return m_pVRCompositor;
             }
 
-            internal CVROverlay VROverlay()
+            public CVROverlay VROverlay()
             {
                 CheckClear();
                 if (m_pVROverlay == null)
@@ -5985,7 +7158,7 @@ namespace Valve.VR
                 return m_pVROverlay;
             }
 
-            internal CVRRenderModels VRRenderModels()
+            public CVRRenderModels VRRenderModels()
             {
                 CheckClear();
                 if (m_pVRRenderModels == null)
@@ -5998,7 +7171,7 @@ namespace Valve.VR
                 return m_pVRRenderModels;
             }
 
-            internal CVRExtendedDisplay VRExtendedDisplay()
+            public CVRExtendedDisplay VRExtendedDisplay()
             {
                 CheckClear();
                 if (m_pVRExtendedDisplay == null)
@@ -6011,7 +7184,7 @@ namespace Valve.VR
                 return m_pVRExtendedDisplay;
             }
 
-            internal CVRSettings VRSettings()
+            public CVRSettings VRSettings()
             {
                 CheckClear();
                 if (m_pVRSettings == null)
@@ -6024,7 +7197,7 @@ namespace Valve.VR
                 return m_pVRSettings;
             }
 
-            internal CVRApplications VRApplications()
+            public CVRApplications VRApplications()
             {
                 CheckClear();
                 if (m_pVRApplications == null)
@@ -6037,7 +7210,7 @@ namespace Valve.VR
                 return m_pVRApplications;
             }
 
-            internal CVRScreenshots VRScreenshots()
+            public CVRScreenshots VRScreenshots()
             {
                 CheckClear();
                 if (m_pVRScreenshots == null)
@@ -6050,7 +7223,7 @@ namespace Valve.VR
                 return m_pVRScreenshots;
             }
 
-            internal CVRTrackedCamera VRTrackedCamera()
+            public CVRTrackedCamera VRTrackedCamera()
             {
                 CheckClear();
                 if (m_pVRTrackedCamera == null)
@@ -6063,7 +7236,7 @@ namespace Valve.VR
                 return m_pVRTrackedCamera;
             }
 
-            internal CVRInput VRInput()
+            public CVRInput VRInput()
             {
                 CheckClear();
                 if (m_pVRInput == null)
@@ -6076,7 +7249,20 @@ namespace Valve.VR
                 return m_pVRInput;
             }
 
-            internal CVRSpatialAnchors VRSpatialAnchors()
+            public CVRIOBuffer VRIOBuffer()
+            {
+                CheckClear();
+                if (m_pVRIOBuffer == null)
+                {
+                    var eError = EVRInitError.None;
+                    var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix + IVRIOBuffer_Version, ref eError);
+                    if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
+                        m_pVRIOBuffer = new CVRIOBuffer(pInterface);
+                }
+                return m_pVRIOBuffer;
+            }
+
+            public CVRSpatialAnchors VRSpatialAnchors()
             {
                 CheckClear();
                 if (m_pVRSpatialAnchors == null)
@@ -6087,6 +7273,32 @@ namespace Valve.VR
                         m_pVRSpatialAnchors = new CVRSpatialAnchors(pInterface);
                 }
                 return m_pVRSpatialAnchors;
+            }
+
+            public CVRDebug VRDebug()
+            {
+                CheckClear();
+                if (m_pVRDebug == null)
+                {
+                    var eError = EVRInitError.None;
+                    var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix + IVRDebug_Version, ref eError);
+                    if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
+                        m_pVRDebug = new CVRDebug(pInterface);
+                }
+                return m_pVRDebug;
+            }
+
+            public CVRNotifications VRNotifications()
+            {
+                CheckClear();
+                if (m_pVRNotifications == null)
+                {
+                    var eError = EVRInitError.None;
+                    var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix + IVRNotifications_Version, ref eError);
+                    if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
+                        m_pVRNotifications = new CVRNotifications(pInterface);
+                }
+                return m_pVRNotifications;
             }
 
             private CVRSystem m_pVRSystem;
@@ -6101,7 +7313,10 @@ namespace Valve.VR
             private CVRScreenshots m_pVRScreenshots;
             private CVRTrackedCamera m_pVRTrackedCamera;
             private CVRInput m_pVRInput;
+            private CVRIOBuffer m_pVRIOBuffer;
             private CVRSpatialAnchors m_pVRSpatialAnchors;
+            private CVRNotifications m_pVRNotifications;
+            private CVRDebug m_pVRDebug;
         };
 
         private static COpenVRContext _OpenVRInternal_ModuleContext = null;
@@ -6115,22 +7330,26 @@ namespace Valve.VR
             }
         }
 
-        internal static CVRSystem System { get { return OpenVRInternal_ModuleContext.VRSystem(); } }
-        internal static CVRChaperone Chaperone { get { return OpenVRInternal_ModuleContext.VRChaperone(); } }
-        internal static CVRChaperoneSetup ChaperoneSetup { get { return OpenVRInternal_ModuleContext.VRChaperoneSetup(); } }
-        internal static CVRCompositor Compositor { get { return OpenVRInternal_ModuleContext.VRCompositor(); } }
-        internal static CVROverlay Overlay { get { return OpenVRInternal_ModuleContext.VROverlay(); } }
-        internal static CVRRenderModels RenderModels { get { return OpenVRInternal_ModuleContext.VRRenderModels(); } }
-        internal static CVRExtendedDisplay ExtendedDisplay { get { return OpenVRInternal_ModuleContext.VRExtendedDisplay(); } }
-        internal static CVRSettings Settings { get { return OpenVRInternal_ModuleContext.VRSettings(); } }
-        internal static CVRApplications Applications { get { return OpenVRInternal_ModuleContext.VRApplications(); } }
-        internal static CVRScreenshots Screenshots { get { return OpenVRInternal_ModuleContext.VRScreenshots(); } }
-        internal static CVRTrackedCamera TrackedCamera { get { return OpenVRInternal_ModuleContext.VRTrackedCamera(); } }
-        internal static CVRInput Input { get { return OpenVRInternal_ModuleContext.VRInput(); } }
-        internal static CVRSpatialAnchors SpatialAnchors { get { return OpenVRInternal_ModuleContext.VRSpatialAnchors(); } }
+        public static CVRSystem System { get { return OpenVRInternal_ModuleContext.VRSystem(); } }
+        public static CVRChaperone Chaperone { get { return OpenVRInternal_ModuleContext.VRChaperone(); } }
+        public static CVRChaperoneSetup ChaperoneSetup { get { return OpenVRInternal_ModuleContext.VRChaperoneSetup(); } }
+        public static CVRCompositor Compositor { get { return OpenVRInternal_ModuleContext.VRCompositor(); } }
+        public static CVROverlay Overlay { get { return OpenVRInternal_ModuleContext.VROverlay(); } }
+        public static CVRRenderModels RenderModels { get { return OpenVRInternal_ModuleContext.VRRenderModels(); } }
+        public static CVRExtendedDisplay ExtendedDisplay { get { return OpenVRInternal_ModuleContext.VRExtendedDisplay(); } }
+        public static CVRSettings Settings { get { return OpenVRInternal_ModuleContext.VRSettings(); } }
+        public static CVRApplications Applications { get { return OpenVRInternal_ModuleContext.VRApplications(); } }
+        public static CVRScreenshots Screenshots { get { return OpenVRInternal_ModuleContext.VRScreenshots(); } }
+        public static CVRTrackedCamera TrackedCamera { get { return OpenVRInternal_ModuleContext.VRTrackedCamera(); } }
+        public static CVRInput Input { get { return OpenVRInternal_ModuleContext.VRInput(); } }
+        public static CVRIOBuffer IOBuffer { get { return OpenVRInternal_ModuleContext.VRIOBuffer(); } }
+        public static CVRSpatialAnchors SpatialAnchors { get { return OpenVRInternal_ModuleContext.VRSpatialAnchors(); } }
+        public static CVRNotifications Notifications { get { return OpenVRInternal_ModuleContext.VRNotifications(); } }
+        public static CVRDebug Debug { get { return OpenVRInternal_ModuleContext.VRDebug(); } }
+
 
         /** Finds the active installation of vrclient.dll and initializes it */
-internal static CVRSystem Init(ref EVRInitError peError, EVRApplicationType eApplicationType = EVRApplicationType.VRApplication_Scene, string pchStartupInfo = "")
+        public static CVRSystem Init(ref EVRInitError peError, EVRApplicationType eApplicationType = EVRApplicationType.VRApplication_Scene, string pchStartupInfo = "")
         {
             try
             {
@@ -6159,7 +7378,7 @@ internal static CVRSystem Init(ref EVRInitError peError, EVRApplicationType eApp
 
         /** unloads vrclient.dll. Any interface pointers from the interface are
         * invalid after this point */
-        internal static void Shutdown()
+        public static void Shutdown()
         {
             ShutdownInternal();
         }
@@ -6169,3 +7388,4 @@ internal static CVRSystem Init(ref EVRInitError peError, EVRApplicationType eApp
 
 
 }
+

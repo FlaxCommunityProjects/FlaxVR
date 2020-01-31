@@ -113,6 +113,7 @@ namespace FlaxVR
                 // And set the position and direction
                 lRenderView.Position = lEyePos;
                 lRenderView.Direction = lDirection;
+                lRenderView.Flags = lRenderView.Flags & ~ViewFlags.MotionBlur;
 
                 // Update right eye
                 var rightView = poses.CreateView(VREye.Right, Actor.Position, Vector3.UnitZ, Vector3.UnitY, out Vector3 rEyePos, out Vector3 rDirection);
@@ -122,6 +123,7 @@ namespace FlaxVR
                 // And set the position and direction
                 rRenderView.Position = rEyePos;
                 rRenderView.Direction = rDirection;
+                rRenderView.Flags = rRenderView.Flags & ~ViewFlags.MotionBlur;
 
                 canvas.IsActive = MirrorEnabled;
 
@@ -296,10 +298,8 @@ namespace FlaxVR
                 lRenderBuffers.Size = _context.LeftEyeGPUTexture.Size;
                 rRenderBuffers.Size = _context.RightEyeGPUTexture.Size;
 
-                lRenderView.Flags = lRenderView.Flags & ~ViewFlags.MotionBlur;
                 lRenderView.Near = ZNear;
                 lRenderView.Far = ZFar;
-                rRenderView.Flags = rRenderView.Flags & ~ViewFlags.MotionBlur;
                 rRenderView.Near = ZNear;
                 rRenderView.Far = ZFar;
                 ctx.DrawScene(renderTask, _context.LeftEyeGPUTexture, lRenderBuffers, ref lRenderView, Utils.GetEmptyArray<Actor>(), ActorsSources.Scenes, null);
