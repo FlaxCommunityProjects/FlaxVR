@@ -269,7 +269,8 @@ namespace FlaxVR
                 throw new Exception("OpenVR is not supported");
 
             _context.Initialize();
-
+            _context.UpdateProjectionMatrices(_zNear, _zFar);
+            
             MainRenderTask.Instance.Enabled = false;
 
 
